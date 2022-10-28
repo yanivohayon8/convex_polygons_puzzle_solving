@@ -1,6 +1,6 @@
 import pandas as pd
 
-class Ofir():
+class bag_of_pieces():
 
     def __init__(self,puzzle_path,rels_path,pieces_path) -> None:
         '''
