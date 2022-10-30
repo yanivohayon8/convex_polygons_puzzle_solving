@@ -1,6 +1,6 @@
 import pandas as pd
 
-class bag_of_pieces():
+class puzzle():
 
     def __init__(self,puzzle_path,rels_path,pieces_path) -> None:
         '''
@@ -19,3 +19,17 @@ class bag_of_pieces():
         self.df_puzzle = pd.read_csv(self.puzzle_path)
         self.df_rels = pd.read_csv(self.rels_path)
         self.df_pieces = pd.read_csv(self.pieces_path)
+
+    def get_bag_of_pieces(self,csv_conv="Ofir"):
+        if csv_conv!="Ofir":
+            raise NotImplementedError("Currently we support only Ofir puzzle style")
+        
+        pieces_ids = self.df_pieces["piece"].unique()
+        pieces = []
+        for _id in pieces_ids:
+            vertices = self.df_pieces[self.df_pieces["piece"] == _id]
+            coordinates = [(_x,_y) for _x,_y in zip(vertices["x"].values.tolist(),vertices["y"].values.tolist())]
+            pieces.append(coordinates)
+
+        return pieces
+

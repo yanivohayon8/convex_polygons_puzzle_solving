@@ -1,10 +1,10 @@
 import unittest
+
 import src.bag_of_pieces as bag_of_pieces
 
+class TestNaiveSolver(unittest.TestCase):
 
-class TestLoader(unittest.TestCase):
-
-    def test_simple(self):
+    def test_unnoised_puzzle(self):
         puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
         loader = bag_of_pieces.puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
                         puzzle_directory + "/ground_truth_rels.csv", 
@@ -15,8 +15,8 @@ class TestLoader(unittest.TestCase):
         print(loader.df_pieces.head())
 
         pieces = loader.get_bag_of_pieces()
-        pass
 
+        
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
