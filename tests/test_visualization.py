@@ -37,7 +37,7 @@ class TestOpencv(unittest.TestCase):
 
         out.release()
 
-    def test_simple_video(self):
+    def test_interactive_video(self):
         img = np.zeros((512,512,3), np.uint8)
         cv2.namedWindow("Test")
         cv2.imshow("Test",img)
