@@ -1,5 +1,8 @@
 import pandas as pd
 
+'''Maybe bag of pieces is not a reperesenting name'''
+
+
 class puzzle():
 
     def __init__(self,puzzle_path,rels_path,pieces_path) -> None:
@@ -29,7 +32,7 @@ class puzzle():
         for _id in pieces_ids:
             vertices = self.df_pieces[self.df_pieces["piece"] == _id]
             coordinates = [(_x,_y) for _x,_y in zip(vertices["x"].values.tolist(),vertices["y"].values.tolist())]
-            pieces.append(coordinates)
+            pieces.append(coordinates)#''' Import Shapely as pieces?'''
 
         return pieces
 
