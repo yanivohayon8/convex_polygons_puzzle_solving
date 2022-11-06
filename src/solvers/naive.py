@@ -32,3 +32,4 @@ class Concater():
         df_locations = pd.read_csv("data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0/ground_truth_puzzle.csv") 
         return Assembly(df_adjacency_relations,df_locations)
         # return an object of "assembly that will be very similar to puzzle (or rather the same)?"
+

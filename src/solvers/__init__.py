@@ -1,4 +1,5 @@
 import pandas as pd
+import cv2
 
 class Assembly():
 
@@ -12,4 +13,7 @@ class Assembly():
         self.df_adjacency = df_adjacency_relations
         self.df_location = df_locations
 
+
+    def visualize(self):
+        pass
     
