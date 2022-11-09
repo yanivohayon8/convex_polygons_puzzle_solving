@@ -31,8 +31,8 @@ class Concater():
 
         # eihhhssss:
         df_locations = pd.read_csv("data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0/ground_truth_puzzle.csv")
-        pts = np.array([[10,5],[20,30],[70,20],[50,10]], np.int32)
-        pts = pts.reshape((-1,1,2))
-        return Assembly(df_adjacency_relations,[pts])
+        # pts = np.array([[10,5],[20,30],[70,20],[50,10]], np.int32)
+        # pts = pts.reshape((-1,1,2))
+        return Assembly(df_adjacency_relations,self.pieces)
         # return an object of "assembly that will be very similar to puzzle (or rather the same)?"
 

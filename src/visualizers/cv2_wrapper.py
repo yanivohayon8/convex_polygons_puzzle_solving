@@ -15,8 +15,9 @@ class Frame():
             polygons_colors: list of 
         '''
         for poly_coords,color in zip(polygons_coordinates,polygons_colors):
-            cv2.polylines(self.img,[poly_coords],True,color)
-            cv2.fillPoly(self.img,[poly_coords],color)
+            pts = np.asarray(poly_coords,np.int32).reshape((-1,1,2))
+            cv2.polylines(self.img,[pts],True,color)
+            cv2.fillPoly(self.img,[pts],color)
 
     def show(self):
         if not self.is_initialized:
