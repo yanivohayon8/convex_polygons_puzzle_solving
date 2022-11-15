@@ -32,7 +32,21 @@ class TestFrame(unittest.TestCase):
         assembly.draw(frame)
         frame.show()
         frame.wait()
-        frame.destroy() 
+        frame.destroy()
+
+    def test_load_assmebly(self):
+        puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+        loader = bag_of_pieces.puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+                        puzzle_directory + "/ground_truth_rels.csv", 
+                        puzzle_directory + "/pieces.csv")
+        loader.load()
+        pieces = loader.get_chaos_pieces()
+        assembly = Assembly(None,pieces)
+        frame = cv2_wrapper.Frame(size=(1080,1920,3)) # 
+        assembly.draw(frame)
+        frame.show()
+        frame.wait()
+        frame.destroy()
 
 
 
