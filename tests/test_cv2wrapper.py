@@ -26,7 +26,14 @@ class TestFrame(unittest.TestCase):
                         puzzle_directory + "/ground_truth_rels.csv", 
                         puzzle_directory + "/pieces.csv")
         loader.load()
-        pieces = loader.get_bag_of_pieces()
+        pieces = loader.pieces_pd2list(loader.df_locations)
+        assembly = Assembly(None,pieces)
+        frame = cv2_wrapper.Frame(size=(1080,1920,3)) # 
+        assembly.draw(frame)
+        frame.show()
+        frame.wait()
+        frame.destroy() 
+
 
 
 if __name__ == "__main__":

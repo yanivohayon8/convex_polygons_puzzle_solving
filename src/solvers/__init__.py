@@ -6,7 +6,7 @@ import numpy as np
 
 class Assembly():
 
-    def __init__(self,df_adjacency_relations,locations):
+    def __init__(self,df_adjacency_relations,locations:list):
         '''
             relations - pandas Dataframe, describes the adjacentsy relations
         '''

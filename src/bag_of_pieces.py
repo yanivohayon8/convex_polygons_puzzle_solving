@@ -33,7 +33,7 @@ class puzzle():
         pieces_ids = df["piece"].unique()
         pieces = []
         for _id in pieces_ids:
-            vertices = self.df_pieces[df["piece"] == _id]
+            vertices = df[df["piece"] == _id]
             coordinates = [(_x,_y) for _x,_y in zip(vertices["x"].values.tolist(),vertices["y"].values.tolist())]
             pieces.append(coordinates)#''' Import Shapely as pieces?'''
 
