@@ -2,6 +2,9 @@ import unittest
 from src.visualizers import cv2_wrapper 
 import cv2
 import numpy as np
+from src.solvers import Assembly
+from src import bag_of_pieces 
+
 
 class TestFrame(unittest.TestCase):
 
@@ -17,12 +20,13 @@ class TestFrame(unittest.TestCase):
         frame.wait()
         frame.destroy()
 
-    def test_showimg(self):
-        frame = cv2_wrapper.Frame(size=(2880,1620,3))
-
-        img_path = "..\data\ofir\Pseudo-Sappho_MAN_Napoli_Inv9084\Puzzle1\0\0.png"
-        img = cv2.imread(img_path,cv2.COLOR_BGR2RGB)
-
+    def test_final_assembly(self):
+        puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+        loader = bag_of_pieces.puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+                        puzzle_directory + "/ground_truth_rels.csv", 
+                        puzzle_directory + "/pieces.csv")
+        loader.load()
+        pieces = loader.get_bag_of_pieces()
 
 
 if __name__ == "__main__":

@@ -6,17 +6,17 @@ from src.visualizers.cv2_wrapper import Frame
 
 class TestNaiveSolver(unittest.TestCase):
 
-    def test_unnoised_puzzle(self):
+    def test_donothing(self):
         puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
         loader = bag_of_pieces.puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
                         puzzle_directory + "/ground_truth_rels.csv", 
                         puzzle_directory + "/pieces.csv")
         loader.load()
-        print(loader.df_puzzle.head())
-        print(loader.df_rels.head())
-        print(loader.df_pieces.head())
+        # print(loader.df_locations.head())
+        # print(loader.df_rels.head())
+        # print(loader.df_pieces.head())
 
-        pieces = loader.get_bag_of_pieces()        
+        pieces = loader.get_chaos_pieces()        
         naive = solvers.DoNothing(pieces)
         assembly = naive.run()
 
