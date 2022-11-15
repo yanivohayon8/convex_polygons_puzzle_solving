@@ -16,12 +16,11 @@ class TestNaiveSolver(unittest.TestCase):
         print(loader.df_rels.head())
         print(loader.df_pieces.head())
 
-        pieces = loader.get_bag_of_pieces()
-        
+        pieces = loader.get_bag_of_pieces()        
         naive = solvers.Concater(pieces)
         assembly = naive.run()
 
-        frame = Frame()
+        frame = Frame(size=(2880,1620,3)) # 
         assembly.draw(frame)
         frame.show()
         frame.wait()

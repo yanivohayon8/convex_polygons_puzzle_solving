@@ -30,7 +30,7 @@ class Concater():
         df_adjacency_relations = None
 
         # eihhhssss:
-        df_locations = pd.read_csv("data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0/ground_truth_puzzle.csv")
+        #df_locations = pd.read_csv("data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0/ground_truth_puzzle.csv")
         # pts = np.array([[10,5],[20,30],[70,20],[50,10]], np.int32)
         # pts = pts.reshape((-1,1,2))
         return Assembly(df_adjacency_relations,self.pieces)

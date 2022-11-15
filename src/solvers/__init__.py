@@ -2,6 +2,7 @@ import pandas as pd
 import cv2
 from src.visualizers.cv2_wrapper import Frame
 from src.consts_and_params import RGB_COLORS
+import numpy as np
 
 class Assembly():
 
@@ -24,4 +25,6 @@ class Assembly():
             colors = RGB_COLORS[:n_polys]
         else:
             colors = RGB_COLORS * (int(n_polys/n_total_colors) + n_polys%n_total_colors)
+        #moved_coords = frame.move_to_screen(np.asarray(self.locations))
+        #frame.draw_polygons(moved_coords,colors)
         frame.draw_polygons(self.locations,colors)
