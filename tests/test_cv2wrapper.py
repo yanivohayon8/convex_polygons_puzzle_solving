@@ -5,11 +5,11 @@ import numpy as np
 
 class TestFrame(unittest.TestCase):
 
-    def test_simple_square(self):
+    def test_simple_rect(self):
         frame = cv2_wrapper.Frame(size=(1080,1920,3))
         square_length = 200
         simple_square = np.array([
-            (0,0),(square_length,0),(square_length,square_length),(0,square_length)
+            (0,0),(square_length*2,0),(square_length*2,square_length),(0,square_length)
         ])
 
         frame.draw_polygons([simple_square],[(255,0,0)])

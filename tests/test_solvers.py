@@ -20,7 +20,7 @@ class TestNaiveSolver(unittest.TestCase):
         naive = solvers.Concater(pieces)
         assembly = naive.run()
 
-        frame = Frame(size=(2880,1620,3)) # 
+        frame = Frame(size=(1080,1920,3)) # 
         assembly.draw(frame)
         frame.show()
         frame.wait()
