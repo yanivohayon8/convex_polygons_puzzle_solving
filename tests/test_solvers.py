@@ -17,7 +17,7 @@ class TestNaiveSolver(unittest.TestCase):
         print(loader.df_pieces.head())
 
         pieces = loader.get_bag_of_pieces()        
-        naive = solvers.Concater(pieces)
+        naive = solvers.DoNothing(pieces)
         assembly = naive.run()
 
         frame = Frame(size=(1080,1920,3)) # 
