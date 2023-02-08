@@ -1,6 +1,21 @@
 import pandas as pd
-from src.solvers import Assembly
+from src.solvers import Assembly,Solver
+from src.feature_extraction.geometric import GeometricFeatureExtractor
 import numpy as np
+
+class GeometricSolver(Solver):
+
+    def __init__(self, bag_of_pieces: list):
+        super().__init__(bag_of_pieces)
+
+    def extract_features(self):
+        #return super().extract_features()
+        geomteric_extractor = GeometricFeatureExtractor()
+
+        for piece in self.bag_of_pieces:
+            coords = list(piece.polygon.exterior.coords)
+            piece.features["edges_lengths"] = geomteric_extractor.get_edges_lengths(coords) 
+        
 
 class DoNothing():
     
