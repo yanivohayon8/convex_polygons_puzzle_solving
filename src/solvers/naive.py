@@ -18,7 +18,7 @@ class GeometricSolver(Solver):
             coords = list(piece.polygon.exterior.coords)
             edges_lengths.append(geomteric_extractor.get_edges_lengths(coords))
         
-        self.features["edges_lengths"] = np.array(edges_lengths)
+        self.features["edges_lengths"] = edges_lengths #np.array(edges_lengths)
     
     def pairwise(self):
         geometric_pairwiser = GeometricPairwiseMatcher()
