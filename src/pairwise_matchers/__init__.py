@@ -1,4 +1,4 @@
-# class PairwiseMatcher():
+class PairwiseMatcher():
 
-#     def __init__(self) -> None:
-#         pass
+    def __init__(self) -> None:
+        self.match_pieces_score = {}
