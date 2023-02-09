@@ -36,7 +36,6 @@ class Puzzle():
         for _id in pieces_ids:
             vertices = df[df["piece"] == _id]
             coordinates = [(_x,_y) for _x,_y in zip(vertices["x"].values.tolist(),vertices["y"].values.tolist())]
-
             pieces.append(Piece(coordinates))
 
         return pieces

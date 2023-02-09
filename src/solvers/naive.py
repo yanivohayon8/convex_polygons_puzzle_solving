@@ -1,20 +1,28 @@
 import pandas as pd
 from src.solvers import Assembly,Solver
 from src.feature_extraction.geometric import GeometricFeatureExtractor
+from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 
 class GeometricSolver(Solver):
 
-    def __init__(self, bag_of_pieces: list):
-        super().__init__(bag_of_pieces)
+    def __init__(self, pieces: list):
+        super().__init__(pieces)
 
     def extract_features(self):
-        #return super().extract_features()
+        super().extract_features()
         geomteric_extractor = GeometricFeatureExtractor()
+        edges_lengths = []
 
-        for piece in self.bag_of_pieces:
+        for i,piece in self.bag_of_pieces:
             coords = list(piece.polygon.exterior.coords)
-            piece.features["edges_lengths"] = geomteric_extractor.get_edges_lengths(coords) 
+            edges_lengths.append(geomteric_extractor.get_edges_lengths(coords))
+        
+        self.features["edges_lengths"] = np.array(edges_lengths)
+    
+    def pairwise(self):
+        geometric_pairwiser = GeometricPairwiseMatcher()
+        geometric_pairwiser.pairwise_edges_lengths(self.features["edges_lengths"])
         
 
 class DoNothing():

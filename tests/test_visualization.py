@@ -1,6 +1,8 @@
 import unittest
 import numpy as np
 import cv2 
+import matplotlib.pyplot as plt
+
 
 class TestOpencv(unittest.TestCase):
 
@@ -61,6 +63,35 @@ class TestOpencv(unittest.TestCase):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+    def test_plot_img(self):
+        #img = cv2.imread("data\\ofir\\Pseudo-Sappho_MAN_Napoli_Inv9084\\Puzzle1\\0\\ground_truth.jpg")
+        img = cv2.imread("data\\ofir\\Pseudo-Sappho_MAN_Napoli_Inv9084\\Puzzle1\\0\\0.png")
+        
+        w,h,c = img.shape
+
+        # Set screen resolution
+        resolution = (1920, 1080)
+
+        # # Create window
+        cv2.namedWindow("Output")
+        cv2.resizeWindow("Output", resolution[0], resolution[1])
+
+        # new_w = w#int(w*1.5)
+        # new_h = h#int(h*1.5)
+
+        # img = cv2.resize(img, (new_w, new_h))
+        # img = cv2.copyMakeBorder( img,
+        #  int((1080-new_h)/2), int((1080-new_h)/2),
+        #   int((1920-new_w)/2), int((1920-new_h)/2), 0)
+
+        cv2.imshow("Output",img)
+
+        if cv2.waitKey(0) == ord('q'):
+            cv2.destroyAllWindows()
+        
+        #plt.imshow(img)
+        #plt.close()
+        
 
 if __name__ == "__main__":
     unittest.main()

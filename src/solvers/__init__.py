@@ -1,8 +1,20 @@
 import pandas as pd
 import cv2
-from src.visualizers.cv2_wrapper import Frame
-from src.consts_and_params import RGB_COLORS
+from src import RGB_COLORS
 import numpy as np
+
+class Solver():
+
+    def __init__(self,pieces:list):
+        self.bag_of_pieces = enumerate(pieces)
+        self.features = {}
+        self.pairwise_matching = []
+
+    def extract_features(self):
+        pass
+
+    def pairwise(self):
+        assert "Implement me"
 
 class Assembly():
 
@@ -17,7 +29,7 @@ class Assembly():
         self.locations = locations
 
 
-    def draw(self,frame:Frame):
+    def draw(self,frame):
         colors = []
         n_total_colors = len(RGB_COLORS)
         n_polys = len(self.locations)

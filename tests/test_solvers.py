@@ -34,6 +34,7 @@ class TestNaiveSolver(unittest.TestCase):
         bag_of_pieces = loader.get_final_puzzle()
         solver = solvers.GeometricSolver(bag_of_pieces)
         solver.extract_features()
+        solver.pairwise_matching()
         
 
 if __name__ == "__main__":
