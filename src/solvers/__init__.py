@@ -6,14 +6,17 @@ import numpy as np
 class Solver():
 
     def __init__(self,pieces:list):
-        self.bag_of_pieces = enumerate(pieces)
+        self.pieces = pieces
         self.features = {}
-        self.pairwise_matching = []
+        self.pairwise_matching = {}
 
     def extract_features(self):
         pass
 
     def pairwise(self):
+        assert "Implement me"
+    
+    def global_optimize(self):
         assert "Implement me"
 
 class Assembly():

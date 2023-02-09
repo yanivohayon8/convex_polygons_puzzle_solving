@@ -14,12 +14,12 @@ class GeometricPairwiseMatcher():
                     print(edge_lengths[i].shape)
                     piece_i = edge_lengths[i].reshape(-1,1)
                     piece_j = edge_lengths[j].reshape(1,-1)
-                    subs = np.abs(piece_i-piece_j)
-                    match_edges = np.argwhere(subs<confidence_interval)
+                    subs = np.abs(piece_i-piece_j) # tiling
+                    match_edges_diff = subs[subs<confidence_interval]
 
-                    if np.size(match_edges) > 0:
+                    if match_edges_diff.size > 0:
                         # Ensure without duplicates
                         if not f"{i},{j}" in match_pieces.keys() and not f"{j},{i}" in match_pieces.keys():
-                            match_pieces[f"{i},{j}"] = match_edges
+                            match_pieces[f"{i},{j}"] = np.min(match_edges_diff)
     
         return match_pieces

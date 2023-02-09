@@ -14,7 +14,7 @@ class GeometricSolver(Solver):
         geomteric_extractor = GeometricFeatureExtractor()
         edges_lengths = []
 
-        for i,piece in self.bag_of_pieces:
+        for piece in self.pieces:
             coords = list(piece.polygon.exterior.coords)
             edges_lengths.append(geomteric_extractor.get_edges_lengths(coords))
         
@@ -22,8 +22,11 @@ class GeometricSolver(Solver):
     
     def pairwise(self):
         geometric_pairwiser = GeometricPairwiseMatcher()
-        geometric_pairwiser.pairwise_edges_lengths(self.features["edges_lengths"])
-        
+        self.pairwise_matching = geometric_pairwiser.pairwise_edges_lengths(self.features["edges_lengths"])
+    
+    def global_optimize(self):
+        pass
+
 
 class DoNothing():
     
