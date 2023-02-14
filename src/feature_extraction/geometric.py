@@ -19,10 +19,12 @@ class GeometricFeatureExtractor():
         denominator = (np.linalg.norm(vector_1) * np.linalg.norm(vector_2))
         return np.arccos(dot/denominator)
 
-    def get_polygon_angle(self,coords):
+    def get_polygon_angles(self,coords):
         num_coords = coords.shape[0]-1
-        polygon_angles = [np.degrees(
-            self.get_angle_of_vectors_(coords[(i-1)%num_coords],coords[i],coords[(i+1)%num_coords])
-            ) for i in range(num_coords)
-        ]
+        polygon_angles = {}
+        for i in range(num_coords):
+            polygon_angles[f"edge_{i},edge_{((i-1)%num_coords)}"] = np.degrees(
+                self.get_angle_of_vectors_(coords[(i-1)%num_coords],coords[i],coords[(i+1)%num_coords])
+                ) 
+        
         return polygon_angles

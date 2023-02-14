@@ -29,7 +29,7 @@ class GeometricSolver(Solver):
         pieces_angles = []
         for piece in self.pieces:
             coords = np.array(list(piece.polygon.exterior.coords)) 
-            pieces_angles.append(self.geomteric_feature_extractor.get_polygon_angle(coords))
+            pieces_angles.append(self.geomteric_feature_extractor.get_polygon_angles(coords))
         
         pass
             
