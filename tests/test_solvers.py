@@ -35,7 +35,7 @@ class TestNaiveSolver(unittest.TestCase):
         solver = solvers.GeometricSolver(bag_of_pieces)
         solver.extract_features()
         solver.pairwise()
-        
+        solver.global_optimize()
 
 if __name__ == "__main__":
     unittest.main()

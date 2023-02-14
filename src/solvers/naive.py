@@ -1,31 +1,41 @@
-import pandas as pd
 from src.solvers import Assembly,Solver
 from src.feature_extraction.geometric import GeometricFeatureExtractor
 from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 
+
 class GeometricSolver(Solver):
 
     def __init__(self, pieces: list):
         super().__init__(pieces)
+        self.geomteric_feature_extractor = GeometricFeatureExtractor()
+        self.geometric_pairwiser = GeometricPairwiseMatcher()
 
     def extract_features(self):
         super().extract_features()
-        geomteric_extractor = GeometricFeatureExtractor()
         edges_lengths = []
 
         for piece in self.pieces:
             coords = list(piece.polygon.exterior.coords)
-            edges_lengths.append(geomteric_extractor.get_edges_lengths(coords))
+            edges_lengths.append(self.geomteric_feature_extractor.get_polygon_edges_lengths(coords))
         
         self.features["edges_lengths"] = edges_lengths #np.array(edges_lengths)
     
-    def pairwise(self):
-        geometric_pairwiser = GeometricPairwiseMatcher()
-        self.pairwise_matching = geometric_pairwiser.pairwise_edges_lengths(self.features["edges_lengths"])
+    def pairwise(self):        
+        self.geometric_pairwiser.pairwise_edges_lengths(self.features["edges_lengths"])
+        pass
     
     def global_optimize(self):
+        pieces_angles = []
+        for piece in self.pieces:
+            coords = np.array(list(piece.polygon.exterior.coords)) 
+            pieces_angles.append(self.geomteric_feature_extractor.get_polygon_angle(coords))
+        
         pass
+            
+                
+                
+            
 
 
 class DoNothing():

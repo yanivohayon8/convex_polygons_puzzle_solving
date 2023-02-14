@@ -21,5 +21,5 @@ class GeometricPairwiseMatcher(PairwiseMatcher):
                     if match_edges_diff.size > 0:
                         # Ensure without duplicates
                         if not f"{i},{j}" in self.match_pieces_score.keys() and not f"{j},{i}" in self.match_pieces_score.keys():
-                            self.match_pieces_score[f"{i},{j}"] = np.min(match_edges_diff)
-                            self.match_edges[f"{i},{j}"] = np.argwhere(subs<confidence_interval)
+                            self.match_pieces_score[f"piece_{i},piece_{j}"] = np.min(match_edges_diff)
+                            self.match_edges[f"piece_{i},piece_{j}"] = np.argwhere(subs<confidence_interval)
