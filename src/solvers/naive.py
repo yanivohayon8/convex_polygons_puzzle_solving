@@ -22,7 +22,7 @@ class GeometricSolver(Solver):
         self.features["edges_lengths"] = edges_lengths #np.array(edges_lengths)
     
     def pairwise(self):        
-        self.geometric_pairwiser.pairwise_edges_lengths(self.features["edges_lengths"])
+        self.geometric_pairwiser.pairwise_edges_lengths(self.features["edges_lengths"],confidence_interval=1)
         pass
     
     def global_optimize(self):
@@ -31,6 +31,9 @@ class GeometricSolver(Solver):
             coords = np.array(list(piece.polygon.exterior.coords)) 
             pieces_angles.append(self.geomteric_feature_extractor.get_polygon_angles(coords))
         
+        def loop(start_piece,start_edge,accumulated_angle):
+            pass
+
         pass
             
                 
