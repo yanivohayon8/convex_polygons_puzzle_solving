@@ -86,31 +86,7 @@ class GeometricNoiselessSolver(Solver):
     def global_optimize(self):
         cycles = nx.simple_cycles(self.edges_mating_graph)
         print(sorted(cycles))
-        pass
-
-
-
-
-        #for piece_index in range(num_pieces):
-        #    
-
-
-        # accumulated_angle = 180
-        # #for i_row in range()
-        # row_i = 0
-        # num_pieces = len(self.pieces)
-        # curr_match_pieces = [col_i for col_i in range(num_pieces) if self.geometric_pairwiser.match_edges[row_i,col_i] !=[]]
-        # next_piece = curr_match_pieces[0]
-        # match_edges = self.geometric_pairwiser.match_edges[row_i,next_piece]
-        # # because we don't know the orientation of the piece
-        # next_edge_in_loop_1 = int(match_edges[0][0][1]+1)%(self.features["pieces_degree"][next_piece])
-        # next_edge_in_loop_2 = int(match_edges[0][0][1]-1)%(self.features["pieces_degree"][next_piece])
         
-        # curr_match_pieces_copy = [col_i for col_i in range(num_pieces)\
-        #                           if self.geometric_pairwiser.match_edges[next_piece,col_i] !=[]]
-        # print(self.geometric_pairwiser.match_edges[next_piece,2])
-
-        pass
             
                 
                 
