@@ -72,7 +72,8 @@ class GeometricNoiselessSolver(Solver):
         
         num_pieces = len(self.pieces)
         for piece_i in range(num_pieces):
-            for piece_j in range(piece_i+1,num_pieces):
+            #for piece_j in range(piece_i+1,num_pieces):
+            for piece_j in range(num_pieces):
                 mating_edges = self.geometric_pairwiser.match_edges[piece_i,piece_j]
                 if len(mating_edges)>0:
                     mating_edges = mating_edges[0] # In refactor make this not necessary
@@ -83,6 +84,8 @@ class GeometricNoiselessSolver(Solver):
 
         
     def global_optimize(self):
+        cycles = nx.simple_cycles(self.edges_mating_graph)
+        print(sorted(cycles))
         pass
 
 

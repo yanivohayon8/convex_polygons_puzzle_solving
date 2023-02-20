@@ -29,7 +29,7 @@ class TestNaiveSolver(unittest.TestCase):
         frame.destroy()        
 
     def test_geometric_solver(self):
-        puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+        puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/simplest_puzzle"
         loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
                         puzzle_directory + "/ground_truth_rels.csv", 
                         puzzle_directory + "/pieces.csv")
@@ -40,14 +40,15 @@ class TestNaiveSolver(unittest.TestCase):
         solver.pairwise()
         solver.compute_edges_mating_graph()
 
-        print(solver.edges_mating_graph.edges)
+        #print(solver.edges_mating_graph.edges)
 
-        ax = plt.subplot(121)
-        nx.draw(solver.edges_mating_graph,with_labels=True,font_weight='bold')
-        plt.plot()
-        keyboardClick=False
-        while keyboardClick != True:
-            keyboardClick=plt.waitforbuttonpress()
+        # ax = plt.subplot(121)
+        # nx.draw(solver.edges_mating_graph,with_labels=True,font_weight='bold')
+        # plt.plot()
+        # keyboardClick=False
+        # while keyboardClick != True:
+        #     keyboardClick=plt.waitforbuttonpress()
+
         solver.global_optimize()
 
 if __name__ == "__main__":
