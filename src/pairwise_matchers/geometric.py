@@ -25,5 +25,5 @@ class GeometricPairwiseMatcher(PairwiseMatcher):
                         matching_edges[i*num_pieces+j].append(np.argwhere(subs<confidence_interval))
                         matching_scores[i*num_pieces+j] = match_edges_diff
 
-                    self.match_edges = np.array(matching_edges,dtype="object").reshape((num_pieces,num_pieces))
-                    self.match_pieces_score = np.array(matching_scores,dtype="object").reshape((num_pieces,num_pieces))
+        self.match_edges = np.array(matching_edges,dtype="object").reshape((num_pieces,num_pieces))
+        self.match_pieces_score = np.array(matching_scores,dtype="object").reshape((num_pieces,num_pieces))

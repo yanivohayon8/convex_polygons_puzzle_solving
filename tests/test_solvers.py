@@ -3,6 +3,9 @@ import unittest
 from src.puzzle import Puzzle
 import src.solvers.naive as solvers
 from src.visualizers.cv2_wrapper import Frame
+import matplotlib.pyplot as plt
+import networkx as nx
+
 
 class TestNaiveSolver(unittest.TestCase):
 
@@ -31,10 +34,20 @@ class TestNaiveSolver(unittest.TestCase):
                         puzzle_directory + "/ground_truth_rels.csv", 
                         puzzle_directory + "/pieces.csv")
         loader.load()
-        bag_of_pieces = loader.get_final_puzzle()
-        solver = solvers.GeometricSolver(bag_of_pieces)
+        bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
+        solver = solvers.GeometricNoiselessSolver(bag_of_pieces)
         solver.extract_features()
         solver.pairwise()
+        solver.compute_edges_mating_graph()
+
+        print(solver.edges_mating_graph.edges)
+
+        ax = plt.subplot(121)
+        nx.draw(solver.edges_mating_graph,with_labels=True,font_weight='bold')
+        plt.plot()
+        keyboardClick=False
+        while keyboardClick != True:
+            keyboardClick=plt.waitforbuttonpress()
         solver.global_optimize()
 
 if __name__ == "__main__":
