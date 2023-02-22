@@ -89,6 +89,8 @@ class GeometricNoiselessSolver(Solver):
     def global_optimize(self):
         cycles = list(nx.simple_cycles(self.edges_mating_graph))
         valid_cycles = []
+        valid_cycles_sorted = [] # just for comprasion later to remove duplicates
+        valid_cycles_pieces = [] # for debugging
         for cycle in cycles:
             if len(cycles) <=2:
                 continue
@@ -111,11 +113,22 @@ class GeometricNoiselessSolver(Solver):
                 continue
 
 
-            next_cycle = sorted(edge_rels)
-            if next_cycle not in valid_cycles:
-                valid_cycles.append(next_cycle)
+            edge_rels_sorted = sorted(edge_rels)
+            
+            for cyc in valid_cycles_sorted:
+                if edge_rels_sorted == cyc:
+                    is_valid = False
+            if not is_valid:
+                continue
+            
+            valid_cycles_sorted.append(edge_rels_sorted)
+            valid_cycles.append(edge_rels)
+            valid_cycles_pieces.append(pieces_involved_set)
 
         print(valid_cycles)
+        print()
+        print("Pieces involved in each cycle: ")
+        print(valid_cycles_pieces)
         # for cycle in cycles:
         #     for elm in cycle:
         #         print(elm ,end="****")
