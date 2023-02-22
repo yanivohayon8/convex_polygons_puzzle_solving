@@ -45,7 +45,7 @@ class GeometricNoiselessSolver(Solver):
         '''
 
         for piece in self.pieces:
-            coords = piece.get_coords()
+            coords = piece.get_coords()[:-1]
             
             self.edges_mating_graph.add_nodes_from(
                 [f"P_{piece.id}_RELS_E_{edge_index}" for edge_index in range(len(coords))]
@@ -55,18 +55,21 @@ class GeometricNoiselessSolver(Solver):
             angles = piece.features["angles"]
             for edge_index in range(len(angles)):
                 central_edge = f"P_{piece.id}_ENV_{edge_index}"
-                adj_edge_1 = f"P_{piece.id}_ENV_{edge_index}_ADJ_{(edge_index-1)%len(coords)}"
-                adj_edge_2 = f"P_{piece.id}_ENV_{edge_index}_ADJ_{(edge_index+1)%len(coords)}"
-
+                adj_edge_1_index = (edge_index-1)%len(angles)
+                adj_edge_1 = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_1_index}"
+                adj_edge_2_index = (edge_index+1)%len(angles)
+                adj_edge_2 = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_2_index}"
                 self.edges_mating_graph.add_nodes_from([central_edge,adj_edge_1,adj_edge_2])
+
                 angle_1 = angles[(edge_index)%len(angles)]
                 angle_2 = angles[(edge_index+1)%len(angles)]
                 self.edges_mating_graph.add_edges_from(
                     [
                     (central_edge,adj_edge_1,{'weight': angle_1}),
                     (central_edge,adj_edge_2,{'weight': angle_2}),
-                    (adj_edge_1,f"P_{piece.id}_RELS_E_{adj_edge_1}"),
-                    (adj_edge_2,f"P_{piece.id}_RELS_E_{adj_edge_2}")
+                    (f"P_{piece.id}_RELS_E_{edge_index}",central_edge),
+                    (adj_edge_1,f"P_{piece.id}_RELS_E_{adj_edge_1_index}"),
+                    (adj_edge_2,f"P_{piece.id}_RELS_E_{adj_edge_2_index}")
                     ]
                 )
         
@@ -84,9 +87,39 @@ class GeometricNoiselessSolver(Solver):
 
         
     def global_optimize(self):
-        cycles = nx.simple_cycles(self.edges_mating_graph)
-        print(sorted(cycles))
-        
+        cycles = list(nx.simple_cycles(self.edges_mating_graph))
+        valid_cycles = []
+        for cycle in cycles:
+            if len(cycles) <=2:
+                continue
+            edge_rels = [edge for edge in cycle if "RELS" in edge]
+            pieces_involved = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
+            pieces_involved_set = set(pieces_involved)
+            
+            if len(pieces_involved_set) <=2:
+                continue
+            
+            '''
+                Since we assume the pieces are convex, in the hierchical loops they will appear only twice
+            '''
+            is_valid = True
+            for piece_id in pieces_involved_set:
+                if pieces_involved.count(piece_id) != 2:
+                    is_valid = False
+                    break
+            if not is_valid:
+                continue
+
+
+            next_cycle = sorted(edge_rels)
+            if next_cycle not in valid_cycles:
+                valid_cycles.append(next_cycle)
+
+        print(valid_cycles)
+        # for cycle in cycles:
+        #     for elm in cycle:
+        #         print(elm ,end="****")
+        # print()        
             
                 
                 

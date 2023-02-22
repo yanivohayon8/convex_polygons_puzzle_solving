@@ -29,7 +29,10 @@ class TestNaiveSolver(unittest.TestCase):
         frame.destroy()        
 
     def test_geometric_solver(self):
-        puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/simplest_puzzle"
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        #puzzle_directory = direrctory + "0"
+        puzzle_directory = direrctory + "simplest_puzzle"
+        #puzzle_directory = direrctory + "simplest_puzzle_v2"
         loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
                         puzzle_directory + "/ground_truth_rels.csv", 
                         puzzle_directory + "/pieces.csv")
@@ -41,13 +44,26 @@ class TestNaiveSolver(unittest.TestCase):
         solver.compute_edges_mating_graph()
 
         #print(solver.edges_mating_graph.edges)
+        
+        #ax = plt.subplot(121)
+        fig = plt.figure(figsize=(20,20))
+        #nx.draw(solver.edges_mating_graph,with_labels=True,font_weight='bold')
+        nodes = solver.edges_mating_graph.nodes
+        edges = solver.edges_mating_graph.edges
+        #print(nodes)
+        #pos = nx.spring_layout(solver.edges_mating_graph,k=1)
+        
+        pos = nx.spring_layout(solver.edges_mating_graph,k=1)
+        nx.draw_networkx_nodes(solver.edges_mating_graph, pos,nodelist=[n for n in nodes if "P_5" in n],node_color="red", node_size=50) #,cmap=plt.get_cmap('jet'), node_size = 500)
+        nx.draw_networkx_nodes(solver.edges_mating_graph, pos,nodelist=[n for n in nodes if "P_3" in n],node_color="blue",node_size=50) #,cmap=plt.get_cmap('jet'), node_size = 500)
+        nx.draw_networkx_nodes(solver.edges_mating_graph, pos,nodelist=[n for n in nodes if "P_2" in n],node_color="green",node_size=50) #,cmap=plt.get_cmap('jet'), node_size = 500)
 
-        # ax = plt.subplot(121)
-        # nx.draw(solver.edges_mating_graph,with_labels=True,font_weight='bold')
-        # plt.plot()
-        # keyboardClick=False
-        # while keyboardClick != True:
-        #     keyboardClick=plt.waitforbuttonpress()
+        nx.draw_networkx_labels(solver.edges_mating_graph, pos,font_size=6)
+        nx.draw_networkx_edges(solver.edges_mating_graph, pos, arrows=True)
+        plt.plot()
+        keyboardClick=False
+        while keyboardClick != True:
+            keyboardClick=plt.waitforbuttonpress()
 
         solver.global_optimize()
 
