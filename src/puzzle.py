@@ -1,5 +1,7 @@
 import pandas as pd
 from src.piece import Piece
+from shapely.geometry.polygon import orient as orient_as_ccw
+
 
 class Puzzle():
 
@@ -22,12 +24,16 @@ class Puzzle():
         self.df_pieces = pd.read_csv(self.pieces_path)
 
     def get_bag_of_pieces(self,csv_conv="Ofir"):
-        return self.pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
+        pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
+        self._preprocess(pieces)
+        return pieces
 
     def get_final_puzzle(self,csv_conv="Ofir"):
-        return self.pieces_pd2list(self.df_solution_locations,csv_conv=csv_conv)
+        pieces = self._pieces_pd2list(self.df_solution_locations,csv_conv=csv_conv)
+        self._preprocess(pieces)
+        return pieces
 
-    def pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
+    def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
         if csv_conv!="Ofir":
             raise NotImplementedError("Currently we support only Ofir puzzle style")
 
@@ -40,3 +46,7 @@ class Puzzle():
 
         return pieces
 
+    def _preprocess(self,pieces):
+        for piece in pieces:
+            piece.polygon = orient_as_ccw(piece.polygon)
+        
