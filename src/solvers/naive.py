@@ -55,21 +55,18 @@ class GeometricNoiselessSolver(Solver):
             angles = piece.features["angles"]
             for edge_index in range(len(angles)):
                 central_edge = f"P_{piece.id}_ENV_{edge_index}"
-                adj_edge_1_index = (edge_index-1)%len(angles)
-                adj_edge_1 = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_1_index}"
-                adj_edge_2_index = (edge_index+1)%len(angles)
-                adj_edge_2 = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_2_index}"
-                self.edges_mating_graph.add_nodes_from([central_edge,adj_edge_1,adj_edge_2])
 
-                angle_1 = angles[(edge_index)%len(angles)]
+                '''Since the polygons are oriented counter clockwise (ccw) than we need to check only one adjacent edge (and not both)'''
+                adj_edge_index = (edge_index+1)%len(angles)
+                adj_edge = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_index}"
+                self.edges_mating_graph.add_nodes_from([central_edge,adj_edge])
+
                 angle_2 = angles[(edge_index+1)%len(angles)]
                 self.edges_mating_graph.add_edges_from(
                     [
-                    (central_edge,adj_edge_1,{'weight': angle_1}),
-                    (central_edge,adj_edge_2,{'weight': angle_2}),
+                    (central_edge,adj_edge,{'weight': angle_2}),
                     (f"P_{piece.id}_RELS_E_{edge_index}",central_edge),
-                    (adj_edge_1,f"P_{piece.id}_RELS_E_{adj_edge_1_index}"),
-                    (adj_edge_2,f"P_{piece.id}_RELS_E_{adj_edge_2_index}")
+                    (adj_edge,f"P_{piece.id}_RELS_E_{adj_edge_index}")
                     ]
                 )
         
