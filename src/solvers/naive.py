@@ -5,6 +5,35 @@ import numpy as np
 import networkx as nx
 
 
+class Loop():
+    
+    def __init__(self,traversal) -> None:
+        edge_rels = [edge for edge in traversal if "RELS" in edge]
+        pieces_involved = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
+        pieces_involved_set = set(pieces_involved)
+        
+        if len(pieces_involved_set) <=2:
+            raise ValueError("Loop must contain at least 3 pieces due to the convexity assumption")
+        
+        '''
+            Since we assume the pieces are convex, in the hierchical loops they will appear only twice
+        '''
+        is_valid = True
+        for piece_id in pieces_involved_set:
+            if pieces_involved.count(piece_id) != 2:
+                is_valid = False
+                break
+        if not is_valid:
+            raise ValueError("Loop is not valid, each piece must appear exactly twice. ")
+
+        self.traversal = traversal
+        self.edge_rels = edge_rels
+        self.pieces_involved = pieces_involved_set
+    
+    def get_accumulated_angle(self,mating_graph_edges):
+        pass
+
+
 class GeometricNoiselessSolver(Solver):
 
     def __init__(self, pieces: list):
@@ -33,7 +62,7 @@ class GeometricNoiselessSolver(Solver):
         self.geometric_pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=1)
         pass
 
-    def compute_edges_mating_graph(self):
+    def _compute_edges_mating_graph(self):
         self.edges_mating_graph = nx.DiGraph()
         pieces_angles = []
 
@@ -59,12 +88,15 @@ class GeometricNoiselessSolver(Solver):
                 '''Since the polygons are oriented counter clockwise (ccw) than we need to check only one adjacent edge (and not both)'''
                 adj_edge_index = (edge_index+1)%len(angles)
                 adj_edge = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_index}"
-                self.edges_mating_graph.add_nodes_from([central_edge,adj_edge])
+                angle = angles[(edge_index+1)%len(angles)]
+                
+                self.edges_mating_graph.add_nodes_from(
+                    [central_edge,(adj_edge,{"angle":angle})]
+                )
 
-                angle_2 = angles[(edge_index+1)%len(angles)]
                 self.edges_mating_graph.add_edges_from(
                     [
-                    (central_edge,adj_edge,{'weight': angle_2}),
+                    (central_edge,adj_edge,{'angle': angle}),
                     (f"P_{piece.id}_RELS_E_{edge_index}",central_edge),
                     (adj_edge,f"P_{piece.id}_RELS_E_{adj_edge_index}")
                     ]
@@ -72,7 +104,6 @@ class GeometricNoiselessSolver(Solver):
         
         num_pieces = len(self.pieces)
         for piece_i in range(num_pieces):
-            #for piece_j in range(piece_i+1,num_pieces):
             for piece_j in range(num_pieces):
                 mating_edges = self.geometric_pairwiser.match_edges[piece_i,piece_j]
                 if len(mating_edges)>0:
@@ -82,55 +113,28 @@ class GeometricNoiselessSolver(Solver):
                                 for mating in mating_edges]
                     self.edges_mating_graph.add_edges_from(new_links)
 
-        
+
+    def _filter_unvalid_loops(self,cycles):
+        pass
+
     def global_optimize(self):
-        cycles = list(nx.simple_cycles(self.edges_mating_graph))
-        valid_cycles = []
-        valid_cycles_sorted = [] # just for comprasion later to remove duplicates
-        valid_cycles_pieces = [] # for debugging
-        for cycle in cycles:
-            if len(cycles) <=2:
-                continue
-            edge_rels = [edge for edge in cycle if "RELS" in edge]
-            pieces_involved = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
-            pieces_involved_set = set(pieces_involved)
-            
-            if len(pieces_involved_set) <=2:
-                continue
-            
-            '''
-                Since we assume the pieces are convex, in the hierchical loops they will appear only twice
-            '''
-            is_valid = True
-            for piece_id in pieces_involved_set:
-                if pieces_involved.count(piece_id) != 2:
-                    is_valid = False
-                    break
-            if not is_valid:
-                continue
+        self._compute_edges_mating_graph()
+        cycles = nx.simple_cycles(self.edges_mating_graph)
+        list_cycle = list(cycles)
+        valid_loops = []
 
+        for cycle in list_cycle:
+            try:
+                loop = Loop(cycle)
+                print(loop.pieces_involved)
+                valid_loops.append(valid_loops)
+            except ValueError as ve:
+                pass
 
-            edge_rels_sorted = sorted(edge_rels)
-            
-            for cyc in valid_cycles_sorted:
-                if edge_rels_sorted == cyc:
-                    is_valid = False
-            if not is_valid:
-                continue
-            
-            valid_cycles_sorted.append(edge_rels_sorted)
-            valid_cycles.append(edge_rels)
-            valid_cycles_pieces.append(pieces_involved_set)
-
-        print(valid_cycles)
-        print()
-        print("Pieces involved in each cycle: ")
-        print(valid_cycles_pieces)
-        # for cycle in cycles:
-        #     for elm in cycle:
-        #         print(elm ,end="****")
-        # print()        
-            
+        valid_loops = self._filter_unvalid_loops(list_cycle)
+        print(self.edges_mating_graph.edges[('P_0_ENV_1', 'P_0_ENV_1_ADJ_2')]["angle"])
+        print(valid_loops)
+      
                 
                 
             

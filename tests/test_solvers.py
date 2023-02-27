@@ -41,7 +41,8 @@ class TestNaiveSolver(unittest.TestCase):
         solver = solvers.GeometricNoiselessSolver(bag_of_pieces)
         solver.extract_features()
         solver.pairwise()
-        solver.compute_edges_mating_graph()
+        solver.global_optimize()
+        #solver.compute_edges_mating_graph()
 
         #print(solver.edges_mating_graph.edges)
         
@@ -66,7 +67,6 @@ class TestNaiveSolver(unittest.TestCase):
         # while keyboardClick != True:
         #     keyboardClick=plt.waitforbuttonpress()
 
-        solver.global_optimize()
 
 if __name__ == "__main__":
     unittest.main()
