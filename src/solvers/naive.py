@@ -27,11 +27,13 @@ class Loop():
             raise ValueError("Loop is not valid, each piece must appear exactly twice. ")
 
         self.traversal = traversal
-        self.edge_rels = edge_rels
+        self.nodes_rels = edge_rels
+        self.nodes_adj = [edge for edge in traversal if "_ADJ_" in edge]
         self.pieces_involved = pieces_involved_set
+        
     
-    def get_accumulated_angle(self,mating_graph_edges):
-        pass
+    def get_accumulated_angle(self,edges_mating_graph):
+        return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
 
 
 class GeometricNoiselessSolver(Solver):
@@ -112,27 +114,28 @@ class GeometricNoiselessSolver(Solver):
                         (f"P_{self.pieces[piece_i].id}_RELS_E_{mating[0]}",f"P_{self.pieces[piece_j].id}_RELS_E_{mating[1]}") \
                                 for mating in mating_edges]
                     self.edges_mating_graph.add_edges_from(new_links)
-
-
-    def _filter_unvalid_loops(self,cycles):
-        pass
+        
 
     def global_optimize(self):
         self._compute_edges_mating_graph()
         cycles = nx.simple_cycles(self.edges_mating_graph)
         list_cycle = list(cycles)
-        valid_loops = []
+        loops = []
 
         for cycle in list_cycle:
             try:
                 loop = Loop(cycle)
-                print(loop.pieces_involved)
-                valid_loops.append(valid_loops)
+                loops.append(loop)
             except ValueError as ve:
                 pass
-
-        valid_loops = self._filter_unvalid_loops(list_cycle)
-        print(self.edges_mating_graph.edges[('P_0_ENV_1', 'P_0_ENV_1_ADJ_2')]["angle"])
+        
+        err_angle = 2
+        CIRCLE_DEGREES = 360
+        valid_loops = []
+        for loop in loops:
+            accumulated_angle = loop.get_accumulated_angle(self.edges_mating_graph)
+            if abs(CIRCLE_DEGREES-accumulated_angle) < err_angle:
+                valid_loops.append(loop)
         print(valid_loops)
       
                 
