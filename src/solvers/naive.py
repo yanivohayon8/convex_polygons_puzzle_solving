@@ -136,9 +136,25 @@ class GeometricNoiselessSolver(Solver):
             if abs(CIRCLE_DEGREES-accumulated_angle) < err_angle:
                 valid_loops.append(loop)
         
+        super_pieces_edges = []
+
         for loop in valid_loops:
-            pass
+            pieces2edges_not_looped = {}
+
+            for edge_rel in loop.nodes_rels:
+                _ = edge_rel.split("_") #"P_<PIECE_INDEX>_RELS_E_<EDGE_INDEX>"
+                piece_index = int(_[1])
+                edge_index = int(_[4])
+
+                if piece_index not in pieces2edges_not_looped.keys():
+                    pieces2edges_not_looped[piece_index] = list(range(len(self.pieces[piece_index].coordinates)))
+
+                pieces2edges_not_looped[piece_index].remove(edge_index)
+
+            super_pieces_edges.append(pieces2edges_not_looped)
             
+        
+        print(super_pieces_edges)
       
                 
                 

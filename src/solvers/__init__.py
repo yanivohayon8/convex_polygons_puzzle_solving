@@ -2,10 +2,12 @@ import pandas as pd
 import cv2
 from src import RGB_COLORS
 import numpy as np
+from src.piece import Piece
+
 
 class Solver():
 
-    def __init__(self,pieces:list):
+    def __init__(self,pieces:list[Piece]):
         self.pieces = pieces
         self.features = {}
         self.pairwise_matching = {}

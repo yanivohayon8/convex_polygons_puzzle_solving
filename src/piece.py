@@ -6,6 +6,7 @@ class Piece():
     def __init__(self,id:str,coordinates:list,img_path=None) -> None:
         self.id = id
         self.polygon = Polygon(coordinates)
+        self.coordinates = coordinates
         self.img_path = img_path
         self.features = {}
 
@@ -15,7 +16,3 @@ class Piece():
             This is because we read it from the piece.csv file...
         '''
         return list(self.polygon.exterior.coords)
-    
-    def get_coords(self,edge_index):
-        mycoords = self.get_coords()
-        return mycoords[edge_index],mycoords[(edge_index+1)%len(mycoords)]
