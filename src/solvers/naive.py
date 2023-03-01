@@ -35,7 +35,6 @@ class Loop():
     def get_accumulated_angle(self,edges_mating_graph):
         return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
 
-
 class GeometricNoiselessSolver(Solver):
 
     def __init__(self, pieces: list):
@@ -136,7 +135,10 @@ class GeometricNoiselessSolver(Solver):
             accumulated_angle = loop.get_accumulated_angle(self.edges_mating_graph)
             if abs(CIRCLE_DEGREES-accumulated_angle) < err_angle:
                 valid_loops.append(loop)
-        print(valid_loops)
+        
+        for loop in valid_loops:
+            pass
+            
       
                 
                 
