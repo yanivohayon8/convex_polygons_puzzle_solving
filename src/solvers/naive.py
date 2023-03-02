@@ -35,6 +35,80 @@ class Loop():
     def get_accumulated_angle(self,edges_mating_graph):
         return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
 
+
+class SuperPiece():
+    
+    def __init__(self,inner_edges_indexes:dict,outer_edges_indexes:dict) -> None:
+        self.inner_edges_indexes = inner_edges_indexes
+        self.outer_edges_indexes = outer_edges_indexes
+        pass
+
+    def __repr__(self) -> str:
+        _repr = ""
+        for piece in self.outer_edges_indexes.keys():
+            _repr = _repr + f"P{piece}_"
+            for edge_index in self.outer_edges_indexes[piece]:
+                _repr = _repr + f"e{edge_index}_"
+        
+        return _repr[:-1]
+    
+    def get_pieces_involved(self):
+        return [int(_[1:]) for _ in self.__repr__().split("_") if _.startswith("P")]
+
+    
+    def get_mutual_pieces(self,super_piece):
+        self_pieces = self.get_pieces_involved()
+        super_piece_pieces = super_piece.get_pieces_involved()
+        return list(set(self_pieces) & set(super_piece_pieces))
+
+    def union(self,super_piece,mutual_pieces=None):
+        union_outer_edges = {}
+        union_inner_edges = {}
+         
+        # Because we already computed it in the outer loop
+        if mutual_pieces is None:
+            mutual_pieces = self.get_mutual_pieces(super_piece)
+        
+        if len(mutual_pieces) == 0:
+            raise ValueError("To union super pieces, they must have mutual elementary pieces")
+   
+        for basic_piece in self.inner_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_inner_edges[basic_piece] = self.inner_edges_indexes[basic_piece]
+
+        for basic_piece in super_piece.inner_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_inner_edges[basic_piece] = super_piece.inner_edges_indexes[basic_piece]
+        
+        for basic_piece in self.outer_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_outer_edges[basic_piece] = self.outer_edges_indexes[basic_piece]
+            # else:
+            #     #union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
+            #     union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
+
+        for basic_piece in super_piece.outer_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_outer_edges[basic_piece] = super_piece.outer_edges_indexes[basic_piece]
+            # else:
+            #     union_outer_edges[basic_piece] = list(set(super_piece.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
+        
+        for mut_piece in mutual_pieces:
+            union_outer_edges[mut_piece] = list(set(super_piece.outer_edges_indexes[mut_piece]) & set(self.outer_edges_indexes[mut_piece]))
+
+            if mut_piece in union_inner_edges.keys():
+                union_outer_edges[mut_piece] = list(set(union_outer_edges[mut_piece])-set(union_inner_edges[mut_piece]))
+
+        pieces_to_clean = [piece for piece in union_outer_edges.keys() if len(union_outer_edges[piece]) == 0]
+        [union_outer_edges.pop(piece) for piece in pieces_to_clean]
+        
+        pieces_to_clean = [piece for piece in union_inner_edges.keys() if len(union_inner_edges[piece]) == 0]
+        [union_inner_edges.pop(piece) for piece in pieces_to_clean]
+
+        return SuperPiece(union_inner_edges,union_outer_edges)
+        
+
+
 class GeometricNoiselessSolver(Solver):
 
     def __init__(self, pieces: list):
@@ -136,25 +210,63 @@ class GeometricNoiselessSolver(Solver):
             if abs(CIRCLE_DEGREES-accumulated_angle) < err_angle:
                 valid_loops.append(loop)
         
-        super_pieces_edges = []
+        super_pieces = []
 
         for loop in valid_loops:
             pieces2edges_not_looped = {}
+            pieces2edges_looped = {}
 
             for edge_rel in loop.nodes_rels:
                 _ = edge_rel.split("_") #"P_<PIECE_INDEX>_RELS_E_<EDGE_INDEX>"
                 piece_index = int(_[1])
+                piece_key = piece_index #f"P_{piece_index}"
                 edge_index = int(_[4])
 
-                if piece_index not in pieces2edges_not_looped.keys():
-                    pieces2edges_not_looped[piece_index] = list(range(len(self.pieces[piece_index].coordinates)))
+                if piece_key not in pieces2edges_not_looped.keys():
+                    pieces2edges_not_looped[piece_key] = list(range(len(self.pieces[piece_index].coordinates)))
+                    pieces2edges_looped[piece_key] = []
 
-                pieces2edges_not_looped[piece_index].remove(edge_index)
+                pieces2edges_not_looped[piece_key].remove(edge_index)
+                pieces2edges_looped[piece_key].append(edge_index)
 
-            super_pieces_edges.append(pieces2edges_not_looped)
+            super_pieces.append(SuperPiece(pieces2edges_looped,pieces2edges_not_looped))
             
         
-        print(super_pieces_edges)
+        print("Super pieces:")
+        print(super_pieces,sep="\n")
+        print()
+
+        new_pieces = []
+        for i in range(len(super_pieces)-1):
+            super_1 = super_pieces[i]
+            for j in range(i+1,len(super_pieces)):
+                super_2 = super_pieces[j]
+                if j == i:
+                    continue
+                
+                mutual_pieces = super_1.get_mutual_pieces(super_2)
+
+                # if len(mutual_pieces)==0:
+                #     continue
+                
+                try:
+                    new_piece = super_1.union(super_2,mutual_pieces)
+                    new_pieces.append(new_piece)
+                    print("Union pieces:")
+                    print(super_1)
+                    print("AND")
+                    print(super_2)
+                    print("result:")
+                    print(new_piece)
+                    print()
+                except ValueError as ve:
+                    pass
+
+                
+        
+        print(new_pieces,sep="\n")
+            
+        
       
                 
                 

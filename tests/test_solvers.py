@@ -67,6 +67,69 @@ class TestNaiveSolver(unittest.TestCase):
         # while keyboardClick != True:
         #     keyboardClick=plt.waitforbuttonpress()
 
+    def test_union_0_loops(self):
+        super_pieces = [            
+            solvers.SuperPiece({8: [1, 0], 9: [3, 0], 7: [1, 2]},{8: [2], 9: [1, 2], 7: [0]}),
+            solvers.SuperPiece({3: [0, 1], 5: [2, 3], 2: [1, 2]},{3: [2], 5: [0, 1], 2: [0]}),
+            solvers.SuperPiece({0: [2, 1], 5: [0, 1], 6: [0, 1], 9: [2, 3], 8: [1, 2]},{0: [0, 3], 5: [2, 3], 6: [2], 9: [0, 1], 8: [0]}),
+            solvers.SuperPiece({2: [1, 0], 5: [3, 0], 0: [2, 3], 1: [0, 1]},{2: [2], 5: [1, 2], 0: [0, 1], 1: [2]}),
+            solvers.SuperPiece({6: [0, 2], 5: [1, 2], 3: [1, 2], 4: [0, 1]},{6: [1], 5: [0, 3], 3: [0], 4: [2]})
+        ]
+        # Need to check:
+        # 3,2
+        # 3,4
+        # 3,1
+        # 0,2
+        # 2,4
+        # 2,1
+        # 4,1
+        merges=[(3,2),(3,4),(3,1),(0,2),(2,4),(2,1),(4,1)]
+
+        expected_piece2numedges = [
+            {1:1,2:1,5:1,6:1,9:2,8:1,0:1},
+            {0:2,1:1,4:1,6:1},
+            {1:1,3:1,5:1,0:2},
+            {7:1,0:2,5:2,6:1,9:1},
+            {3:1,4:1,9:1,8:1,0:2},
+            {2:1,3:1,6:1,9:2,8:1,0:2},
+            {2:1,4:1,6:1,5:1}
+        ]
+
+        for expected_numedges, merge in zip(expected_piece2numedges,merges):
+            super_1 = super_pieces[merge[0]]
+            super_2 = super_pieces[merge[1]]
+            super_new = super_1.union(super_2)
+            print("Union pieces:")
+            print(super_1)
+            print("AND")
+            print(super_2)
+            print(f"result:{super_new}")
+            print(f"Expected: ",expected_numedges)
+            print
+            #print(super_new.inner_edges_indexes)
+            #print(super_new.outer_edges_indexes)
+            print()
+
+            count_edges = {}
+            next_key = None
+            splitted_repr = repr(super_new).split("_")
+
+            for token in splitted_repr:
+                if token.startswith("P"):
+                    next_key = int(token[1:])
+                    count_edges[next_key] = 0
+                else:
+                    count_edges[next_key]+=1
+            
+            exp_sub_real = list(set(expected_numedges.keys()) - set(count_edges.keys()))
+            assert len(exp_sub_real) == 0, f"False Negative piece as outter: {exp_sub_real}"
+            
+            real_sub_exp = list(set(count_edges.keys()) - set(expected_numedges.keys()))
+            assert len(real_sub_exp) == 0, f"False Positive piece as outter: {real_sub_exp}"
+            
+            for piece in count_edges.keys():
+                err_msg = f"Expected num edge at piece {piece} is {expected_numedges[piece]}. Recieve {count_edges[piece]}"
+                assert (count_edges[piece] == expected_numedges[piece]), err_msg
 
 if __name__ == "__main__":
     unittest.main()
