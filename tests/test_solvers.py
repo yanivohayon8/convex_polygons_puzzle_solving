@@ -68,6 +68,21 @@ class TestNaiveSolver(unittest.TestCase):
         #     keyboardClick=plt.waitforbuttonpress()
 
     def test_union_0_loops(self):
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        puzzle_directory = direrctory + "0"
+        #puzzle_directory = direrctory + "simplest_puzzle"
+        #puzzle_directory = direrctory + "simplest_puzzle_v2"
+        loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+                        puzzle_directory + "/ground_truth_rels.csv", 
+                        puzzle_directory + "/pieces.csv")
+        loader.load()
+        bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
+        solver = solvers.GeometricNoiselessSolver(bag_of_pieces)
+        solver.extract_features()
+        solver.pairwise()
+        solver._compute_edges_mating_graph()
+        
+        
         super_pieces = [            
             solvers.SuperPiece({8: [1, 0], 9: [3, 0], 7: [1, 2]},{8: [2], 9: [1, 2], 7: [0]}),
             solvers.SuperPiece({3: [0, 1], 5: [2, 3], 2: [1, 2]},{3: [2], 5: [0, 1], 2: [0]}),
@@ -75,14 +90,7 @@ class TestNaiveSolver(unittest.TestCase):
             solvers.SuperPiece({2: [1, 0], 5: [3, 0], 0: [2, 3], 1: [0, 1]},{2: [2], 5: [1, 2], 0: [0, 1], 1: [2]}),
             solvers.SuperPiece({6: [0, 2], 5: [1, 2], 3: [1, 2], 4: [0, 1]},{6: [1], 5: [0, 3], 3: [0], 4: [2]})
         ]
-        # Need to check:
-        # 3,2
-        # 3,4
-        # 3,1
-        # 0,2
-        # 2,4
-        # 2,1
-        # 4,1
+
         merges=[(3,2),(3,4),(3,1),(0,2),(2,4),(2,1),(4,1)]
 
         expected_piece2numedges = [
@@ -90,7 +98,7 @@ class TestNaiveSolver(unittest.TestCase):
             {0:2,1:1,4:1,6:1},
             {1:1,3:1,5:1,0:2},
             {7:1,0:2,5:2,6:1,9:1},
-            {3:1,4:1,9:1,8:1,0:2},
+            {3:1,4:1,9:2,8:1,0:2,5:1},
             {2:1,3:1,6:1,9:2,8:1,0:2},
             {2:1,4:1,6:1,5:1}
         ]
@@ -98,11 +106,11 @@ class TestNaiveSolver(unittest.TestCase):
         for expected_numedges, merge in zip(expected_piece2numedges,merges):
             super_1 = super_pieces[merge[0]]
             super_2 = super_pieces[merge[1]]
-            super_new = super_1.union(super_2)
             print("Union pieces:")
             print(super_1)
             print("AND")
             print(super_2)
+            super_new = solver._union(super_1,super_2)
             print(f"result:{super_new}")
             print(f"Expected: ",expected_numedges)
             print
@@ -131,5 +139,17 @@ class TestNaiveSolver(unittest.TestCase):
                 err_msg = f"Expected num edge at piece {piece} is {expected_numedges[piece]}. Recieve {count_edges[piece]}"
                 assert (count_edges[piece] == expected_numedges[piece]), err_msg
 
+    def test_merge_1_loops(self):
+        super_pieces = [
+            solvers.SuperPiece({3: [0, 1], 0: [2, 3], 1: [0, 1]},{3: [2], 0: [0, 1], 1: [2], 5: [1]}),
+            solvers.SuperPiece({2: [2, 1], 3: [0, 1], 0: [2, 1], 6: [0, 1], 9: [2, 3], 8: [1, 2]},{2: [0], 3: [2], 0: [0, 3], 6: [2], 9: [0, 1], 8: [0]}),
+            solvers.SuperPiece({2: [2, 1], 4: [1, 0], 6: [2, 0]},{2: [0], 4: [2], 6: [1], 5: [0]}),
+            solvers.SuperPiece({1: [0, 1], 2: [0, 1], 6: [0, 1], 9: [2, 3], 8: [1, 2]},{1: [2], 2: [2], 6: [2], 9: [0, 1], 8: [0], 0: [0], 5: [2]}),
+            solvers.SuperPiece({0: [2, 3], 1: [0, 1], 2: [0, 1], 4: [1, 0], 6: [2, 0], 3: [1, 2]},{0: [0, 1], 1: [2], 4: [2], 6: [1]}),
+            solvers.SuperPiece({0: [2, 1], 9: [2, 3], 8: [1, 2], 4: [1, 0], 3: [1, 2]},{0: [0, 3], 9: [0, 1], 8: [0], 4: [2], 3: [0], 5: [3]}),
+            solvers.SuperPiece({0: [2, 1], 5: [0, 1], 6: [0, 1], 7: [2, 1]},{0: [0, 3], 5: [2, 3], 6: [2], 7: [0], 9: [1]})
+        ]
+
+        
 if __name__ == "__main__":
     unittest.main()

@@ -61,51 +61,51 @@ class SuperPiece():
         super_piece_pieces = super_piece.get_pieces_involved()
         return list(set(self_pieces) & set(super_piece_pieces))
 
-    def union(self,super_piece,mutual_pieces=None):
-        union_outer_edges = {}
-        union_inner_edges = {}
+    # def union(self,super_piece,edges_mating,mutual_pieces=None):
+    #     union_outer_edges = {}
+    #     union_inner_edges = {}
          
-        # Because we already computed it in the outer loop
-        if mutual_pieces is None:
-            mutual_pieces = self.get_mutual_pieces(super_piece)
+    #     # Because we already computed it in the outer loop
+    #     if mutual_pieces is None:
+    #         mutual_pieces = self.get_mutual_pieces(super_piece)
         
-        if len(mutual_pieces) == 0:
-            raise ValueError("To union super pieces, they must have mutual elementary pieces")
+    #     if len(mutual_pieces) == 0:
+    #         raise ValueError("To union super pieces, they must have mutual elementary pieces")
    
-        for basic_piece in self.inner_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_inner_edges[basic_piece] = self.inner_edges_indexes[basic_piece]
+    #     for basic_piece in self.inner_edges_indexes.keys():
+    #         if basic_piece not in mutual_pieces:
+    #             union_inner_edges[basic_piece] = self.inner_edges_indexes[basic_piece]
 
-        for basic_piece in super_piece.inner_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_inner_edges[basic_piece] = super_piece.inner_edges_indexes[basic_piece]
+    #     for basic_piece in super_piece.inner_edges_indexes.keys():
+    #         if basic_piece not in mutual_pieces:
+    #             union_inner_edges[basic_piece] = super_piece.inner_edges_indexes[basic_piece]
         
-        for basic_piece in self.outer_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_outer_edges[basic_piece] = self.outer_edges_indexes[basic_piece]
-            # else:
-            #     #union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
-            #     union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
+    #     for basic_piece in self.outer_edges_indexes.keys():
+    #         if basic_piece not in mutual_pieces:
+    #             union_outer_edges[basic_piece] = self.outer_edges_indexes[basic_piece]
+    #         # else:
+    #         #     #union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
+    #         #     union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
 
-        for basic_piece in super_piece.outer_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_outer_edges[basic_piece] = super_piece.outer_edges_indexes[basic_piece]
-            # else:
-            #     union_outer_edges[basic_piece] = list(set(super_piece.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
+    #     for basic_piece in super_piece.outer_edges_indexes.keys():
+    #         if basic_piece not in mutual_pieces:
+    #             union_outer_edges[basic_piece] = super_piece.outer_edges_indexes[basic_piece]
+    #         # else:
+    #         #     union_outer_edges[basic_piece] = list(set(super_piece.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
         
-        for mut_piece in mutual_pieces:
-            union_outer_edges[mut_piece] = list(set(super_piece.outer_edges_indexes[mut_piece]) & set(self.outer_edges_indexes[mut_piece]))
+    #     for mut_piece in mutual_pieces:
+    #         union_outer_edges[mut_piece] = list(set(super_piece.outer_edges_indexes[mut_piece]) & set(self.outer_edges_indexes[mut_piece]))
 
-            if mut_piece in union_inner_edges.keys():
-                union_outer_edges[mut_piece] = list(set(union_outer_edges[mut_piece])-set(union_inner_edges[mut_piece]))
+    #         if mut_piece in union_inner_edges.keys():
+    #             union_outer_edges[mut_piece] = list(set(union_outer_edges[mut_piece])-set(union_inner_edges[mut_piece]))
 
-        pieces_to_clean = [piece for piece in union_outer_edges.keys() if len(union_outer_edges[piece]) == 0]
-        [union_outer_edges.pop(piece) for piece in pieces_to_clean]
+    #     pieces_to_clean = [piece for piece in union_outer_edges.keys() if len(union_outer_edges[piece]) == 0]
+    #     [union_outer_edges.pop(piece) for piece in pieces_to_clean]
         
-        pieces_to_clean = [piece for piece in union_inner_edges.keys() if len(union_inner_edges[piece]) == 0]
-        [union_inner_edges.pop(piece) for piece in pieces_to_clean]
+    #     pieces_to_clean = [piece for piece in union_inner_edges.keys() if len(union_inner_edges[piece]) == 0]
+    #     [union_inner_edges.pop(piece) for piece in pieces_to_clean]
 
-        return SuperPiece(union_inner_edges,union_outer_edges)
+    #     return SuperPiece(union_inner_edges,union_outer_edges)
         
 
 
@@ -187,7 +187,93 @@ class GeometricNoiselessSolver(Solver):
                         (f"P_{self.pieces[piece_i].id}_RELS_E_{mating[0]}",f"P_{self.pieces[piece_j].id}_RELS_E_{mating[1]}") \
                                 for mating in mating_edges]
                     self.edges_mating_graph.add_edges_from(new_links)
+
+    def _union(self,super_piece_1:SuperPiece,super_piece_2:SuperPiece):
+        union_outer_edges = {}
+        union_inner_edges = {}
+         
+        # Because we already computed it in the outer loop
+        #if mutual_pieces is None:
+        mutual_pieces = super_piece_1.get_mutual_pieces(super_piece_2)
         
+        if len(mutual_pieces) == 0:
+            raise ValueError("To union super pieces, they must have mutual elementary pieces")
+   
+        for basic_piece in super_piece_1.inner_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_inner_edges[basic_piece] = super_piece_1.inner_edges_indexes[basic_piece].copy()
+
+        for basic_piece in super_piece_2.inner_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_inner_edges[basic_piece] = super_piece_2.inner_edges_indexes[basic_piece].copy()
+        
+        for basic_piece in super_piece_1.outer_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_outer_edges[basic_piece] = super_piece_1.outer_edges_indexes[basic_piece].copy()
+
+        for basic_piece in super_piece_2.outer_edges_indexes.keys():
+            if basic_piece not in mutual_pieces:
+                union_outer_edges[basic_piece] = super_piece_2.outer_edges_indexes[basic_piece].copy()
+        
+        for mut_piece in mutual_pieces:
+            union_outer_edges[mut_piece] = list(set(super_piece_2.outer_edges_indexes[mut_piece]) & set(super_piece_1.outer_edges_indexes[mut_piece])).copy()
+
+            if mut_piece in union_inner_edges.keys():
+                union_outer_edges[mut_piece] = list(set(union_outer_edges[mut_piece])-set(union_inner_edges[mut_piece])).copy()
+
+
+        ''' Detecting False positive in the outer ring of the new piece'''
+        # This might be calculated beforehand when loading the superpieces
+        edges_mating = [mate for mate in self.edges_mating_graph.edges if "ENV" not in mate[0] and "ENV" not in mate[1]]
+        union_outer_edges_copy = union_outer_edges.copy()
+
+        for mate in edges_mating:
+            mate_1_splitted = mate[0].split("_")
+            piece_1 = int(mate_1_splitted[1])
+            mate_2_splitted = mate[1].split("_")
+            piece_2 = int(mate_2_splitted[1])
+
+            if piece_1 in union_outer_edges.keys() and piece_2 in union_outer_edges.keys():
+                for e1 in union_outer_edges[piece_1]:
+                    for e2 in union_outer_edges[piece_2]:
+                        if (f"P_{piece_1}_RELS_E_{e1}",f"P_{piece_2}_RELS_E_{e2}") in edges_mating or \
+                            (f"P_{piece_2}_RELS_E_{e2}",f"P_{piece_1}_RELS_E_{e1}") in edges_mating:
+                            union_outer_edges_copy[piece_1].remove(e1)
+                            union_outer_edges_copy[piece_2].remove(e2)
+                
+
+        union_outer_edges = union_outer_edges_copy
+        
+        pieces_to_clean = [piece for piece in union_outer_edges.keys() if len(union_outer_edges[piece]) == 0]
+        [union_outer_edges.pop(piece) for piece in pieces_to_clean]
+        
+        pieces_to_clean = [piece for piece in union_inner_edges.keys() if len(union_inner_edges[piece]) == 0]
+        [union_inner_edges.pop(piece) for piece in pieces_to_clean]
+        
+        return SuperPiece(union_inner_edges,union_outer_edges)
+    
+    def _union_super_piece(self,super_pieces):
+        new_pieces = []
+        for i in range(len(super_pieces)-1):
+            super_1 = super_pieces[i]
+            for j in range(i+1,len(super_pieces)):
+                super_2 = super_pieces[j]
+                if j == i:
+                    continue
+                
+                try:
+                    new_piece = self._union(super_1,super_2)
+                    new_pieces.append(new_piece)
+                    print("Union pieces:")
+                    print(super_1)
+                    print("AND")
+                    print(super_2)
+                    print("result:")
+                    print(new_piece)
+                    print()
+                except ValueError as ve:
+                    pass
+        return new_pieces
 
     def global_optimize(self):
         self._compute_edges_mating_graph()
@@ -232,39 +318,36 @@ class GeometricNoiselessSolver(Solver):
             super_pieces.append(SuperPiece(pieces2edges_looped,pieces2edges_not_looped))
             
         
-        print("Super pieces:")
-        print(super_pieces,sep="\n")
-        print()
+        #print("Super pieces:")
+        #print(super_pieces,sep="\n")
+        #print()
 
-        new_pieces = []
-        for i in range(len(super_pieces)-1):
-            super_1 = super_pieces[i]
-            for j in range(i+1,len(super_pieces)):
-                super_2 = super_pieces[j]
-                if j == i:
-                    continue
+        phase1_pieces = self._union_super_piece(super_pieces)
+        phase2 = self._union_super_piece(phase1_pieces)
+        print(phase2)
+        # new_pieces = []
+        # for i in range(len(super_pieces)-1):
+        #     super_1 = super_pieces[i]
+        #     for j in range(i+1,len(super_pieces)):
+        #         super_2 = super_pieces[j]
+        #         if j == i:
+        #             continue
                 
-                mutual_pieces = super_1.get_mutual_pieces(super_2)
-
-                # if len(mutual_pieces)==0:
-                #     continue
-                
-                try:
-                    new_piece = super_1.union(super_2,mutual_pieces)
-                    new_pieces.append(new_piece)
-                    print("Union pieces:")
-                    print(super_1)
-                    print("AND")
-                    print(super_2)
-                    print("result:")
-                    print(new_piece)
-                    print()
-                except ValueError as ve:
-                    pass
+        #         try:
+        #             new_piece = self._union(super_1,super_2)
+        #             new_pieces.append(new_piece)
+        #             print("Union pieces:")
+        #             print(super_1)
+        #             print("AND")
+        #             print(super_2)
+        #             print("result:")
+        #             print(new_piece)
+        #             print()
+        #         except ValueError as ve:
+        #             pass
 
                 
         
-        print(new_pieces,sep="\n")
             
         
       
