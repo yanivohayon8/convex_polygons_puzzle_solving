@@ -3,14 +3,16 @@ from src.feature_extraction.geometric import GeometricFeatureExtractor
 from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import networkx as nx
-
+from functools import reduce
 
 class Loop():
     
     def __init__(self,traversal) -> None:
         edge_rels = [edge for edge in traversal if "RELS" in edge]
-        pieces_involved = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
-        pieces_involved_set = set(pieces_involved)
+        pieces_involved_with_duplicates = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
+        pieces_involved_set = set(pieces_involved_with_duplicates)
+        pieces_involved = []
+        [pieces_involved.append(p) for p in pieces_involved_with_duplicates if p not in pieces_involved]
         
         if len(pieces_involved_set) <=2:
             raise ValueError("Loop must contain at least 3 pieces due to the convexity assumption")
@@ -20,21 +22,29 @@ class Loop():
         '''
         is_valid = True
         for piece_id in pieces_involved_set:
-            if pieces_involved.count(piece_id) != 2:
+            if pieces_involved_with_duplicates.count(piece_id) != 2:
                 is_valid = False
                 break
         if not is_valid:
             raise ValueError("Loop is not valid, each piece must appear exactly twice. ")
 
-        self.traversal = traversal
-        self.nodes_rels = edge_rels
+        # self.traversal = traversal
+        self.graph_path = traversal 
+        # self.nodes_rels = edge_rels
+        self.mating_rels = edge_rels
         self.nodes_adj = [edge for edge in traversal if "_ADJ_" in edge]
-        self.pieces_involved = pieces_involved_set
+        # self.pieces_involved = pieces_involved_set
+        self.pieces_involved = pieces_involved # To save counter clockwise ordering
+    
+    def __repr__(self) -> str:
+        return reduce(lambda acc,x: f"P_{x}_"+acc,self.pieces_involved,"")[:-1]
         
     
     def get_accumulated_angle(self,edges_mating_graph):
         return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
 
+    def mutual_mating_rels(self,loop):
+        return list(set(self.mating_rels) & set(loop.mating_rels))
 
 class SuperPiece():
     
@@ -251,12 +261,19 @@ class GeometricNoiselessSolver(Solver):
     def global_optimize(self):
         self._compute_edges_mating_graph()
         cycles = nx.simple_cycles(self.edges_mating_graph)
-        list_cycle = list(cycles)
+        list_cycles = list(cycles)
         loops = []
+        
+        # for cycle in list_cycles:
+        #     rels_cy = [e for e in cycle if "RELS" in e]
+        #     # if rels
+        #     print(rels_cy)
 
-        for cycle in list_cycle:
+
+        for cycle in list_cycles:
             try:
                 loop = Loop(cycle)
+                #print(loop.pieces_involved)
                 loops.append(loop)
             except ValueError as ve:
                 pass
@@ -269,36 +286,13 @@ class GeometricNoiselessSolver(Solver):
             if abs(CIRCLE_DEGREES-accumulated_angle) < err_angle:
                 valid_loops.append(loop)
         
-        super_pieces = []
 
-        for loop in valid_loops:
-            pieces2edges_not_looped = {}
-            pieces2edges_looped = {}
-
-            for edge_rel in loop.nodes_rels:
-                _ = edge_rel.split("_") #"P_<PIECE_INDEX>_RELS_E_<EDGE_INDEX>"
-                piece_index = int(_[1])
-                piece_key = piece_index #f"P_{piece_index}"
-                edge_index = int(_[4])
-
-                if piece_key not in pieces2edges_not_looped.keys():
-                    pieces2edges_not_looped[piece_key] = list(range(len(self.pieces[piece_index].coordinates)))
-                    pieces2edges_looped[piece_key] = []
-
-                pieces2edges_not_looped[piece_key].remove(edge_index)
-                pieces2edges_looped[piece_key].append(edge_index)
-
-            super_pieces.append(SuperPiece(pieces2edges_looped,pieces2edges_not_looped))
+        for loop_i in range(len(valid_loops)):
+            for loop_j in range(loop_i+1,len(valid_loops)):
+                mut_edges = valid_loops[loop_i].mutual_mating_rels(valid_loops[loop_j])
+                if len(mut_edges) > 0:
+                    print(f"Merge between {valid_loops[loop_i]} and {valid_loops[loop_j]}")
             
-        
-        #print("Super pieces:")
-        #print(super_pieces,sep="\n")
-        #print()
-
-        phase1_pieces = self._union_super_piece_loop_0(super_pieces)
-        self.super_pieces_phases.append(phase1_pieces)
-        phase2 = self._union_super_piece(phase1_pieces)
-        print(phase2)
         
 
                 
