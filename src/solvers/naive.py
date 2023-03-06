@@ -61,52 +61,6 @@ class SuperPiece():
         super_piece_pieces = super_piece.get_pieces_involved()
         return list(set(self_pieces) & set(super_piece_pieces))
 
-    # def union(self,super_piece,edges_mating,mutual_pieces=None):
-    #     union_outer_edges = {}
-    #     union_inner_edges = {}
-         
-    #     # Because we already computed it in the outer loop
-    #     if mutual_pieces is None:
-    #         mutual_pieces = self.get_mutual_pieces(super_piece)
-        
-    #     if len(mutual_pieces) == 0:
-    #         raise ValueError("To union super pieces, they must have mutual elementary pieces")
-   
-    #     for basic_piece in self.inner_edges_indexes.keys():
-    #         if basic_piece not in mutual_pieces:
-    #             union_inner_edges[basic_piece] = self.inner_edges_indexes[basic_piece]
-
-    #     for basic_piece in super_piece.inner_edges_indexes.keys():
-    #         if basic_piece not in mutual_pieces:
-    #             union_inner_edges[basic_piece] = super_piece.inner_edges_indexes[basic_piece]
-        
-    #     for basic_piece in self.outer_edges_indexes.keys():
-    #         if basic_piece not in mutual_pieces:
-    #             union_outer_edges[basic_piece] = self.outer_edges_indexes[basic_piece]
-    #         # else:
-    #         #     #union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
-    #         #     union_outer_edges[basic_piece] = list(set(self.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
-
-    #     for basic_piece in super_piece.outer_edges_indexes.keys():
-    #         if basic_piece not in mutual_pieces:
-    #             union_outer_edges[basic_piece] = super_piece.outer_edges_indexes[basic_piece]
-    #         # else:
-    #         #     union_outer_edges[basic_piece] = list(set(super_piece.outer_edges_indexes[basic_piece])-set(union_inner_edges[basic_piece]))
-        
-    #     for mut_piece in mutual_pieces:
-    #         union_outer_edges[mut_piece] = list(set(super_piece.outer_edges_indexes[mut_piece]) & set(self.outer_edges_indexes[mut_piece]))
-
-    #         if mut_piece in union_inner_edges.keys():
-    #             union_outer_edges[mut_piece] = list(set(union_outer_edges[mut_piece])-set(union_inner_edges[mut_piece]))
-
-    #     pieces_to_clean = [piece for piece in union_outer_edges.keys() if len(union_outer_edges[piece]) == 0]
-    #     [union_outer_edges.pop(piece) for piece in pieces_to_clean]
-        
-    #     pieces_to_clean = [piece for piece in union_inner_edges.keys() if len(union_inner_edges[piece]) == 0]
-    #     [union_inner_edges.pop(piece) for piece in pieces_to_clean]
-
-    #     return SuperPiece(union_inner_edges,union_outer_edges)
-        
 
 
 class GeometricNoiselessSolver(Solver):
@@ -116,6 +70,7 @@ class GeometricNoiselessSolver(Solver):
         self.geomteric_feature_extractor = GeometricFeatureExtractor()
         self.geometric_pairwiser = GeometricPairwiseMatcher()
         self.edges_mating_graph = None
+        self.super_pieces_phases = []
 
     def extract_features(self):
         super().extract_features()
@@ -187,14 +142,25 @@ class GeometricNoiselessSolver(Solver):
                         (f"P_{self.pieces[piece_i].id}_RELS_E_{mating[0]}",f"P_{self.pieces[piece_j].id}_RELS_E_{mating[1]}") \
                                 for mating in mating_edges]
                     self.edges_mating_graph.add_edges_from(new_links)
+    
+    def _get_mutual_pieces(self,super_piece_1:SuperPiece,super_piece_2:SuperPiece):
+        # if len(self.super_pieces_phases)==0:
+        #     return super_piece_1.get_mutual_pieces(super_piece_2)
+        return super_piece_1.get_mutual_pieces(super_piece_2)
+
+        
+        
 
     def _union(self,super_piece_1:SuperPiece,super_piece_2:SuperPiece):
+        '''
+            In case the pieces to merge are from the csv file (the direct pieces from the puzzle)
+        '''
         union_outer_edges = {}
         union_inner_edges = {}
          
         # Because we already computed it in the outer loop
         #if mutual_pieces is None:
-        mutual_pieces = super_piece_1.get_mutual_pieces(super_piece_2)
+        mutual_pieces = self._get_mutual_pieces(super_piece_1,super_piece_2) #super_piece_1.get_mutual_pieces(super_piece_2)
         
         if len(mutual_pieces) == 0:
             raise ValueError("To union super pieces, they must have mutual elementary pieces")
@@ -252,7 +218,7 @@ class GeometricNoiselessSolver(Solver):
         
         return SuperPiece(union_inner_edges,union_outer_edges)
     
-    def _union_super_piece(self,super_pieces):
+    def _union_super_piece_loop_0(self,super_pieces):
         new_pieces = []
         for i in range(len(super_pieces)-1):
             super_1 = super_pieces[i]
@@ -264,16 +230,23 @@ class GeometricNoiselessSolver(Solver):
                 try:
                     new_piece = self._union(super_1,super_2)
                     new_pieces.append(new_piece)
-                    print("Union pieces:")
-                    print(super_1)
-                    print("AND")
-                    print(super_2)
-                    print("result:")
-                    print(new_piece)
-                    print()
+                    # print("Union pieces:")
+                    # print(super_1)
+                    # print("AND")
+                    # print(super_2)
+                    # print("result:")
+                    # print(new_piece)
+                    # print()
                 except ValueError as ve:
                     pass
         return new_pieces
+
+    def _union_loop(self,super_piece_1,super_piece_2):
+        '''
+            In case the pieces to merge are not 
+            the elementry that were read in the csv file
+        '''
+        pass
 
     def global_optimize(self):
         self._compute_edges_mating_graph()
@@ -322,29 +295,11 @@ class GeometricNoiselessSolver(Solver):
         #print(super_pieces,sep="\n")
         #print()
 
-        phase1_pieces = self._union_super_piece(super_pieces)
+        phase1_pieces = self._union_super_piece_loop_0(super_pieces)
+        self.super_pieces_phases.append(phase1_pieces)
         phase2 = self._union_super_piece(phase1_pieces)
         print(phase2)
-        # new_pieces = []
-        # for i in range(len(super_pieces)-1):
-        #     super_1 = super_pieces[i]
-        #     for j in range(i+1,len(super_pieces)):
-        #         super_2 = super_pieces[j]
-        #         if j == i:
-        #             continue
-                
-        #         try:
-        #             new_piece = self._union(super_1,super_2)
-        #             new_pieces.append(new_piece)
-        #             print("Union pieces:")
-        #             print(super_1)
-        #             print("AND")
-        #             print(super_2)
-        #             print("result:")
-        #             print(new_piece)
-        #             print()
-        #         except ValueError as ve:
-        #             pass
+        
 
                 
         

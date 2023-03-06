@@ -140,6 +140,21 @@ class TestNaiveSolver(unittest.TestCase):
                 assert (count_edges[piece] == expected_numedges[piece]), err_msg
 
     def test_merge_1_loops(self):
+
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        puzzle_directory = direrctory + "0"
+        #puzzle_directory = direrctory + "simplest_puzzle"
+        #puzzle_directory = direrctory + "simplest_puzzle_v2"
+        loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+                        puzzle_directory + "/ground_truth_rels.csv", 
+                        puzzle_directory + "/pieces.csv")
+        loader.load()
+        bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
+        solver = solvers.GeometricNoiselessSolver(bag_of_pieces)
+        solver.extract_features()
+        solver.pairwise()
+        solver._compute_edges_mating_graph()
+
         super_pieces = [
             solvers.SuperPiece({3: [0, 1], 0: [2, 3], 1: [0, 1]},{3: [2], 0: [0, 1], 1: [2], 5: [1]}),
             solvers.SuperPiece({2: [2, 1], 3: [0, 1], 0: [2, 1], 6: [0, 1], 9: [2, 3], 8: [1, 2]},{2: [0], 3: [2], 0: [0, 3], 6: [2], 9: [0, 1], 8: [0]}),
@@ -149,6 +164,12 @@ class TestNaiveSolver(unittest.TestCase):
             solvers.SuperPiece({0: [2, 1], 9: [2, 3], 8: [1, 2], 4: [1, 0], 3: [1, 2]},{0: [0, 3], 9: [0, 1], 8: [0], 4: [2], 3: [0], 5: [3]}),
             solvers.SuperPiece({0: [2, 1], 5: [0, 1], 6: [0, 1], 7: [2, 1]},{0: [0, 3], 5: [2, 3], 6: [2], 7: [0], 9: [1]})
         ]
+
+        res = solver._union(super_pieces[2],super_pieces[4])
+        print(res)
+        res = solver._union(super_pieces[2],super_pieces[0])
+        print(res)
+
 
         
 if __name__ == "__main__":
