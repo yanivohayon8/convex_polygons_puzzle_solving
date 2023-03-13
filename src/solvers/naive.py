@@ -3,74 +3,7 @@ from src.feature_extraction.geometric import GeometricFeatureExtractor
 from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import networkx as nx
-from functools import reduce
-
-class Loop():
-    
-    def __init__(self,traversal) -> None:
-        edge_rels = [edge for edge in traversal if "RELS" in edge]
-        pieces_involved_with_duplicates = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
-        pieces_involved_set = set(pieces_involved_with_duplicates)
-        pieces_involved = []
-        [pieces_involved.append(p) for p in pieces_involved_with_duplicates if p not in pieces_involved]
-        
-        if len(pieces_involved_set) <=2:
-            raise ValueError("Loop must contain at least 3 pieces due to the convexity assumption")
-        
-        '''
-            Since we assume the pieces are convex, in the hierchical loops they will appear only twice
-        '''
-        is_valid = True
-        for piece_id in pieces_involved_set:
-            if pieces_involved_with_duplicates.count(piece_id) != 2:
-                is_valid = False
-                break
-        if not is_valid:
-            raise ValueError("Loop is not valid, each piece must appear exactly twice. ")
-
-        # self.traversal = traversal
-        self.graph_path = traversal 
-        # self.nodes_rels = edge_rels
-        self.mating_rels = edge_rels
-        self.nodes_adj = [edge for edge in traversal if "_ADJ_" in edge]
-        # self.pieces_involved = pieces_involved_set
-        self.pieces_involved = pieces_involved # To save counter clockwise ordering
-    
-    def __repr__(self) -> str:
-        return reduce(lambda acc,x: f"P_{x}_"+acc,self.pieces_involved,"")[:-1]
-        
-    
-    def get_accumulated_angle(self,edges_mating_graph):
-        return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
-
-    def mutual_mating_rels(self,loop):
-        return list(set(self.mating_rels) & set(loop.mating_rels))
-
-class SuperPiece():
-    
-    def __init__(self,inner_edges_indexes:dict,outer_edges_indexes:dict) -> None:
-        self.inner_edges_indexes = inner_edges_indexes
-        self.outer_edges_indexes = outer_edges_indexes
-        pass
-
-    def __repr__(self) -> str:
-        _repr = ""
-        for piece in self.outer_edges_indexes.keys():
-            _repr = _repr + f"P{piece}_"
-            for edge_index in self.outer_edges_indexes[piece]:
-                _repr = _repr + f"e{edge_index}_"
-        
-        return _repr[:-1]
-    
-    def get_pieces_involved(self):
-        return [int(_[1:]) for _ in self.__repr__().split("_") if _.startswith("P")]
-
-    
-    def get_mutual_pieces(self,super_piece):
-        self_pieces = self.get_pieces_involved()
-        super_piece_pieces = super_piece.get_pieces_involved()
-        return list(set(self_pieces) & set(super_piece_pieces))
-
+from src.data_structures.hierarchical_loops import ZeroLoop,Loop,MatingLink
 
 
 class GeometricNoiselessSolver(Solver):
@@ -80,7 +13,8 @@ class GeometricNoiselessSolver(Solver):
         self.geomteric_feature_extractor = GeometricFeatureExtractor()
         self.geometric_pairwiser = GeometricPairwiseMatcher()
         self.edges_mating_graph = None
-        self.super_pieces_phases = []
+        self.zero_loops = []
+        
 
     def extract_features(self):
         super().extract_features()
@@ -153,110 +87,32 @@ class GeometricNoiselessSolver(Solver):
                                 for mating in mating_edges]
                     self.edges_mating_graph.add_edges_from(new_links)
     
-    def _get_mutual_pieces(self,super_piece_1:SuperPiece,super_piece_2:SuperPiece):
-        # if len(self.super_pieces_phases)==0:
-        #     return super_piece_1.get_mutual_pieces(super_piece_2)
-        return super_piece_1.get_mutual_pieces(super_piece_2)
 
+    def _loops_to_union(self,loops,num_mut_edges):
+        pairs_indexes = []
+
+        for loop_i in range(len(loops)):
+            for loop_j in range(loop_i+1,len(loops)):
+                mut_edges = loops[loop_i].mutual_mating_rels(loops[loop_j])
+                # if len(mut_edges) <= num_mut_edges*2 and len(mut_edges) > 0: # *2 because the edges are nodes and we looking for a link betwween two nodes
+                if len(mut_edges) >0 and len(mut_edges)%2==0: # *2 because the edges are nodes and we looking for a link betwween two nodes
+                    pairs_indexes.append((loop_i,loop_j))
+                    #print(f"Union {loops[loop_i]} and {loops[loop_j]}")        
         
-        
-
-    def _union(self,super_piece_1:SuperPiece,super_piece_2:SuperPiece):
-        '''
-            In case the pieces to merge are from the csv file (the direct pieces from the puzzle)
-        '''
-        union_outer_edges = {}
-        union_inner_edges = {}
-         
-        # Because we already computed it in the outer loop
-        #if mutual_pieces is None:
-        mutual_pieces = self._get_mutual_pieces(super_piece_1,super_piece_2) #super_piece_1.get_mutual_pieces(super_piece_2)
-        
-        if len(mutual_pieces) == 0:
-            raise ValueError("To union super pieces, they must have mutual elementary pieces")
-   
-        for basic_piece in super_piece_1.inner_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_inner_edges[basic_piece] = super_piece_1.inner_edges_indexes[basic_piece].copy()
-
-        for basic_piece in super_piece_2.inner_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_inner_edges[basic_piece] = super_piece_2.inner_edges_indexes[basic_piece].copy()
-        
-        for basic_piece in super_piece_1.outer_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_outer_edges[basic_piece] = super_piece_1.outer_edges_indexes[basic_piece].copy()
-
-        for basic_piece in super_piece_2.outer_edges_indexes.keys():
-            if basic_piece not in mutual_pieces:
-                union_outer_edges[basic_piece] = super_piece_2.outer_edges_indexes[basic_piece].copy()
-        
-        for mut_piece in mutual_pieces:
-            union_outer_edges[mut_piece] = list(set(super_piece_2.outer_edges_indexes[mut_piece]) & set(super_piece_1.outer_edges_indexes[mut_piece])).copy()
-
-            if mut_piece in union_inner_edges.keys():
-                union_outer_edges[mut_piece] = list(set(union_outer_edges[mut_piece])-set(union_inner_edges[mut_piece])).copy()
-
-
-        ''' Detecting False positive in the outer ring of the new piece'''
-        # This might be calculated beforehand when loading the superpieces
-        edges_mating = [mate for mate in self.edges_mating_graph.edges if "ENV" not in mate[0] and "ENV" not in mate[1]]
-        union_outer_edges_copy = union_outer_edges.copy()
-
-        for mate in edges_mating:
-            mate_1_splitted = mate[0].split("_")
-            piece_1 = int(mate_1_splitted[1])
-            mate_2_splitted = mate[1].split("_")
-            piece_2 = int(mate_2_splitted[1])
-
-            if piece_1 in union_outer_edges.keys() and piece_2 in union_outer_edges.keys():
-                for e1 in union_outer_edges[piece_1]:
-                    for e2 in union_outer_edges[piece_2]:
-                        if (f"P_{piece_1}_RELS_E_{e1}",f"P_{piece_2}_RELS_E_{e2}") in edges_mating or \
-                            (f"P_{piece_2}_RELS_E_{e2}",f"P_{piece_1}_RELS_E_{e1}") in edges_mating:
-                            union_outer_edges_copy[piece_1].remove(e1)
-                            union_outer_edges_copy[piece_2].remove(e2)
-                
-
-        union_outer_edges = union_outer_edges_copy
-        
-        pieces_to_clean = [piece for piece in union_outer_edges.keys() if len(union_outer_edges[piece]) == 0]
-        [union_outer_edges.pop(piece) for piece in pieces_to_clean]
-        
-        pieces_to_clean = [piece for piece in union_inner_edges.keys() if len(union_inner_edges[piece]) == 0]
-        [union_inner_edges.pop(piece) for piece in pieces_to_clean]
-        
-        return SuperPiece(union_inner_edges,union_outer_edges)
+        return pairs_indexes
     
-    def _union_super_piece_loop_0(self,super_pieces):
-        new_pieces = []
-        for i in range(len(super_pieces)-1):
-            super_1 = super_pieces[i]
-            for j in range(i+1,len(super_pieces)):
-                super_2 = super_pieces[j]
-                if j == i:
-                    continue
-                
-                try:
-                    new_piece = self._union(super_1,super_2)
-                    new_pieces.append(new_piece)
-                    # print("Union pieces:")
-                    # print(super_1)
-                    # print("AND")
-                    # print(super_2)
-                    # print("result:")
-                    # print(new_piece)
-                    # print()
-                except ValueError as ve:
-                    pass
-        return new_pieces
+    def _load_zero_loops(self,cycles_list):
+        zero_loops = []
 
-    def _union_loop(self,super_piece_1,super_piece_2):
-        '''
-            In case the pieces to merge are not 
-            the elementry that were read in the csv file
-        '''
-        pass
+        for cycle in cycles_list:
+            try:
+                loop = ZeroLoop(cycle)
+                #print(loop.pieces_involved)
+                zero_loops.append(loop)
+            except ValueError as ve:
+                pass
+        
+        return zero_loops
 
     def global_optimize(self):
         self._compute_edges_mating_graph()
@@ -272,7 +128,8 @@ class GeometricNoiselessSolver(Solver):
 
         for cycle in list_cycles:
             try:
-                loop = Loop(cycle)
+                loop = Loop()
+                loop.load(cycle)
                 #print(loop.pieces_involved)
                 loops.append(loop)
             except ValueError as ve:
@@ -286,12 +143,11 @@ class GeometricNoiselessSolver(Solver):
             if abs(CIRCLE_DEGREES-accumulated_angle) < err_angle:
                 valid_loops.append(loop)
         
-
         for loop_i in range(len(valid_loops)):
             for loop_j in range(loop_i+1,len(valid_loops)):
                 mut_edges = valid_loops[loop_i].mutual_mating_rels(valid_loops[loop_j])
                 if len(mut_edges) > 0:
-                    print(f"Merge between {valid_loops[loop_i]} and {valid_loops[loop_j]}")
+                    print(f"Union {valid_loops[loop_i]} and {valid_loops[loop_j]}")
             
         
 
