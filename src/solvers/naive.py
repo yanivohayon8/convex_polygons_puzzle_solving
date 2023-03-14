@@ -207,7 +207,7 @@ class GeometricNoiselessSolver(Solver):
             if piece_1 == piece_2:
                 continue
 
-            mating = Mating(piece_1,edge_1,piece_2,edge_2)
+            mating = Mating(piece_1=piece_1,edge_1=edge_1,piece_2=piece_2,edge_2=edge_2)
             key_p_1 = f"P_{piece_1}"
             piece2edge2matings.setdefault(key_p_1,{})
             piece2edge2matings[key_p_1][edge_1] = mating # Because each edge has only one mating in the loop
@@ -228,11 +228,6 @@ class GeometricNoiselessSolver(Solver):
 
         for cycle in cycles_list:
             try:
-                print(cycle)
-                # self._load_zeroloop(cycle)
-                # loop = ZeroLoop(cycle)
-                # #print(loop.pieces_involved)
-
                 loop = self._load_zeroloop(cycle)
                 zero_loops.append(loop)
             except ZeroLoopError as ve:

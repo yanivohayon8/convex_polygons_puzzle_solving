@@ -85,8 +85,12 @@ class TestNaiveSolver(unittest.TestCase):
         with open(puzzle_directory + "/cycles.txt", 'r') as f:
             cycles_list = [eval(line.rstrip('\n')) for line in f]
         #cycles_list = solver._compute_cycles()
-        
-        solver._load_zero_loops(cycles_list)
+
+        zero_loops = solver._load_zero_loops(cycles_list)
+        expected_zero_loops = ["P_0_P_8_P_9_P_6_P_5", "P_9_P_8_P_7", "P_1_P_0_P_5_P_2", "P_4_P_3_P_5_P_6", "P_3_P_2_P_5"]
+
+        for exp_loop,loop in zip(expected_zero_loops,zero_loops):
+            assert exp_loop == loop
 
 
     def test_union_loops(self):

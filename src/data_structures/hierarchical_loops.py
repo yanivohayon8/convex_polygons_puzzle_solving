@@ -9,11 +9,21 @@ class Mating():
         edge_2: 
 
     '''
-    def __init__(self, piece_1:str, edge_1:str, piece_2:str,edge_2:str) -> None:
-        self.piece_1 = piece_1
-        self.edge_1 = edge_1
-        self.piece_2 = piece_2
-        self.edge_2 = edge_2
+    def __init__(self,**kwargs) -> None:
+        
+        if "repr_string" in kwargs.keys():
+            '''Look at the __repr__ function '''
+            repr_splited = kwargs["repr_string"].split("_")
+            self.piece_1 = repr_splited[1]
+            self.edge_1 = repr_splited[3].split("<")[0]
+            self.piece_2 = repr_splited[-3]
+            self.edge_2 = repr_splited[-1]
+        else:
+        #(piece_1:str, edge_1:str, piece_2:str,edge_2:str)
+            self.piece_1 = kwargs["piece_1"]
+            self.edge_1 = kwargs["edge_1"]
+            self.piece_2 = kwargs["piece_2"]
+            self.edge_2 = kwargs["edge_2"]
     
     def __repr__(self) -> str:
         return f"P_{self.piece_1}_e_{self.piece_2}<--->P_{self.piece_2}_e_{self.edge_2}"
@@ -23,9 +33,6 @@ class Mating():
             return (self.piece_1 == __o.piece_1 and self.piece_2 == __o.piece_2 and self.edge_1==__o.edge_1 and self.edge_2==__o.edge_2\
             or self.piece_1 == __o.piece_2 and self.piece_2 == __o.piece_1 and self.edge_1==__o.edge_2 and self.edge_2==__o.edge_1)
         return False
-    
-    def get_piece_1_edge_1(self):
-        return self.edge_1
 
 
 class Loop():
