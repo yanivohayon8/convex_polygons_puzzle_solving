@@ -58,16 +58,13 @@ class Loop():
         # return reduce(lambda acc,x: f"P_{x}_"+acc,self.pieces_involved,"")[:-1]
         return reduce(lambda acc,x: f"{x}_"+acc,self.get_pieces_invovled(),"")[:-1]
         
-    # def mutual_mating_rels(self,loop):
-    #     return list(set(self.mating_rels) & set(loop.mating_rels))
-    
     def get_mutual_pieces(self,loop):
         if isinstance(loop,Loop):
-            return list(set(self.pieces_involved) & set(loop.pieces_involved))
+            return list(set(self.get_pieces_invovled()) & set(loop.get_pieces_invovled()))
     
     def is_contained(self,loop):
         if isinstance(loop,Loop):
-            unmutual_pieces = list(set(self.pieces_involved) - set(loop.pieces_involved))
+            unmutual_pieces = list(set(self.get_pieces_invovled()) - set(loop.get_pieces_invovled()))
             return len(unmutual_pieces)==0 
     
     def union(self,loop,new_matings:list):
@@ -76,71 +73,6 @@ class Loop():
             or it belong to here just give the '''
         pass
 
-
-class ZeroLoop(Loop):
-
-    def __init__(self,graph_path) -> None:
-        self.graph_path = graph_path
-
-        edge_rels = [edge for edge in graph_path if "RELS" in edge]
-        pieces_involved_with_duplicates = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
-        pieces_involved_set = set(pieces_involved_with_duplicates)
-        pieces_involved = []
-        [pieces_involved.append(p) for p in pieces_involved_with_duplicates if p not in pieces_involved]
-        
-        if len(pieces_involved_set) <=2:
-            raise ValueError("Loop must contain at least 3 pieces due to the convexity assumption")
-        
-        '''
-            Since we assume the pieces are convex, in the hierchical loops they will appear only twice
-        '''
-        is_valid = True
-        for piece_id in pieces_involved_set:
-            if pieces_involved_with_duplicates.count(piece_id) != 2:
-                is_valid = False
-                break
-        if not is_valid:
-            raise ValueError("Loop is not valid, each piece must appear exactly twice. ")
-
-        # self.traversal = traversal
-        self.graph_path = graph_path 
-        # self.nodes_rels = edge_rels
-        self.mating_rels = edge_rels
-        self.nodes_adj = [edge for edge in graph_path if "_ADJ_" in edge]
-        # self.pieces_involved = pieces_involved_set
-        self.pieces_involved = pieces_involved # To save counter clockwise ordering
-        self.piece2matings = {}
-
-        for edge_prev,edge_next in zip(edge_rels,edge_rels[1:] + [edge_rels[0]]):
-            '''The convention of node of edge rels in the mating graph is the following:
-            f"P_{piece.id}_RELS_E_{edge_index}"'''
-            split_prev = edge_prev.split("_")
-            piece_1 = split_prev[1]
-            edge_1 = split_prev[-1]
-            split_next = edge_next.split("_")
-            piece_2 = split_next[1]
-            edge_2 = split_next[-1]
-
-            if piece_1 == piece_2:
-                continue
-
-            mating = Mating(piece_1,edge_1,piece_2,edge_2)
-            key_1 = f"P_{piece_1}"
-            self.piece2matings.setdefault(key_1,[])
-            
-            if mating not in self.piece2matings[key_1]:
-                self.piece2matings[key_1].append(mating) 
-            
-            key_2 = f"P_{piece_2}"
-            self.piece2matings.setdefault(key_2,[])
-            if mating not in self.piece2matings[key_2]:
-                self.piece2matings[key_2].append(mating)
-
-    def get_accumulated_angle(self,edges_mating_graph):
-        return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
-
-    
-        
 
 class ZeroLoopError(Exception):
     pass

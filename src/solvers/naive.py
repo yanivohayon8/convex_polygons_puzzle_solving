@@ -3,7 +3,7 @@ from src.feature_extraction.geometric import GeometricFeatureExtractor
 from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import networkx as nx
-from src.data_structures.hierarchical_loops import ZeroLoop,Loop,Mating,ZeroLoopError
+from src.data_structures.hierarchical_loops import Loop,Mating,ZeroLoopError
 
 
 CIRCLE_DEGREES = 360
@@ -123,7 +123,7 @@ class GeometricNoiselessSolver(Solver):
                 self.piece2matings[key_2].append(mating)
 
 
-    def _loops_to_union(self,loops,num_mut_edges):
+    def _loops_to_union(self,loops:list):
         
         # if not self.piece2matings:
         #     self.piece2matings = self._get_possible_matings()
