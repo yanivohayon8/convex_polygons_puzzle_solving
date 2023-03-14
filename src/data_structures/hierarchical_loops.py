@@ -1,13 +1,15 @@
 from functools import reduce
 
-
-
-class MatingLink():
+class Mating():
     '''
         A relationship between two mating (match) edges
-    '''
+        piece_1: 
+        edge_1: 
+        piece_2: 
+        edge_2: 
 
-    def __init__(self, piece_1, edge_1, piece_2,edge_2) -> None:
+    '''
+    def __init__(self, piece_1:str, edge_1:str, piece_2:str,edge_2:str) -> None:
         self.piece_1 = piece_1
         self.edge_1 = edge_1
         self.piece_2 = piece_2
@@ -15,51 +17,64 @@ class MatingLink():
     
     def __repr__(self) -> str:
         return f"P_{self.piece_1}_e_{self.piece_2}<--->P_{self.piece_2}_e_{self.edge_2}"
+    
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, Mating):
+            return (self.piece_1 == __o.piece_1 and self.piece_2 == __o.piece_2 and self.edge_1==__o.edge_1 and self.edge_2==__o.edge_2\
+            or self.piece_1 == __o.piece_2 and self.piece_2 == __o.piece_1 and self.edge_1==__o.edge_2 and self.edge_2==__o.edge_1)
+        return False
+    
+    def get_piece_1_edge_1(self):
+        return self.edge_1
 
 
 class Loop():
     
-    def __init__(self,graph_path=None,mating_rels=None,nodes_adj=None,pieces_involved=None) -> None:
-        self.graph_path = graph_path
-        self.mating_rels = mating_rels
-        self.nodes_adj = nodes_adj
-        self.pieces_involved = pieces_involved
+    # def __init__(self,pieces_involved=None) -> None:
+    #     '''
+        
+    #     '''
+    #     self.piece2matings = {}
+    #     self.pieces_involved = pieces_involved
     
+    def __init__(self,piece2edge2matings={}) -> None:
+        '''
+        
+        '''
+        self.piece2edge2matings = piece2edge2matings
+    
+
+    def get_pieces_invovled(self):
+        return self.piece2edge2matings.keys()
+
     def __repr__(self) -> str:
-        return reduce(lambda acc,x: f"P_{x}_"+acc,self.pieces_involved,"")[:-1]
+        # return reduce(lambda acc,x: f"P_{x}_"+acc,self.pieces_involved,"")[:-1]
+        return reduce(lambda acc,x: f"{x}_"+acc,self.get_pieces_invovled(),"")[:-1]
         
+    # def mutual_mating_rels(self,loop):
+    #     return list(set(self.mating_rels) & set(loop.mating_rels))
     
-    def get_accumulated_angle(self,edges_mating_graph):
-        return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
-
-    def mutual_mating_rels(self,loop):
-        return list(set(self.mating_rels) & set(loop.mating_rels))
+    def get_mutual_pieces(self,loop):
+        if isinstance(loop,Loop):
+            return list(set(self.pieces_involved) & set(loop.pieces_involved))
     
-    def union(self,loop):
-        union_loop_rels = [] #self.mating_rels
-        [union_loop_rels.append(rel) for rel in self.mating_rels + loop.mating_rels if rel not in union_loop_rels] 
-
-        union_nodes_adj = []
-        [union_nodes_adj.append(node) for node in self.nodes_adj + loop.nodes_adj if node not in union_nodes_adj]
-        
-        union_pieces_involved = []
-        [union_pieces_involved.append(p) for p in self.pieces_involved + loop.pieces_involved if p not in union_pieces_involved]
-
-        '''Is this a naive implementation?'''
-        union_graph_path = []
-        [union_graph_path.append(node) for node in self.graph_path + loop.graph_path]
-
-        union_loop  = Loop(graph_path=union_graph_path,
-                           mating_rels=union_loop_rels,
-                           nodes_adj=union_nodes_adj,
-                           pieces_involved=union_pieces_involved)
-
-        return union_loop
+    def is_contained(self,loop):
+        if isinstance(loop,Loop):
+            unmutual_pieces = list(set(self.pieces_involved) - set(loop.pieces_involved))
+            return len(unmutual_pieces)==0 
+    
+    def union(self,loop,new_matings:list):
+        ''' You should consider where the loops are pairing
+            maybe this method belongs to the geometric solver? 
+            or it belong to here just give the '''
+        pass
 
 
 class ZeroLoop(Loop):
 
     def __init__(self,graph_path) -> None:
+        self.graph_path = graph_path
+
         edge_rels = [edge for edge in graph_path if "RELS" in edge]
         pieces_involved_with_duplicates = [elm.split("_")[1] for elm in edge_rels] #P_<NUM_PIECE>_.....
         pieces_involved_set = set(pieces_involved_with_duplicates)
@@ -87,7 +102,39 @@ class ZeroLoop(Loop):
         self.nodes_adj = [edge for edge in graph_path if "_ADJ_" in edge]
         # self.pieces_involved = pieces_involved_set
         self.pieces_involved = pieces_involved # To save counter clockwise ordering
+        self.piece2matings = {}
+
+        for edge_prev,edge_next in zip(edge_rels,edge_rels[1:] + [edge_rels[0]]):
+            '''The convention of node of edge rels in the mating graph is the following:
+            f"P_{piece.id}_RELS_E_{edge_index}"'''
+            split_prev = edge_prev.split("_")
+            piece_1 = split_prev[1]
+            edge_1 = split_prev[-1]
+            split_next = edge_next.split("_")
+            piece_2 = split_next[1]
+            edge_2 = split_next[-1]
+
+            if piece_1 == piece_2:
+                continue
+
+            mating = Mating(piece_1,edge_1,piece_2,edge_2)
+            key_1 = f"P_{piece_1}"
+            self.piece2matings.setdefault(key_1,[])
+            
+            if mating not in self.piece2matings[key_1]:
+                self.piece2matings[key_1].append(mating) 
+            
+            key_2 = f"P_{piece_2}"
+            self.piece2matings.setdefault(key_2,[])
+            if mating not in self.piece2matings[key_2]:
+                self.piece2matings[key_2].append(mating)
+
+    def get_accumulated_angle(self,edges_mating_graph):
+        return sum([edges_mating_graph.nodes[node]["angle"] for node in self.nodes_adj])
+
     
         
 
+class ZeroLoopError(Exception):
+    pass
 

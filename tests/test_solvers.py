@@ -75,22 +75,42 @@ class TestNaiveSolver(unittest.TestCase):
                         puzzle_directory + "/pieces.csv")
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
+        
         solver = solvers.GeometricNoiselessSolver(bag_of_pieces)
-
+        solver.extract_features()
+        solver.pairwise()
+        solver._compute_edges_mating_graph()
+        
+        # # Because the nx package would brings random results, make the test deterministic
         with open(puzzle_directory + "/cycles.txt", 'r') as f:
             cycles_list = [eval(line.rstrip('\n')) for line in f]
+        #cycles_list = solver._compute_cycles()
         
+        solver._load_zero_loops(cycles_list)
+
+
+    def test_union_loops(self):
+        '''Start testing'''
         #print(cycles_list)
-        zero_loops = solver._load_zero_loops(cycles_list)
+
+        '''
+            You need to delete all the aboved code and write here hard coded 
+            the zero loops.
+        '''
+
+        zero_loops = [] #'''Fill me hardcoded'''
+
         assert len(zero_loops) == 5
         expected_loops = ["P_5_P_3_P_2", "P_5_P_6_P_4_P_3", "P_8_P_7_P_9", "P_5_P_0_P_8_P_9_P_6", "P_0_P_5_P_2_P_1"]
+        
         for expected,res in zip(expected_loops,zero_loops):
             assert expected == repr(res) 
+        
         loop_level = 0
         zero_loops_pairs = solver._loops_to_union(zero_loops,loop_level+1)
         # assert zero_loops_pairs == [(0, 1), (0, 4), (1, 3), (2, 3), (3, 4)]
         one_loops = [zero_loops[pair[0]].union(zero_loops[pair[1]]) for pair in zero_loops_pairs]
-        assert len(one_loops) == 5
+        assert len(one_loops) == 7 #5 
         expected_loops = ["P_6_P_4_P_5_P_3_P_2", "P_5_P_6_P_4_P_3", "P_8_P_7_P_9", "P_5_P_0_P_8_P_9_P_6", "P_0_P_5_P_2_P_1"]
         for expected,res in zip(expected_loops,zero_loops):
             assert expected == repr(res) 

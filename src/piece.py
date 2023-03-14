@@ -16,3 +16,6 @@ class Piece():
             This is because we read it from the piece.csv file...
         '''
         return list(self.polygon.exterior.coords)
+    
+    # def __repr__(self) -> str:
+    #     return self.id
