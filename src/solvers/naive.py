@@ -87,7 +87,6 @@ class GeometricNoiselessSolver(Solver):
                 mating_edges = self.geometric_pairwiser.match_edges[piece_i,piece_j]
                 if len(mating_edges)>0:
                     for mat_edge in mating_edges:
-                    #mating_edges = [0] # In refactor make this not necessary
                         new_links = [
                             (f"P_{self.pieces[piece_i].id}_RELS_E_{mating[0]}",f"P_{self.pieces[piece_j].id}_RELS_E_{mating[1]}") \
                                     for mating in mat_edge]
