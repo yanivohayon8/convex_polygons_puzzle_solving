@@ -14,10 +14,7 @@ class GeometricNoiselessSolver(Solver):
         super().__init__(pieces)
         self.geomteric_feature_extractor = GeometricFeatureExtractor()
         self.geometric_pairwiser = GeometricPairwiseMatcher()
-        self.edges_mating_graph = None
-        self.piece2matings = {}
-        self.zero_loops = []
-        
+        self.edges_mating_graph = None        
 
     def extract_features(self):
         super().extract_features()
@@ -40,15 +37,20 @@ class GeometricNoiselessSolver(Solver):
         pass
 
     def _compute_edges_mating_graph(self):
-        self.edges_mating_graph = nx.DiGraph()
-        pieces_angles = []
+        '''
+            Computes the mating graph (direct graph) between edges. 
+            It was design in the following way to allow the nx package to find zero loops.
+            Each edge has the following nodes in the graphs:
+            1. Relationships node. P_{piece.id}_RELS_E_{edge_index}: a node that represents the pairwise matching of the edge.
+                 It has links (edges in the mating graph) to other edges that pairwise it
+            2. P_{piece.id}_ENV_{edge_index}: it has in a in-link to relationship node and out link to two nodes that represent adjacent edge to it.
+            3. P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_index}: represent an edge that adjacent to another edge. the link from the type 2 to this type has weight with the value of the angle.        
+        '''
 
-        '''
-            For create an loop we need to step through a edge that corresponds to the current edge
-            and then to step into one its neighbors (adjacent edge). 
-            So for each edge we have rels that from it out a links to a potential mating.
-            and enviorment that describes the enviorment of the edge.
-        '''
+        if self.edges_mating_graph is not None:
+            return
+
+        self.edges_mating_graph = nx.DiGraph()
 
         for piece in self.pieces:
             coords = piece.get_coords()[:-1]
@@ -90,27 +92,13 @@ class GeometricNoiselessSolver(Solver):
                                 for mating in mating_edges]
                     self.edges_mating_graph.add_edges_from(new_links)
     
-    def _loops_to_union(self,loops:list):
-        next_level_loops = []
-
-        for i in range(len(loops)):
-            loop_i = loops[i]
-            for j in range(i+1,len(loops)):
-                loop_j = loops[j]
-
-                try:
-                    new_loop = loop_i.union(loop_j)
-                    next_level_loops.append(new_loop)
-                    print(f"Union between {repr(loop_i)} and {repr(loop_j)} is {repr(new_loop)}")
-                except LoopUnionConflictError:
-                    pass
-
-        return next_level_loops
-    
-
-    def _load_zeroloop(self,cycle:list,accumulated_angle_err=2):
+    def _load_single_zeroloop(self,cycle:list,accumulated_angle_err=2):
         '''
-        
+            Construct a zero loop. 
+            cycle: list that describe a cycle in the edge_mating_graph
+            accumulated_angle_err: the loop must close a circle of 360 of mating pieces. 
+                if a noise is implemented than it will close it with an error.
+            The method checks if it can initialize a valid loop at first. 
         '''
         if self.edges_mating_graph is None:
             raise ValueError("You need to compute the edge mating graph first")
@@ -169,44 +157,55 @@ class GeometricNoiselessSolver(Solver):
 
         return Loop(piece2edge2matings)
 
-
     def _load_zero_loops(self,cycles_list):
         '''
-            cycles_list
-           
+            cycles_list: a list of cycles that computed from self.edge_mating_graph
+                a cycle is a list of strings (each represent a node in the graph)
         '''
         zero_loops = []
 
         for cycle in cycles_list:
             try:
-                loop = self._load_zeroloop(cycle)
+                loop = self._load_single_zeroloop(cycle)
                 zero_loops.append(loop)
             except ZeroLoopError as ve:
                 pass
         
         return zero_loops
 
-    def _compute_cycles(self):
-        #self._compute_edges_mating_graph()
-        cycles = nx.simple_cycles(self.edges_mating_graph)
-        return list(cycles)
+    def _compute_next_level_loops(self,loops:list):
+        next_level_loops = []
 
+        for i in range(len(loops)):
+            loop_i = loops[i]
+            for j in range(i+1,len(loops)):
+                loop_j = loops[j]
+
+                try:
+                    new_loop = loop_i.union(loop_j)
+                    next_level_loops.append(new_loop)
+                    # print(f"Union between {repr(loop_i)} and {repr(loop_j)} is {repr(new_loop)}")
+                except LoopUnionConflictError:
+                    pass
+
+        return next_level_loops
+    
     def global_optimize(self,cycles=None):
         if cycles is None:
             self._compute_edges_mating_graph()
             cycles = list(nx.simple_cycles(self.edges_mating_graph))
         
         zero_loops = self._load_zero_loops(cycles)
-        print("zero_loops:")
-        print(zero_loops)
-        print(end="\n\n\n\n")
+        # print("zero_loops:")
+        # print(zero_loops)
+        # print(end="\n\n\n\n")
         previous_level_loops = zero_loops
         level = 1
         solutions = []
 
         while True:
             print(f"We are going to create {level}_loops")
-            next_level_loops_ = self._loops_to_union(previous_level_loops)
+            next_level_loops_ = self._compute_next_level_loops(previous_level_loops)
             next_level_loops = []
 
             for lop in next_level_loops_:
@@ -228,7 +227,7 @@ class GeometricNoiselessSolver(Solver):
             
             previous_level_loops = next_level_loops
             level+=1
-            print(end="\n\n\n\n")
+            # print(end="\n\n\n\n")
         
         return solutions
         

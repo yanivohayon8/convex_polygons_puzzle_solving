@@ -3,11 +3,10 @@ from functools import reduce
 class Mating():
     '''
         A relationship between two mating (match) edges
-        piece_1: 
-        edge_1: 
-        piece_2: 
-        edge_2: 
-
+        piece_1: The piece id of edge 1 
+        edge_1: edge 1 id 
+        piece_2: The piece of edge 2
+        edge_2: edge 2 id
     '''
     def __init__(self,**kwargs) -> None:
         
@@ -45,11 +44,12 @@ class Loop():
     
     def __init__(self,piece2edge2matings={}) -> None:
         '''
-            piece2edge2matings
+            piece2edge2matings: a dictionary of dictionaries
+            piece2edge2matings keys are the pieces ids and the values are dictionaries
+            that map between edge id to occupied mating (We assume there is a one to one match between edges)
         '''
         self.piece2edge2matings = piece2edge2matings
     
-
     def get_pieces_invovled(self):
         return self.piece2edge2matings.keys()
 
@@ -77,6 +77,9 @@ class Loop():
         self.piece2edge2matings[piece_id] = piece_mating
 
     def union(self,other_loop):
+        '''
+            Unions between the self loop and another loop
+        '''
 
         if not isinstance(other_loop,Loop):
             raise TypeError("other_loop variable is expected to be of type Loop")
