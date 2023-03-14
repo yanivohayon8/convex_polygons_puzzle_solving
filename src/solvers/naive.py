@@ -3,7 +3,7 @@ from src.feature_extraction.geometric import GeometricFeatureExtractor
 from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import networkx as nx
-from src.data_structures.hierarchical_loops import Loop,Mating,ZeroLoopError
+from src.data_structures.hierarchical_loops import Loop,Mating,ZeroLoopError,LoopUnionConflictError
 
 
 CIRCLE_DEGREES = 360
@@ -90,71 +90,22 @@ class GeometricNoiselessSolver(Solver):
                                 for mating in mating_edges]
                     self.edges_mating_graph.add_edges_from(new_links)
     
-    def _get_possible_matings(self):
-        if self.edges_mating_graph is None:
-            raise NotImplementedError("You need to call _compute_edges_mating_graph function first")
-        
-        edges_pairs = [ e for e in self.edges_mating_graph.edges if "RELS" in e[0] and "RELS" in e[1]]
-
-        for pair in edges_pairs: #zip(edge_rels,edge_rels[1:] + [edge_rels[0]]):
-            '''The convention of node of edge rels in the mating graph is the following:
-            f"P_{piece.id}_RELS_E_{edge_index}"'''
-            edge_prev,edge_next = pair[0],pair[1]
-            split_prev = edge_prev.split("_")
-            piece_1 = split_prev[1]
-            edge_1 = split_prev[-1]
-            split_next = edge_next.split("_")
-            piece_2 = split_next[1]
-            edge_2 = split_next[-1]
-
-            if piece_1 == piece_2:
-                continue
-
-            mating = Mating(piece_1,edge_1,piece_2,edge_2)
-            key_1 = f"P_{piece_1}"
-            self.piece2matings.setdefault(key_1,[])
-            
-            if mating not in self.piece2matings[key_1]:
-                self.piece2matings[key_1].append(mating) 
-            
-            key_2 = f"P_{piece_2}"
-            self.piece2matings.setdefault(key_2,[])
-            if mating not in self.piece2matings[key_2]:
-                self.piece2matings[key_2].append(mating)
-
-
     def _loops_to_union(self,loops:list):
-        
-        # if not self.piece2matings:
-        #     self.piece2matings = self._get_possible_matings()
-
-        pairs_indexes = []
+        next_level_loops = []
 
         for i in range(len(loops)):
             loop_i = loops[i]
             for j in range(i+1,len(loops)):
                 loop_j = loops[j]
 
-                if len(loop_i.get_mutual_pieces(loop_j)) == 0:
-                    continue
+                try:
+                    new_loop = loop_i.union(loop_j)
+                    next_level_loops.append(new_loop)
+                    print(f"Union between {repr(loop_i)} and {repr(loop_j)} is {repr(new_loop)}")
+                except LoopUnionConflictError:
+                    pass
 
-                if loop_i.is_contained(loop_j) or loop_j.is_contained(loop_i):
-                    continue
-
-                '''Check here if the two loops have an availiable edge for match'''
-                pass
-
-                pairs_indexes.append((i,j))
-
-
-
-                # mut_edges = loops[loop_i].mutual_mating_rels(loops[loop_j])
-                # # if len(mut_edges) <= num_mut_edges*2 and len(mut_edges) > 0: # *2 because the edges are nodes and we looking for a link betwween two nodes
-                # if len(mut_edges) >0 and len(mut_edges)%2==0: # *2 because the edges are nodes and we looking for a link betwween two nodes
-                #     pairs_indexes.append((loop_i,loop_j))
-                #     #print(f"Union {loops[loop_i]} and {loops[loop_j]}")        
-        
-        return pairs_indexes
+        return next_level_loops
     
 
     def _load_zeroloop(self,cycle:list,accumulated_angle_err=2):
@@ -240,34 +191,49 @@ class GeometricNoiselessSolver(Solver):
         cycles = nx.simple_cycles(self.edges_mating_graph)
         return list(cycles)
 
-    def global_optimize(self):
-        self._compute_edges_mating_graph()
-        cycles = nx.simple_cycles(self.edges_mating_graph)
-        list_cycles = list(cycles)
-        loops = []
+    def global_optimize(self,cycles=None):
+        if cycles is None:
+            self._compute_edges_mating_graph()
+            cycles = list(nx.simple_cycles(self.edges_mating_graph))
         
-        # for cycle in list_cycles:
-        #     rels_cy = [e for e in cycle if "RELS" in e]
-        #     # if rels
-        #     print(rels_cy)
+        zero_loops = self._load_zero_loops(cycles)
+        print("zero_loops:")
+        print(zero_loops)
+        print(end="\n\n\n\n")
+        previous_level_loops = zero_loops
+        level = 1
+        solutions = []
 
+        while True:
+            print(f"We are going to create {level}_loops")
+            next_level_loops_ = self._loops_to_union(previous_level_loops)
+            next_level_loops = []
 
-        for cycle in list_cycles:
-            try:
-                loop = Loop()
-                loop.load(cycle)
-                #print(loop.pieces_involved)
-                loops.append(loop)
-            except ValueError as ve:
-                pass
+            for lop in next_level_loops_:
+
+                if len(lop.get_pieces_invovled())==len(self.pieces):
+                    if len(solutions) == 0:
+                        solutions.append(lop)
+                    else:
+                        tmp = []
+                        [tmp.append(lop) for lop in solutions if lop not in solutions]
+                        solutions = solutions+tmp
+                    continue
+                
+                if lop not in next_level_loops:
+                    next_level_loops.append(lop)
+            
+            if len(next_level_loops) == 0:
+                break
+            
+            previous_level_loops = next_level_loops
+            level+=1
+            print(end="\n\n\n\n")
         
-        err_angle = 2
-        CIRCLE_DEGREES = 360
-        valid_loops = []
-        for loop in loops:
-            accumulated_angle = loop.get_accumulated_angle(self.edges_mating_graph)
-            if abs(CIRCLE_DEGREES-accumulated_angle) < err_angle:
-                valid_loops.append(loop)
+        return solutions
+        
+        
+        
 
             
         

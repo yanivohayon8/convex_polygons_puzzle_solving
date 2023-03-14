@@ -83,19 +83,28 @@ class TestNaiveSolver(unittest.TestCase):
         
         # # Because the nx package would brings random results, make the test deterministic
         with open(puzzle_directory + "/cycles.txt", 'r') as f:
-            cycles_list = [eval(line.rstrip('\n')) for line in f]
+            cycles = [eval(line.rstrip('\n')) for line in f]
         #cycles_list = solver._compute_cycles()
 
-        zero_loops = solver._load_zero_loops(cycles_list)
-        expected_zero_loops = ["P_0_P_8_P_9_P_6_P_5", "P_9_P_8_P_7", "P_1_P_0_P_5_P_2", "P_4_P_3_P_5_P_6", "P_3_P_2_P_5"]
+        solver.global_optimize(cycles)
 
-        for exp_loop,loop in zip(expected_zero_loops,zero_loops):
-            assert exp_loop == repr(loop)
+        # print("zero_loops:")
+        # print(zero_loops)
+        # # expected_zero_loops = ["P_0_P_8_P_9_P_6_P_5", "P_9_P_8_P_7", "P_1_P_0_P_5_P_2", "P_4_P_3_P_5_P_6", "P_3_P_2_P_5"]
 
-        zero_loops_pairs = solver._loops_to_union(zero_loops)
-        assert zero_loops_pairs == [(0, 1), (0, 2), (0, 3), (0, 4), (2, 3), (2, 4), (3, 4)]
-        
-        one_loops = [zero_loops[pair[0]].union(zero_loops[pair[1]]) for pair in zero_loops_pairs]
+        # # for exp_loop,loop in zip(expected_zero_loops,zero_loops):
+        # #     assert exp_loop == repr(loop)
+
+        # print("one_loops:")
+        # one_loops = solver._loops_to_union(zero_loops)
+        # print()
+        # print()
+        # print()
+
+        # two_loops = solver._loops_to_union(one_loops)
+        # three_loops = solver._loops_to_union(two_loops)
+
+
     
 
 

@@ -35,18 +35,17 @@ class Mating():
         return False
 
 
+class ZeroLoopError(Exception):
+    pass
+
+class LoopUnionConflictError(Exception):
+    pass
+
 class Loop():
-    
-    # def __init__(self,pieces_involved=None) -> None:
-    #     '''
-        
-    #     '''
-    #     self.piece2matings = {}
-    #     self.pieces_involved = pieces_involved
     
     def __init__(self,piece2edge2matings={}) -> None:
         '''
-        
+            piece2edge2matings
         '''
         self.piece2edge2matings = piece2edge2matings
     
@@ -56,7 +55,8 @@ class Loop():
 
     def __repr__(self) -> str:
         # return reduce(lambda acc,x: f"P_{x}_"+acc,self.pieces_involved,"")[:-1]
-        return reduce(lambda acc,x: f"{x}_"+acc,self.get_pieces_invovled(),"")[:-1]
+        pieces = sorted(self.get_pieces_invovled())
+        return reduce(lambda acc,x: f"{x}_"+acc,pieces,"")[:-1]
         
     def get_mutual_pieces(self,loop):
         if isinstance(loop,Loop):
@@ -67,13 +67,74 @@ class Loop():
             unmutual_pieces = list(set(self.get_pieces_invovled()) - set(loop.get_pieces_invovled()))
             return len(unmutual_pieces)==0 
     
-    def union(self,loop,new_matings:list):
-        ''' You should consider where the loops are pairing
-            maybe this method belongs to the geometric solver? 
-            or it belong to here just give the '''
-        pass
+    def copy(self):
+        return Loop(self.piece2edge2matings.copy())
+
+    def _get_piece_matings(self,piece_id):
+        return self.piece2edge2matings[piece_id]
+    
+    def _set_piece_matings(self,piece_id,piece_mating:dict):
+        self.piece2edge2matings[piece_id] = piece_mating
+
+    def union(self,other_loop):
+
+        if not isinstance(other_loop,Loop):
+            raise TypeError("other_loop variable is expected to be of type Loop")
+        
+        mutual_pieces = self.get_mutual_pieces(other_loop)
+
+        if len(mutual_pieces) == 0:
+            mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but they don't have mutual pieces"
+            raise LoopUnionConflictError(mess)
+        
+        if self.is_contained(other_loop) or other_loop.is_contained(self):
+            mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but the union does not results with a novel piece"
+            raise LoopUnionConflictError(mess)
 
 
-class ZeroLoopError(Exception):
-    pass
+        new_loop = other_loop.copy()
+        
+        unmutual_pieces = self.get_pieces_invovled() - mutual_pieces
+
+        for piece_id in unmutual_pieces:
+            new_loop._set_piece_matings(piece_id,self._get_piece_matings(piece_id)) 
+
+        for piece_id in mutual_pieces:
+
+            self_edge2matings = self._get_piece_matings(piece_id)
+            other_edge2matings = new_loop._get_piece_matings(piece_id)
+
+            for self_edge_id in self_edge2matings.keys():
+
+                if self_edge_id not in other_edge2matings.keys():
+                    other_edge2matings[self_edge_id] = self_edge2matings[self_edge_id]
+                elif not other_edge2matings[self_edge_id] == self_edge2matings[self_edge_id]:
+                    mess = f"Conflict while trying to merge between loop {repr(self)} and loop {repr(other_loop)}."+\
+                          f"The former loop assert the mating {repr(self_edge2matings[self_edge_id])} " +\
+                            f"while the latter {repr(other_edge2matings[self_edge_id])}"
+                    raise LoopUnionConflictError(mess)
+                
+        return new_loop
+
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other,Loop):
+            if not (other.is_contained(self) and self.is_contained(other)):
+                return False
+            
+            for piece in self.get_pieces_invovled():
+                self_edge2mating = self._get_piece_matings(piece)
+                other_edge2mating = other._get_piece_matings(piece)
+
+                if self_edge2mating.keys() != other_edge2mating.keys():
+                    return False
+                
+                for edge in self_edge2mating.keys():
+                    if self_edge2mating[edge]!=other_edge2mating[edge]:
+                        return False
+                
+                return True
+            
+        return False
+
 
