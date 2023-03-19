@@ -88,6 +88,7 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
         solutions = solver.global_optimize(cycles)
 
         loader.evaluate_rels(solutions[0])
+        
 
         
 

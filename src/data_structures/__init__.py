@@ -23,7 +23,7 @@ class Mating():
             self.edge_2 = kwargs["edge_2"]
     
     def __repr__(self) -> str:
-        return f"P_{self.piece_1}_e_{self.piece_2}<--->P_{self.piece_2}_e_{self.edge_2}"
+        return f"P_{self.piece_1}_e_{self.edge_1}<--->P_{self.piece_2}_e_{self.edge_2}"
     
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, Mating):

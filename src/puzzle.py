@@ -38,23 +38,6 @@ class Puzzle():
         pieces = self._pieces_pd2list(self.df_solution_locations,csv_conv=csv_conv)
         self._preprocess(pieces)
         return pieces
-    
-    def get_final_rels(self,csv_conv="Ofir"):
-        ''' 
-            Load to self.rels_as_mating the rels as list of Mating class instances
-            The convention of the csv file should be:
-            piece1,edge1,piece2,edge2
-        '''
-        if len(self.rels_as_mating) > 0:
-            return self.rels_as_mating
-        
-        gd_rels = self.df_solution_rels.values.tolist()
-        for rel in gd_rels:
-            self.rels_as_mating.append(
-                Mating(piece_1=rel[0],edge_1=rel[1],piece_2=rel[2],edge_2=rel[3])
-            )
-
-        return self.rels_as_mating 
 
     def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
         if csv_conv!="Ofir":
@@ -78,11 +61,40 @@ class Puzzle():
             org_indexes = [current_coords.index(org_index) for org_index in org_coords]
             self.pieces2original_edges[piece.id] = org_indexes
             
+    def get_final_rels(self,csv_conv="Ofir"):
+        ''' 
+            Load to self.rels_as_mating the rels as list of Mating class instances
+            The convention of the csv file should be:
+            piece1,edge1,piece2,edge2
+        '''
+        if len(self.rels_as_mating) > 0:
+            return self.rels_as_mating
+        
+        gd_rels = self.df_solution_rels.values.tolist()
+        for rel in gd_rels:
+            self.rels_as_mating.append(
+                Mating(piece_1=rel[0],piece_2=rel[2],edge_1=rel[1],edge_2=rel[3])
+            )
+
+        return self.rels_as_mating 
     
-    def evaluate_rels(self,solver_rels):
-       # raise NotImplementedError("Implement me")
-        
-        
-       
+    def evaluate_rels(self,solver_matings:list):
+        '''
+            solver_matings : list of matings (Mating classes instances)
+        '''
+        ground_truth_matings = self.get_final_rels()
+
+        if len(solver_matings)!=len(ground_truth_matings):
+            print(f"The solver has {len(solver_matings)} matings while the ground truth has {len(ground_truth_matings)} matings")
+            return False
+ 
+        for mate in solver_matings:
+            new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
+                              edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
+                              edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
+
+            if new_mate not in ground_truth_matings:
+                print(f"The ground truth does not have the mating {mate}")
+                return False
         
         return True
