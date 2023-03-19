@@ -1,7 +1,7 @@
 import pandas as pd
 from src.piece import Piece
 from shapely.geometry.polygon import orient as orient_as_ccw
-
+from src.data_structures import Mating
 
 class Puzzle():
 
@@ -16,7 +16,13 @@ class Puzzle():
         self.pieces_path = pieces_path
         self.df_solution_locations = None
         self.df_solution_rels = None
+        self.rels_as_mating = []
         self.df_pieces = None
+
+        # Because we give new edge numbers in ccw order for efficient code and debug, 
+        # we maintain the original "messed order" of the indexing of the ground truth, for evaluation.
+        # we have here implicit assumption that the edges ids are indexes..
+        self.pieces2original_edges ={} # for example {P_0:[2,0,1]}
 
     def load(self):
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
@@ -32,6 +38,11 @@ class Puzzle():
         pieces = self._pieces_pd2list(self.df_solution_locations,csv_conv=csv_conv)
         self._preprocess(pieces)
         return pieces
+    
+    def get_final_rels(self,csv_conv="Ofir"):
+        # The convention of the csv file should be
+        # piece1,edge1,piece2,edge2
+        pass
 
     def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
         if csv_conv!="Ofir":
@@ -48,5 +59,19 @@ class Puzzle():
 
     def _preprocess(self,pieces):
         for piece in pieces:
-            piece.polygon = orient_as_ccw(piece.polygon)
+            orignial_polygon = piece.polygon
+            piece.polygon = orient_as_ccw(orignial_polygon)
+            current_coords = piece.get_coords()[:-1] # the last coordinate is duplicated
+            org_coords = orignial_polygon.exterior.coords[:-1]
+            org_indexes = [current_coords.index(org_index) for org_index in org_coords]
+            self.pieces2original_edges[piece.id] = org_indexes
+            
+    
+    def evaluate_rels(self,solver_rels):
+       # raise NotImplementedError("Implement me")
+        gd_rels = self.df_solution_rels.values.tolist()
         
+        
+       
+        
+        return True

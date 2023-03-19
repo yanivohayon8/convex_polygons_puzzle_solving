@@ -3,8 +3,8 @@ from src.feature_extraction.geometric import GeometricFeatureExtractor
 from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import networkx as nx
-from src.data_structures.hierarchical_loops import Loop,Mating,ZeroLoopError,LoopUnionConflictError
-
+from src.data_structures.hierarchical_loops import Loop,ZeroLoopError,LoopUnionConflictError
+from src.data_structures import Mating
 
 CIRCLE_DEGREES = 360
 
