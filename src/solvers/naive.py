@@ -229,7 +229,9 @@ class GeometricNoiselessSolver(Solver):
             level+=1
             # print(end="\n\n\n\n")
         
-        return solutions
+        solutions_as_mating = [loop.get_as_mating_list() for loop in solutions]
+
+        return solutions_as_mating
         
         
         

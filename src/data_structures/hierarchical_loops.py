@@ -1,4 +1,6 @@
 from functools import reduce
+from src.data_structures import Mating
+
 
 class ZeroLoopError(Exception):
     pass
@@ -85,7 +87,6 @@ class Loop():
                 
         return new_loop
 
-
     def __eq__(self, other: object) -> bool:
         if isinstance(other,Loop):
             if not (other.is_contained(self) and self.is_contained(other)):
@@ -106,4 +107,12 @@ class Loop():
             
         return False
 
+    def get_as_mating_list(self):
+        matings = []
+        for piece in self.piece2edge2matings.keys():
+            curr_piece_matings = list(self.piece2edge2matings[piece].values())
+            [matings.append(mat) for mat in curr_piece_matings if mat not in matings]
+        
+        return matings
+                 
 

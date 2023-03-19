@@ -40,9 +40,21 @@ class Puzzle():
         return pieces
     
     def get_final_rels(self,csv_conv="Ofir"):
-        # The convention of the csv file should be
-        # piece1,edge1,piece2,edge2
-        pass
+        ''' 
+            Load to self.rels_as_mating the rels as list of Mating class instances
+            The convention of the csv file should be:
+            piece1,edge1,piece2,edge2
+        '''
+        if len(self.rels_as_mating) > 0:
+            return self.rels_as_mating
+        
+        gd_rels = self.df_solution_rels.values.tolist()
+        for rel in gd_rels:
+            self.rels_as_mating.append(
+                Mating(piece_1=rel[0],edge_1=rel[1],piece_2=rel[2],edge_2=rel[3])
+            )
+
+        return self.rels_as_mating 
 
     def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
         if csv_conv!="Ofir":
@@ -69,7 +81,6 @@ class Puzzle():
     
     def evaluate_rels(self,solver_rels):
        # raise NotImplementedError("Implement me")
-        gd_rels = self.df_solution_rels.values.tolist()
         
         
        
