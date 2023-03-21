@@ -14,7 +14,10 @@ class GeometricNoiselessSolver(Solver):
         super().__init__(pieces)
         self.geomteric_feature_extractor = GeometricFeatureExtractor()
         self.geometric_pairwiser = GeometricPairwiseMatcher()
-        self.edges_mating_graph = None        
+        self.edges_mating_graph = None
+        self.cycles = []  # For debug (For questioning when testing)
+        self.zero_loops = [] # For debug (For questioning when testing)
+
 
     def extract_features(self):
         super().extract_features()
@@ -22,15 +25,11 @@ class GeometricNoiselessSolver(Solver):
         self.features["pieces_degree"] = []
 
         for piece in self.pieces:
-            coords = piece.get_coords() #list(piece.polygon.exterior.coords)
-            # self.features["edges_lengths"].append(self.geomteric_feature_extractor.get_polygon_edges_lengths(coords))
-            # self.features["pieces_degree"].append(len(coords)-1)
-            piece.features["edges_lengths"] = self.geomteric_feature_extractor.get_polygon_edges_lengths(coords[:-1])
+            coords = piece.get_coords() 
+            piece.features["edges_lengths"] = self.geomteric_feature_extractor.get_polygon_edges_lengths(coords)
             piece.features["poly_degree"] = len(coords)-1
             piece.features["angles"] = self.geomteric_feature_extractor.get_polygon_angles(np.array(coords))
-        
-        #self.features["edges_lengths"] = edges_lengths #np.array(edges_lengths)
-    
+            
     def pairwise(self):        
         edges_lengths = [piece.features["edges_lengths"] for piece in self.pieces]
         self.geometric_pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=1)
@@ -53,7 +52,7 @@ class GeometricNoiselessSolver(Solver):
         self.edges_mating_graph = nx.DiGraph()
 
         for piece in self.pieces:
-            coords = piece.get_coords()[:-1]
+            coords = piece.get_coords()
             
             self.edges_mating_graph.add_nodes_from(
                 [f"P_{piece.id}_RELS_E_{edge_index}" for edge_index in range(len(coords))]
@@ -123,14 +122,12 @@ class GeometricNoiselessSolver(Solver):
         if not is_valid:
             raise ZeroLoopError("Loop is not valid, each piece must appear exactly twice. ")
 
-        # self.mating_rels = edge_rels
         nodes_adj = [edge for edge in cycle if "_ADJ_" in edge]
         accumulated_angle = sum([self.edges_mating_graph.nodes[node]["angle"] for node in nodes_adj])
         
         if abs(CIRCLE_DEGREES-accumulated_angle) > accumulated_angle_err:
                 raise ZeroLoopError(f"Zero loop must close a circle with at most {accumulated_angle_err} error")
 
-        pieces_involved = pieces_involved # To save counter clockwise ordering
         piece2edge2matings = {}
         
         for edge_prev,edge_next in zip(edge_rels,edge_rels[1:] + [edge_rels[0]]):
@@ -184,7 +181,6 @@ class GeometricNoiselessSolver(Solver):
                 try:
                     new_loop = loop_i.union(loop_j)
                     next_level_loops.append(new_loop)
-                    # print(f"Union between {repr(loop_i)} and {repr(loop_j)} is {repr(new_loop)}")
                 except LoopUnionConflictError:
                     pass
 
@@ -193,13 +189,15 @@ class GeometricNoiselessSolver(Solver):
     def global_optimize(self,cycles=None):
         if cycles is None:
             self._compute_edges_mating_graph()
-            cycles = list(nx.simple_cycles(self.edges_mating_graph))
+            self.cycles = list(nx.simple_cycles(self.edges_mating_graph))
+        else:
+            self.cycles = cycles
         
-        zero_loops = self._load_zero_loops(cycles)
+        self.zero_loops = self._load_zero_loops(self.cycles)
         # print("zero_loops:")
         # print(zero_loops)
         # print(end="\n\n\n\n")
-        previous_level_loops = zero_loops
+        previous_level_loops = self.zero_loops
         level = 1
         solutions = []
 

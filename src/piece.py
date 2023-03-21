@@ -15,4 +15,4 @@ class Piece():
             Get the coordinates of the piece where its center of mass is the origin of the axis.
             This is because we read it from the piece.csv file...
         '''
-        return list(self.polygon.exterior.coords)
+        return list(self.polygon.exterior.coords)#[:-1]

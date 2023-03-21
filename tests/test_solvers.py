@@ -67,6 +67,9 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
         while keyboardClick != True:
             keyboardClick=plt.waitforbuttonpress()
 
+
+
+
     def test_0_noise(self):
         direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
         puzzle_directory = direrctory + "0"
@@ -81,18 +84,23 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
         solver.pairwise()
         solver._compute_edges_mating_graph()
         
+        # # For Debug puzzle 1:
         # Because the nx package would brings random results, make the test deterministic
-        with open(puzzle_directory + "/cycles.txt", 'r') as f:
-            cycles = [eval(line.rstrip('\n')) for line in f]
+        # with open(puzzle_directory + "/cycles.txt", 'r') as f:
+        #     cycles = [eval(line.rstrip('\n')) for line in f]
 
-        solutions = solver.global_optimize(cycles)
+        # solutions = solver.global_optimize(cycles)
         
-        # solutions = solver.global_optimize()
-
+        solutions = solver.global_optimize()
+        
+        expected_num_cycles = 69
+        assert len(solver.cycles)==expected_num_cycles
+        expected_num_zero_loops = 5
+        assert len(solver.zero_loops) == expected_num_zero_loops
+        assert len(solutions)==1
         assert loader.evaluate_rels(solutions[0])==1
         
-
-        
+  
 
         
 if __name__ == "__main__":

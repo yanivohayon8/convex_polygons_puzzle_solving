@@ -48,8 +48,7 @@ class Puzzle():
         for _id in pieces_ids:
             vertices = df[df["piece"] == _id]
             coordinates = [(_x,_y) for _x,_y in zip(vertices["x"].values.tolist(),vertices["y"].values.tolist())]
-            pieces.append(Piece(str(int(_id)),coordinates))
-            # pieces.append(Piece(str(_id),coordinates))
+            pieces.append(Piece(str(int(_id)),coordinates)) # The id is int in Ofir ground truth
 
         return pieces
 
@@ -57,7 +56,7 @@ class Puzzle():
         for i_debug,piece in enumerate(pieces):
             orignial_polygon = piece.polygon
             piece.polygon = orient_as_ccw(orignial_polygon)
-            current_coords = piece.get_coords()[:-1] # the last coordinate is duplicated
+            current_coords = piece.get_coords()[:-1]
             org_coords = list(orignial_polygon.exterior.coords)[:-1]
             # org_indexes = [org_coords.index(org_index) for org_index in current_coords]
             curr_i2org_i = {}
@@ -65,19 +64,8 @@ class Puzzle():
                 # curr_i2org_i[i] = org_coords.index(curr)
                 curr_i2org_i[(i-1)%len(current_coords)] = org_coords.index(curr) # Tfira: I don't know why it is working
             
-            #org_indexes.reverse()
-
-            if i_debug==5 or i_debug==6:
-                print("In _preprocess:")
-                print("i_debug",i_debug)
-                print("piece.id",piece.id)
-                print("current_coords",current_coords)
-                print("org_coords",org_coords)
-                print("curr_i2org_i",curr_i2org_i)
-
             self.pieces2original_edges[piece.id] = curr_i2org_i
-            # org_indexes = [org_coords.index(org_index) for org_index in current_coords]
-            # self.pieces2original_edges[piece.id] = org_indexes
+
             
     def get_final_rels(self,csv_conv="Ofir"):
         ''' 
@@ -115,8 +103,7 @@ class Puzzle():
                               edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
 
             if new_mate not in ground_truth_matings:
-                print(f"The ground truth does not have the mating {mate}")
+                #print(f"The ground truth does not have the mating {mate}")
                 count_wrong+=1
-                #return 0
         
         return 1-count_wrong/len(ground_truth_matings)
