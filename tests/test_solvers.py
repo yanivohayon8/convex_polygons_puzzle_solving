@@ -68,11 +68,10 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
             keyboardClick=plt.waitforbuttonpress()
 
 
-
-
-    def test_0_noise(self):
-        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
-        puzzle_directory = direrctory + "0"
+    def _run(self,puzzle_directory:str,expected_solution_accuracy:float,expected_num_cycles=-1,
+             expected_num_zero_loops=-1,expected_num_solutions=-1):
+        # direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        # puzzle_directory = direrctory + "0"
         loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
                         puzzle_directory + "/ground_truth_rels.csv", 
                         puzzle_directory + "/pieces.csv")
@@ -93,12 +92,23 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
         
         solutions = solver.global_optimize()
         
+        assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
+        assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
+        assert len(solutions)==expected_num_solutions or expected_num_solutions==-1
+        assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
+
+    def test_0_noise(self):
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        puzzle_directory = direrctory + "0"
         expected_num_cycles = 69
-        assert len(solver.cycles)==expected_num_cycles
         expected_num_zero_loops = 5
-        assert len(solver.zero_loops) == expected_num_zero_loops
-        assert len(solutions)==1
-        assert loader.evaluate_rels(solutions[0])==1
+        expected_num_solutions = 1 
+        expected_solution_accuracy = 1.0
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_cycles=expected_num_cycles,
+                  expected_num_zero_loops=expected_num_zero_loops,
+                  expected_num_solutions=expected_num_solutions)
         
   
 
