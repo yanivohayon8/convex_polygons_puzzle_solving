@@ -81,13 +81,15 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
         solver.pairwise()
         solver._compute_edges_mating_graph()
         
-        # # Because the nx package would brings random results, make the test deterministic
+        # Because the nx package would brings random results, make the test deterministic
         with open(puzzle_directory + "/cycles.txt", 'r') as f:
             cycles = [eval(line.rstrip('\n')) for line in f]
 
         solutions = solver.global_optimize(cycles)
+        
+        # solutions = solver.global_optimize()
 
-        loader.evaluate_rels(solutions[0])
+        assert loader.evaluate_rels(solutions[0])==1
         
 
         

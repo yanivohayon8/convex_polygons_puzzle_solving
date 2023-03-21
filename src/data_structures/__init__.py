@@ -25,8 +25,12 @@ class Mating():
     def __repr__(self) -> str:
         return f"P_{self.piece_1}_e_{self.edge_1}<--->P_{self.piece_2}_e_{self.edge_2}"
     
-    def __eq__(self, __o: object) -> bool:
-        if isinstance(__o, Mating):
-            return (self.piece_1 == __o.piece_1 and self.piece_2 == __o.piece_2 and self.edge_1==__o.edge_1 and self.edge_2==__o.edge_2\
-            or self.piece_1 == __o.piece_2 and self.piece_2 == __o.piece_1 and self.edge_1==__o.edge_2 and self.edge_2==__o.edge_1)
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Mating):
+            exact_match = self.piece_1 == other.piece_1 and self.piece_2 == other.piece_2\
+                  and self.edge_1==other.edge_1 and self.edge_2==other.edge_2
+            flip_match = self.piece_1 == other.piece_2 and self.piece_2 == other.piece_1 \
+                and self.edge_1==other.edge_2 and self.edge_2==other.edge_1 
+            return (exact_match or flip_match)
+        
         return False

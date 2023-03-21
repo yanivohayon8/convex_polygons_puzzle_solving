@@ -25,7 +25,7 @@ class GeometricNoiselessSolver(Solver):
             coords = piece.get_coords() #list(piece.polygon.exterior.coords)
             # self.features["edges_lengths"].append(self.geomteric_feature_extractor.get_polygon_edges_lengths(coords))
             # self.features["pieces_degree"].append(len(coords)-1)
-            piece.features["edges_lengths"] = self.geomteric_feature_extractor.get_polygon_edges_lengths(coords)
+            piece.features["edges_lengths"] = self.geomteric_feature_extractor.get_polygon_edges_lengths(coords[:-1])
             piece.features["poly_degree"] = len(coords)-1
             piece.features["angles"] = self.geomteric_feature_extractor.get_polygon_angles(np.array(coords))
         
@@ -92,7 +92,7 @@ class GeometricNoiselessSolver(Solver):
                                     for mating in mat_edge]
                         self.edges_mating_graph.add_edges_from(new_links)
     
-    def _load_single_zeroloop(self,cycle:list,accumulated_angle_err=2):
+    def _load_single_zeroloop(self,cycle:list,accumulated_angle_err=0.5):
         '''
             Construct a zero loop. 
             cycle: list that describe a cycle in the edge_mating_graph
@@ -204,7 +204,7 @@ class GeometricNoiselessSolver(Solver):
         solutions = []
 
         while True:
-            print(f"We are going to create {level}_loops")
+            # print(f"We are going to create {level}_loops")
             next_level_loops_ = self._compute_next_level_loops(previous_level_loops)
             next_level_loops = []
 
