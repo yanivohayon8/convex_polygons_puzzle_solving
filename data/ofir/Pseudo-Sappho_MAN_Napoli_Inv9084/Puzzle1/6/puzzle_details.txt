@@ -1,0 +1,10 @@
+Global Puzzle
+Total number of pieces (before noise): 10
+Total number of erased pieces: 0
+Total number of remaining pieces = 10
+Noise volume = 2%
+Puzzle diameter = 3007.6720313778787
+Global noise level (Xi): 60.15344062755758
+Average piece edge length = 919.8655964866382
+Noise relative to average edge length (Xi hat) = 0.06539372801560293
+Rotated: True

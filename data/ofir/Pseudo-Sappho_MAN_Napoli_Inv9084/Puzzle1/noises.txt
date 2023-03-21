@@ -1,0 +1,7 @@
+noise 0 = 0%
+noise 1 = 0.1%
+noise 2 = 0.25%
+noise 3 = 0.5%
+noise 4 = 1%
+noise 5 = 1.5%
+noise 6 = 2%
