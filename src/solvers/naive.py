@@ -151,16 +151,17 @@ class GeometricNoiselessSolver(Solver):
                 raise ZeroLoopError(f"Zero loop must close a circle with at most {accumulated_angle_err} error")
 
         piece2edge2matings = {}
-        
+        occupied_matings = []
+
         for edge_prev,edge_next in zip(edge_rels,edge_rels[1:] + [edge_rels[0]]):
             '''The convention of node of edge rels in the mating graph is the following:
             f"P_{piece.id}_RELS_E_{edge_index}"'''
             split_prev = edge_prev.split("_")
             piece_1 = split_prev[1]
-            edge_1 = split_prev[-1]
+            edge_1 = eval(split_prev[-1])
             split_next = edge_next.split("_")
             piece_2 = split_next[1]
-            edge_2 = split_next[-1]
+            edge_2 = eval(split_next[-1])
 
             if piece_1 == piece_2:
                 continue
@@ -174,7 +175,20 @@ class GeometricNoiselessSolver(Solver):
             piece2edge2matings.setdefault(key_p_2,{})
             piece2edge2matings[key_p_2][edge_2] = mating
 
-        return Loop(piece2edge2matings)
+            occupied_matings.append(mating)
+
+        new_loop = Loop(piece2edge2matings)
+        availiable_matings = []
+
+        for piece in new_loop.get_pieces_invovled():
+            for mat in self.piece2matings[piece]:
+
+                if mat not in occupied_matings:
+                    availiable_matings.append(mat)
+            
+        new_loop.set_availiable_matings(availiable_matings)
+
+        return new_loop
 
     def _load_zero_loops(self,cycles_list):
         '''
@@ -211,12 +225,30 @@ class GeometricNoiselessSolver(Solver):
     
     
 
-    # def _get_loop_mating(self,loop1:Loop,loop2:Loop)->list:
-    #     '''
-    #         The function gets as input two loops
-    #         And returns a list of detected mating between them.
-    #     '''
-    #     pass
+    def _union_loops(self,loop_1,loop_2):
+        '''
+            Unions between the self loop and another loop
+        '''
+
+        if not isinstance(loop_1,Loop):
+            raise TypeError("loop_1 variable is expected to be of type Loop")
+        
+        if not isinstance(loop_2,Loop):
+            raise TypeError("loop_2 variable is expected to be of type Loop")
+        
+        
+        new_loop = loop_2.copy()
+        
+        mutual_pieces = loop_1.get_mutual_pieces(loop_2)
+        unmutual_pieces_loop_1 = loop_1.get_pieces_invovled() - mutual_pieces
+        unmutual_pieces_loop_2 = loop_1.get_pieces_invovled() - mutual_pieces
+
+        for loop_1_piece in loop_1.get_pieces_invovled():
+            for loop_2_piece in loop_2.get_pieces_invovled():
+                pass
+
+
+        
 
 
     def global_optimize(self,cycles=None):
@@ -232,6 +264,7 @@ class GeometricNoiselessSolver(Solver):
         
         pieces_zero_looped = [piece_id for loop in self.zero_loops for piece_id in loop.get_pieces_invovled()]
         pieces_not_zero_looped = [piece.id for piece in self.pieces if piece.id not in pieces_zero_looped]
+        
         for piece_id in pieces_not_zero_looped:
             self.zero_loops.append(Loop({f"{piece_id}":{}}))
             

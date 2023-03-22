@@ -10,14 +10,18 @@ class LoopUnionConflictError(Exception):
 
 class Loop():
     
-    def __init__(self,piece2edge2matings={}) -> None:
+    def __init__(self,piece2edge2matings={},availiable_matings=[]) -> None:
         '''
             piece2edge2matings: a dictionary of dictionaries
             piece2edge2matings keys are the pieces ids and the values are dictionaries
             that map between edge id to occupied mating (We assume there is a one to one match between edges)
         '''
         self.piece2edge2matings = piece2edge2matings
+        self.availible_matings = availiable_matings
     
+    def set_availiable_matings(self,availiable_matings:list):
+        self.availible_matings = availiable_matings
+
     def get_pieces_invovled(self):
         return self.piece2edge2matings.keys()
 
@@ -44,7 +48,7 @@ class Loop():
     def _set_piece_matings(self,piece_id,piece_mating:dict):
         self.piece2edge2matings[piece_id] = piece_mating
 
-    def union(self,other_loop):
+    def union(self,other_loop,new_matings):
         '''
             Unions between the self loop and another loop
         '''
@@ -52,16 +56,15 @@ class Loop():
         if not isinstance(other_loop,Loop):
             raise TypeError("other_loop variable is expected to be of type Loop")
         
-        mutual_pieces = self.get_mutual_pieces(other_loop)
-
-        if len(mutual_pieces) == 0:
-            mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but they don't have mutual pieces"
-            raise LoopUnionConflictError(mess)
-        
         if self.is_contained(other_loop) or other_loop.is_contained(self):
             mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but the union does not results with a novel piece"
             raise LoopUnionConflictError(mess)
 
+        mutual_pieces = self.get_mutual_pieces(other_loop)
+
+        # if len(mutual_pieces) == 0:
+        #     mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but they don't have mutual pieces"
+        #     raise LoopUnionConflictError(mess)
 
         new_loop = other_loop.copy()
         
