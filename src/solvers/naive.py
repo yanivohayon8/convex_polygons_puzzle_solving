@@ -144,11 +144,11 @@ class GeometricNoiselessSolver(Solver):
                 continue
 
             mating = Mating(piece_1=piece_1,edge_1=edge_1,piece_2=piece_2,edge_2=edge_2)
-            key_p_1 = f"P_{piece_1}"
+            key_p_1 = f"{piece_1}" #f"P_{piece_1}"
             piece2edge2matings.setdefault(key_p_1,{})
             piece2edge2matings[key_p_1][edge_1] = mating # Because each edge has only one mating in the loop
 
-            key_p_2 = f"P_{piece_2}"
+            key_p_2 = f"{piece_2}" #f"P_{piece_2}"
             piece2edge2matings.setdefault(key_p_2,{})
             piece2edge2matings[key_p_2][edge_2] = mating
 
@@ -194,6 +194,10 @@ class GeometricNoiselessSolver(Solver):
             self.cycles = cycles
         
         self.zero_loops = self._load_zero_loops(self.cycles)
+        pieces_zero_looped = [piece_id for loop in self.zero_loops for piece_id in loop.get_pieces_invovled()]
+        pieces_not_zero_looped = [piece for piece in self.pieces if piece.id not in pieces_zero_looped]
+            
+            
         # print("zero_loops:")
         # print(zero_loops)
         # print(end="\n\n\n\n")

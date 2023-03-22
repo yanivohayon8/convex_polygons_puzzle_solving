@@ -22,9 +22,9 @@ class Loop():
         return self.piece2edge2matings.keys()
 
     def __repr__(self) -> str:
-        # return reduce(lambda acc,x: f"P_{x}_"+acc,self.pieces_involved,"")[:-1]
         pieces = sorted(self.get_pieces_invovled())
-        return reduce(lambda acc,x: f"{x}_"+acc,pieces,"")[:-1]
+        # return reduce(lambda acc,x: f"{x}_"+acc,pieces,"")[:-1]
+        return reduce(lambda acc,x: f"P_{x}_"+acc,pieces,"")[:-1]
         
     def get_mutual_pieces(self,loop):
         if isinstance(loop,Loop):
