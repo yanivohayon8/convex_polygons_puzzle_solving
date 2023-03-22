@@ -15,6 +15,7 @@ class GeometricNoiselessSolver(Solver):
         self.geomteric_feature_extractor = GeometricFeatureExtractor()
         self.geometric_pairwiser = GeometricPairwiseMatcher()
         self.edges_mating_graph = None
+        self.piece2matings = {}
         self.cycles = []  # For debug (For questioning when testing)
         self.zero_loops = [] # For debug (For questioning when testing)
 
@@ -91,6 +92,27 @@ class GeometricNoiselessSolver(Solver):
                                     for mating in mat_edge]
                         self.edges_mating_graph.add_edges_from(new_links)
     
+    def _load_pieces_matings(self):
+        '''
+            This function load the data to the dict from self.piece2matingsfrom the pairwiser object
+            It maps between pieces id to a list of its pairwise...
+        '''
+        num_pieces = len(self.pieces)
+
+        for piece_i in range(num_pieces):
+            piece_i_id = self.pieces[piece_i].id
+            self.piece2matings.setdefault(piece_i_id,[])
+            for piece_j in range(piece_i+1,num_pieces):
+                mating_edges = self.geometric_pairwiser.match_edges[piece_i,piece_j]
+                if len(mating_edges)>0:
+                    piece_j_id = self.pieces[piece_j].id
+                    self.piece2matings.setdefault(piece_j_id,[])
+                    for mat_edge in mating_edges:
+                        for mating in mat_edge:
+                            new_mate = Mating(piece_1=piece_i_id,piece_2=piece_j_id,edge_1=mating[0],edge_2=mating[1])
+                            self.piece2matings[piece_i_id].append(new_mate)
+                            self.piece2matings[piece_j_id].append(new_mate)
+
     def _load_single_zeroloop(self,cycle:list,accumulated_angle_err=0.5):
         '''
             Construct a zero loop. 
@@ -169,7 +191,8 @@ class GeometricNoiselessSolver(Solver):
                 pass
         
         return zero_loops
-
+    
+    
     def _compute_next_level_loops(self,loops:list):
         next_level_loops = []
 
@@ -186,7 +209,19 @@ class GeometricNoiselessSolver(Solver):
 
         return next_level_loops
     
+    
+
+    # def _get_loop_mating(self,loop1:Loop,loop2:Loop)->list:
+    #     '''
+    #         The function gets as input two loops
+    #         And returns a list of detected mating between them.
+    #     '''
+    #     pass
+
+
     def global_optimize(self,cycles=None):
+        self._load_pieces_matings()
+
         if cycles is None:
             self._compute_edges_mating_graph()
             self.cycles = list(nx.simple_cycles(self.edges_mating_graph))
