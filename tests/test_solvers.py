@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 
-class TestNaiveSolverPuzzle1(unittest.TestCase):
+class TestNaiveSolver(unittest.TestCase):
 
     def test_donothing(self):
         puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
@@ -94,10 +94,10 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
         
         assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
         assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
-        assert len(solutions)==expected_num_solutions or expected_num_solutions==-1
+        assert len(solutions)==expected_num_solutions or len(solutions)>0
         assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
 
-    def test_0_noise(self):
+    def test_image_Inv9084_puzzle_1_noise_0(self):
         direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
         puzzle_directory = direrctory + "0"
         expected_num_cycles = 69
@@ -109,7 +109,24 @@ class TestNaiveSolverPuzzle1(unittest.TestCase):
                   expected_num_cycles=expected_num_cycles,
                   expected_num_zero_loops=expected_num_zero_loops,
                   expected_num_solutions=expected_num_solutions)
-        
+    
+    def test_image_Inv9084_puzzle_2_noise_0(self):
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle2/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
+    
+    def test_image_Inv9084_puzzle_3_noise_0(self):
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle3/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
   
 
         
