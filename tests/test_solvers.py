@@ -115,8 +115,10 @@ class TestNaiveSolver(unittest.TestCase):
         puzzle_directory = direrctory + "0"
         expected_solution_accuracy = 1.0
         expected_num_solutions = 1 
+        expected_num_zero_loops = 6
         self._run(puzzle_directory,
                   expected_solution_accuracy,
+                  expected_num_zero_loops=expected_num_zero_loops,
                   expected_num_solutions=expected_num_solutions)
     
     def test_image_Inv9084_puzzle_3_noise_0(self):

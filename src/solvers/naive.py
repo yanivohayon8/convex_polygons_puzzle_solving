@@ -194,9 +194,11 @@ class GeometricNoiselessSolver(Solver):
             self.cycles = cycles
         
         self.zero_loops = self._load_zero_loops(self.cycles)
+        
         pieces_zero_looped = [piece_id for loop in self.zero_loops for piece_id in loop.get_pieces_invovled()]
-        pieces_not_zero_looped = [piece for piece in self.pieces if piece.id not in pieces_zero_looped]
-            
+        pieces_not_zero_looped = [piece.id for piece in self.pieces if piece.id not in pieces_zero_looped]
+        for piece_id in pieces_not_zero_looped:
+            self.zero_loops.append(Loop({f"{piece_id}":{}}))
             
         # print("zero_loops:")
         # print(zero_loops)
