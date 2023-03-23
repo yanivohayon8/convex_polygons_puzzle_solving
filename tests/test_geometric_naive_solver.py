@@ -65,7 +65,7 @@ class TestOld(unittest.TestCase):
         while keyboardClick != True:
             keyboardClick=plt.waitforbuttonpress()
 
-class TestNaiveSolverFixedZeroLoops(unittest.TestCase):
+class TestFixedZeroLoops(unittest.TestCase):
 
     def _load_fixed_zeroloops_solver(self,puzzle_directory):
         loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
@@ -123,16 +123,15 @@ class TestNaiveSolverFixedZeroLoops(unittest.TestCase):
         # assert len(solutions)==expected_num_solutions or len(solutions)>0
         # assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
     
-    
     def test_image_Inv9084_puzzle_2_noise_0(self,expected_num_cycles=-1,
                 expected_num_zero_loops=-1,expected_num_solutions=-1):
             direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle2/"
             puzzle_directory = direrctory + "0"
             solver,loader = self._load_fixed_zeroloops_solver(puzzle_directory)
-            print(solver.zero_loops)
+            
 
 
-class TestNaiveSolver(unittest.TestCase):
+class TestProd(unittest.TestCase):
 
     def _save_cycles(self,cycles,out_path):
         '''
