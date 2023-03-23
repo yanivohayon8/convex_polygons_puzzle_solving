@@ -149,7 +149,6 @@ class GeometricNoiselessSolver(Solver):
         if abs(CIRCLE_DEGREES-accumulated_angle) > accumulated_angle_err:
                 raise ZeroLoopError(f"Zero loop must close a circle with at most {accumulated_angle_err} error")
 
-        piece2edge2matings = {}
         occupied_matings = []
         new_loop = Loop(piece2edge2matings={},availiable_matings=[])
 
@@ -183,16 +182,18 @@ class GeometricNoiselessSolver(Solver):
 
         return new_loop
 
-    def _load_zero_loops(self,cycles):
+    def _load_zero_loops(self):
         '''
             cycles: a list of cycles that computed from self.edge_mating_graph
                 a cycle is a list of strings (each represent a node in the graph)
 
             It loads to self.zero_loops the zero loops
+
+            First, make sure you run self._compute_cycles
         '''
         self.zero_loops = []
 
-        for cycle in cycles:
+        for cycle in self.cycles:
             try:
                 loop = self._load_single_zeroloop(cycle)
                 self.zero_loops.append(loop)
@@ -223,30 +224,6 @@ class GeometricNoiselessSolver(Solver):
 
         return next_level_loops
     
-    
-
-    # def _union_loops(self,loop_1,loop_2):
-    #     '''
-    #         Unions between the self loop and another loop
-    #     '''
-
-    #     if not isinstance(loop_1,Loop):
-    #         raise TypeError("loop_1 variable is expected to be of type Loop")
-        
-    #     if not isinstance(loop_2,Loop):
-    #         raise TypeError("loop_2 variable is expected to be of type Loop")
-        
-        
-    #     new_loop = loop_2.copy()
-        
-    #     mutual_pieces = loop_1.get_mutual_pieces(loop_2)
-    #     unmutual_pieces_loop_1 = loop_1.get_pieces_invovled() - mutual_pieces
-    #     unmutual_pieces_loop_2 = loop_1.get_pieces_invovled() - mutual_pieces
-
-    #     for loop_1_piece in loop_1.get_pieces_invovled():
-    #         for loop_2_piece in loop_2.get_pieces_invovled():
-    #             pass
-
 
     def _compute_cycles(self,cycles=None):
         if cycles is None:
@@ -258,7 +235,7 @@ class GeometricNoiselessSolver(Solver):
     def global_optimize(self,cycles=None):
         self._load_pieces_matings()
         self._compute_cycles(cycles)
-        self._load_zero_loops(self.cycles)
+        self._load_zero_loops()
         
         # print("zero_loops:")
         # print(zero_loops)
