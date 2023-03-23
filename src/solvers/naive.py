@@ -33,7 +33,6 @@ class GeometricNoiselessSolver(Solver):
     def pairwise(self):        
         edges_lengths = [piece.features["edges_lengths"] for piece in self.pieces]
         self.geometric_pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=1)
-        pass
 
     def _compute_edges_mating_graph(self):
         '''
@@ -219,7 +218,7 @@ class GeometricNoiselessSolver(Solver):
                 try:
                     new_loop = loop_i.union(loop_j)
                     next_level_loops.append(new_loop)
-                except LoopUnionConflictError:
+                except LoopUnionConflictError as e: 
                     pass
 
         return next_level_loops

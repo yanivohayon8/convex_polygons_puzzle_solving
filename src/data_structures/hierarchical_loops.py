@@ -117,16 +117,10 @@ class Loop():
             mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but they don't have mutual pieces and potential mutual availiable matings"
             raise LoopUnionConflictError(mess)
 
-        #new_loop = other_loop.copy()
-        
-        # unmutual_pieces = self.get_pieces_invovled() - mutual_pieces
-
-        # for piece_id in unmutual_pieces:
-        #     new_loop._set_piece_matings(piece_id,self._get_piece_matings(piece_id))
-
         conflict = self._mating_conflict(other_loop)
 
         if conflict is not None:
+            '''This should not happen when there is no noise'''
             mess = f"Conflict while trying to merge between loop {repr(self)} and loop {repr(other_loop)}."+\
                     f"The former loop assert the mating {repr(conflict[0])} " +\
                     f"while the latter {repr(conflict[1])}"
@@ -146,8 +140,6 @@ class Loop():
         for mat in self.get_availiable_matings() +other_loop.get_availiable_matings():
             
             if mat in mutual_ava_matings:
-                # pieces_inv = new_loop.get_pieces_invovled()
-                # if mat.piece_1 in pieces_inv and mat.piece_2 in pieces_inv:
                 if mat.piece_1 in pieces_involved and mat.piece_2 in pieces_involved:
                     new_loop.insert_mating(mat)
                     continue
@@ -160,49 +152,6 @@ class Loop():
         new_loop.unions_history.append((repr(self),repr(other_loop)))
         return new_loop
     
-    # def union(self,other_loop):
-    #     '''
-    #         Unions between the self loop and another loop
-    #     '''
-
-    #     if not isinstance(other_loop,Loop):
-    #         raise TypeError("other_loop variable is expected to be of type Loop")
-        
-    #     if self.is_contained(other_loop) or other_loop.is_contained(self):
-    #         mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but the union does not results with a novel piece"
-    #         raise LoopUnionConflictError(mess)
-
-    #     mutual_pieces = self.get_mutual_pieces(other_loop)
-    #     mutual_ava_matings = self.get_mutual_availiable_matings(other_loop)
-
-    #     if len(mutual_pieces) == 0 and len(mutual_ava_matings) == 0:
-    #         mess = f"Tried to union between loop {repr(self)} and {repr(other_loop)} but they don't have mutual pieces and potential mutual availiable matings"
-    #         raise LoopUnionConflictError(mess)
-
-    #     new_loop = other_loop.copy()
-        
-    #     unmutual_pieces = self.get_pieces_invovled() - mutual_pieces
-
-    #     for piece_id in unmutual_pieces:
-    #         new_loop._set_piece_matings(piece_id,self._get_piece_matings(piece_id))
-
-    #     for piece_id in mutual_pieces:
-
-    #         self_edge2matings = self._get_piece_matings(piece_id)
-    #         other_edge2matings = new_loop._get_piece_matings(piece_id)
-
-    #         for self_edge_id in self_edge2matings.keys():
-
-    #             if self_edge_id not in other_edge2matings.keys():
-    #                 other_edge2matings[self_edge_id] = self_edge2matings[self_edge_id]
-    #             elif not other_edge2matings[self_edge_id] == self_edge2matings[self_edge_id]:
-    #                 mess = f"Conflict while trying to merge between loop {repr(self)} and loop {repr(other_loop)}."+\
-    #                       f"The former loop assert the mating {repr(self_edge2matings[self_edge_id])} " +\
-    #                         f"while the latter {repr(other_edge2matings[self_edge_id])}"
-    #                 raise LoopUnionConflictError(mess)
-                
-    #     return new_loop
-
     def __eq__(self, other: object) -> bool:
         if isinstance(other,Loop):
             if not (other.is_contained(self) and self.is_contained(other)):
