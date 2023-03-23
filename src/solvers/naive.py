@@ -19,7 +19,6 @@ class GeometricNoiselessSolver(Solver):
         self.cycles = []  # For debug (For questioning when testing)
         self.zero_loops = [] # For debug (For questioning when testing)
 
-
     def extract_features(self):
         super().extract_features()
         self.features["edges_lengths"] = []
@@ -152,6 +151,7 @@ class GeometricNoiselessSolver(Solver):
 
         piece2edge2matings = {}
         occupied_matings = []
+        new_loop = Loop(piece2edge2matings={},availiable_matings=[])
 
         for edge_prev,edge_next in zip(edge_rels,edge_rels[1:] + [edge_rels[0]]):
             '''The convention of node of edge rels in the mating graph is the following:
@@ -167,45 +167,45 @@ class GeometricNoiselessSolver(Solver):
                 continue
 
             mating = Mating(piece_1=piece_1,edge_1=edge_1,piece_2=piece_2,edge_2=edge_2)
-            key_p_1 = f"{piece_1}" #f"P_{piece_1}"
-            piece2edge2matings.setdefault(key_p_1,{})
-            piece2edge2matings[key_p_1][edge_1] = mating # Because each edge has only one mating in the loop
-
-            key_p_2 = f"{piece_2}" #f"P_{piece_2}"
-            piece2edge2matings.setdefault(key_p_2,{})
-            piece2edge2matings[key_p_2][edge_2] = mating
-
+            new_loop.insert_mating(mating)
             occupied_matings.append(mating)
 
-        new_loop = Loop(piece2edge2matings)
-        availiable_matings = []
+        # availiable_matings = []
 
         for piece in new_loop.get_pieces_invovled():
             for mat in self.piece2matings[piece]:
 
                 if mat not in occupied_matings:
-                    availiable_matings.append(mat)
+                    new_loop.insert_availiable_mating(mat)
+                    #availiable_matings.append(mat)
             
-        new_loop.set_availiable_matings(availiable_matings)
+        # new_loop.set_availiable_matings(availiable_matings)
 
         return new_loop
 
-    def _load_zero_loops(self,cycles_list):
+    def _load_zero_loops(self,cycles):
         '''
-            cycles_list: a list of cycles that computed from self.edge_mating_graph
+            cycles: a list of cycles that computed from self.edge_mating_graph
                 a cycle is a list of strings (each represent a node in the graph)
-        '''
-        zero_loops = []
 
-        for cycle in cycles_list:
+            It loads to self.zero_loops the zero loops
+        '''
+        self.zero_loops = []
+
+        for cycle in cycles:
             try:
                 loop = self._load_single_zeroloop(cycle)
-                zero_loops.append(loop)
+                self.zero_loops.append(loop)
             except ZeroLoopError as ve:
                 pass
         
-        return zero_loops
-    
+        pieces_zero_looped = [piece_id for loop in self.zero_loops for piece_id in loop.get_pieces_invovled()]
+        pieces_not_zero_looped = [piece.id for piece in self.pieces if piece.id not in pieces_zero_looped]
+        
+        for piece_id in pieces_not_zero_looped:
+            self.zero_loops.append(Loop({f"{piece_id}":{}}))
+
+        # return zero_loops
     
     def _compute_next_level_loops(self,loops:list):
         next_level_loops = []
@@ -225,62 +225,55 @@ class GeometricNoiselessSolver(Solver):
     
     
 
-    def _union_loops(self,loop_1,loop_2):
-        '''
-            Unions between the self loop and another loop
-        '''
+    # def _union_loops(self,loop_1,loop_2):
+    #     '''
+    #         Unions between the self loop and another loop
+    #     '''
 
-        if not isinstance(loop_1,Loop):
-            raise TypeError("loop_1 variable is expected to be of type Loop")
+    #     if not isinstance(loop_1,Loop):
+    #         raise TypeError("loop_1 variable is expected to be of type Loop")
         
-        if not isinstance(loop_2,Loop):
-            raise TypeError("loop_2 variable is expected to be of type Loop")
+    #     if not isinstance(loop_2,Loop):
+    #         raise TypeError("loop_2 variable is expected to be of type Loop")
         
         
-        new_loop = loop_2.copy()
+    #     new_loop = loop_2.copy()
         
-        mutual_pieces = loop_1.get_mutual_pieces(loop_2)
-        unmutual_pieces_loop_1 = loop_1.get_pieces_invovled() - mutual_pieces
-        unmutual_pieces_loop_2 = loop_1.get_pieces_invovled() - mutual_pieces
+    #     mutual_pieces = loop_1.get_mutual_pieces(loop_2)
+    #     unmutual_pieces_loop_1 = loop_1.get_pieces_invovled() - mutual_pieces
+    #     unmutual_pieces_loop_2 = loop_1.get_pieces_invovled() - mutual_pieces
 
-        for loop_1_piece in loop_1.get_pieces_invovled():
-            for loop_2_piece in loop_2.get_pieces_invovled():
-                pass
-
-
-        
+    #     for loop_1_piece in loop_1.get_pieces_invovled():
+    #         for loop_2_piece in loop_2.get_pieces_invovled():
+    #             pass
 
 
-    def global_optimize(self,cycles=None):
-        self._load_pieces_matings()
-
+    def _compute_cycles(self,cycles=None):
         if cycles is None:
             self._compute_edges_mating_graph()
             self.cycles = list(nx.simple_cycles(self.edges_mating_graph))
         else:
             self.cycles = cycles
+
+    def global_optimize(self,cycles=None):
+        self._load_pieces_matings()
+        self._compute_cycles(cycles)
+        self._load_zero_loops(self.cycles)
         
-        self.zero_loops = self._load_zero_loops(self.cycles)
-        
-        pieces_zero_looped = [piece_id for loop in self.zero_loops for piece_id in loop.get_pieces_invovled()]
-        pieces_not_zero_looped = [piece.id for piece in self.pieces if piece.id not in pieces_zero_looped]
-        
-        for piece_id in pieces_not_zero_looped:
-            self.zero_loops.append(Loop({f"{piece_id}":{}}))
-            
         # print("zero_loops:")
         # print(zero_loops)
         # print(end="\n\n\n\n")
         previous_level_loops = self.zero_loops
         level = 1
         solutions = []
+        loop_history_debug = [] # for debug
 
         while True:
             # print(f"We are going to create {level}_loops")
-            next_level_loops_ = self._compute_next_level_loops(previous_level_loops)
+            next_level_loops_raw = self._compute_next_level_loops(previous_level_loops)
             next_level_loops = []
 
-            for lop in next_level_loops_:
+            for lop in next_level_loops_raw:
 
                 if len(lop.get_pieces_invovled())==len(self.pieces):
                     if len(solutions) == 0:
@@ -293,10 +286,12 @@ class GeometricNoiselessSolver(Solver):
                 
                 if lop not in next_level_loops:
                     next_level_loops.append(lop)
+
             
             if len(next_level_loops) == 0:
                 break
             
+            loop_history_debug.append(next_level_loops)
             previous_level_loops = next_level_loops
             level+=1
             # print(end="\n\n\n\n")
