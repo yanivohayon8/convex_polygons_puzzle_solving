@@ -208,7 +208,61 @@ class TestProduction(unittest.TestCase):
         self._run(puzzle_directory,
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)
-  
+    
+    def test_image_Roman009_puzzle_1_noise_0(self):
+        direrctory = "data/ofir/Roman_fresco_Villa_dei_Misteri_Pompeii_009/Puzzle1/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
+        
+    def test_image_Roman009_puzzle_2_noise_0(self):
+        direrctory = "data/ofir/Roman_fresco_Villa_dei_Misteri_Pompeii_009/Puzzle2/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
+    
+    def test_image_Roman009_puzzle_3_noise_0(self):
+        direrctory = "data/ofir/Roman_fresco_Villa_dei_Misteri_Pompeii_009/Puzzle3/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
+    
+    def test_image_terentius_puzzle_1_noise_0(self):
+        direrctory = "data/ofir/Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01/Puzzle1/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
+    
+    def test_image_terentius_puzzle_2_noise_0(self):
+        direrctory = "data/ofir/Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01/Puzzle2/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
+        
+    def test_image_terentius_puzzle_3_noise_0(self):
+        direrctory = "data/ofir/Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01/Puzzle3/"
+        puzzle_directory = direrctory + "0"
+        expected_solution_accuracy = 1.0
+        expected_num_solutions = 1 
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_solutions=expected_num_solutions)
+    
 
         
 if __name__ == "__main__":
