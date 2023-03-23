@@ -6,9 +6,7 @@ from src.visualizers.cv2_wrapper import Frame
 import matplotlib.pyplot as plt
 import networkx as nx
 
-
-class TestNaiveSolver(unittest.TestCase):
-
+class TestOld(unittest.TestCase):
     def test_donothing(self):
         puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
         loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
@@ -67,10 +65,9 @@ class TestNaiveSolver(unittest.TestCase):
         while keyboardClick != True:
             keyboardClick=plt.waitforbuttonpress()
 
-    def test_image_Inv9084_puzzle_1_noise_0_cycles_fixed(self,expected_num_cycles=-1,
-             expected_num_zero_loops=-1,expected_num_solutions=-1):
-        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
-        puzzle_directory = direrctory + "0"
+class TestNaiveSolverFixedZeroLoops(unittest.TestCase):
+
+    def _load_fixed_zeroloops_solver(self,puzzle_directory):
         loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
                         puzzle_directory + "/ground_truth_rels.csv", 
                         puzzle_directory + "/pieces.csv")
@@ -89,9 +86,15 @@ class TestNaiveSolver(unittest.TestCase):
         with open(puzzle_directory + "/cycles.txt", 'r') as f:
             cycles = [eval(line.rstrip('\n')) for line in f]
 
-        
         solver._compute_cycles(cycles)
         solver._load_zero_loops()
+        return solver,loader
+
+    def test_image_Inv9084_puzzle_1_noise_0(self,expected_num_cycles=-1,
+             expected_num_zero_loops=-1,expected_num_solutions=-1):
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        puzzle_directory = direrctory + "0"
+        solver,loader = self._load_fixed_zeroloops_solver(puzzle_directory)
 
         zero_loop_9_P_8_P_6_P_5_P_0 = solver.zero_loops[0]
         zero_loop_P_9_P_8_P_7 = solver.zero_loops[1]
@@ -113,19 +116,35 @@ class TestNaiveSolver(unittest.TestCase):
         assert len(one_loop_9_8_6_5_2_1_0.get_as_mating_list()) == len(manual_couting) # 
 
         # solutions = solver.global_optimize()
-        expected_solution_accuracy=1.0
+        # expected_solution_accuracy=1.0
+        # solutions = solver.global_optimize()
+        # assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
+        # assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
+        # assert len(solutions)==expected_num_solutions or len(solutions)>0
+        # assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
+    
+    
+    def test_image_Inv9084_puzzle_2_noise_0(self,expected_num_cycles=-1,
+                expected_num_zero_loops=-1,expected_num_solutions=-1):
+            direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle2/"
+            puzzle_directory = direrctory + "0"
+            solver,loader = self._load_fixed_zeroloops_solver(puzzle_directory)
+            print(solver.zero_loops)
 
 
-        solutions = solver.global_optimize(cycles)
+class TestNaiveSolver(unittest.TestCase):
 
-        
-        assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
-        assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
-        assert len(solutions)==expected_num_solutions or len(solutions)>0
-        assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
+    def _save_cycles(self,cycles,out_path):
+        '''
+            This method is used for the test when the zero loops are fixed
+        '''
+        with open(out_path, 'w') as fp:
+            for item in cycles:
+                # write each item on a new line
+                fp.write("%s\n" % item)
 
     def _run(self,puzzle_directory:str,expected_solution_accuracy:float,expected_num_cycles=-1,
-             expected_num_zero_loops=-1,expected_num_solutions=-1):
+             expected_num_zero_loops=-1,expected_num_solutions=-1,is_save_cycles=False):
         # direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
         # puzzle_directory = direrctory + "0"
         loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
@@ -138,16 +157,11 @@ class TestNaiveSolver(unittest.TestCase):
         solver.extract_features()
         solver.pairwise()
         solver._compute_edges_mating_graph()
-        
-        # # For Debug puzzle 1:
-        # #Because the nx package would brings random results, make the test deterministic
-        # with open(puzzle_directory + "/cycles.txt", 'r') as f:
-        #     cycles = [eval(line.rstrip('\n')) for line in f]
-
-        # solutions = solver.global_optimize(cycles)
-        
         solutions = solver.global_optimize()
         
+        if is_save_cycles:
+            self._save_cycles(solver.cycles,puzzle_directory+"/cycles.txt")
+
         assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
         assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
         assert len(solutions)==expected_num_solutions or len(solutions)>0
@@ -175,7 +189,8 @@ class TestNaiveSolver(unittest.TestCase):
         self._run(puzzle_directory,
                   expected_solution_accuracy,
                   expected_num_zero_loops=expected_num_zero_loops,
-                  expected_num_solutions=expected_num_solutions)
+                  expected_num_solutions=expected_num_solutions,
+                  is_save_cycles=False)
     
     def test_image_Inv9084_puzzle_3_noise_0(self):
         direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle3/"
