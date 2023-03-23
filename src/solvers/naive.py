@@ -204,9 +204,9 @@ class GeometricNoiselessSolver(Solver):
         pieces_not_zero_looped = [piece.id for piece in self.pieces if piece.id not in pieces_zero_looped]
         
         for piece_id in pieces_not_zero_looped:
-            self.zero_loops.append(Loop({f"{piece_id}":{}}))
-
-        # return zero_loops
+            new_loop = Loop(piece2edge2matings={piece_id:{}},availiable_matings=[])
+            [new_loop.insert_availiable_mating(mat) for mat in self.piece2matings[piece_id]]
+            self.zero_loops.append(new_loop)
     
     def _compute_next_level_loops(self,loops:list):
         next_level_loops = []
@@ -224,7 +224,6 @@ class GeometricNoiselessSolver(Solver):
 
         return next_level_loops
     
-
     def _compute_cycles(self,cycles=None):
         if cycles is None:
             self._compute_edges_mating_graph()
@@ -237,16 +236,12 @@ class GeometricNoiselessSolver(Solver):
         self._compute_cycles(cycles)
         self._load_zero_loops()
         
-        # print("zero_loops:")
-        # print(zero_loops)
-        # print(end="\n\n\n\n")
         previous_level_loops = self.zero_loops
         level = 1
         solutions = []
         loop_history_debug = [] # for debug
 
         while True:
-            # print(f"We are going to create {level}_loops")
             next_level_loops_raw = self._compute_next_level_loops(previous_level_loops)
             next_level_loops = []
 

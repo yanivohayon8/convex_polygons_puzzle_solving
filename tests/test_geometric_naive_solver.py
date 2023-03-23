@@ -118,20 +118,29 @@ class TestFixedZeroLoops(unittest.TestCase):
         # solutions = solver.global_optimize()
         # expected_solution_accuracy=1.0
         # solutions = solver.global_optimize()
-        # assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
         # assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
         # assert len(solutions)==expected_num_solutions or len(solutions)>0
         # assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
     
     def test_image_Inv9084_puzzle_2_noise_0(self,expected_num_cycles=-1,
                 expected_num_zero_loops=-1,expected_num_solutions=-1):
-            direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle2/"
-            puzzle_directory = direrctory + "0"
-            solver,loader = self._load_fixed_zeroloops_solver(puzzle_directory)
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle2/"
+        puzzle_directory = direrctory + "0"
+        solver,loader = self._load_fixed_zeroloops_solver(puzzle_directory)
+
+        solutions = solver.global_optimize()
+
+        expected_solution_accuracy=1.0
+        expected_num_zero_loops = 6
+        expected_num_solutions = 1
+        
+        assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
+        assert len(solutions)==expected_num_solutions or len(solutions)>0
+        assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
             
 
 
-class TestProd(unittest.TestCase):
+class TestProduction(unittest.TestCase):
 
     def _save_cycles(self,cycles,out_path):
         '''

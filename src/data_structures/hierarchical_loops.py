@@ -136,6 +136,9 @@ class Loop():
         
         self_matings = self.get_as_mating_list()
         other_matings = other_loop.get_as_mating_list()
+        pieces_involved = []# 
+        pieces_involved_with_duplicates = list(self.get_pieces_invovled()) + list(other_loop.get_pieces_invovled())
+        [pieces_involved.append(piece) for piece in pieces_involved_with_duplicates if piece not in pieces_involved]
 
         for mat in self_matings+other_matings:
             new_loop.insert_mating(mat)
@@ -143,8 +146,9 @@ class Loop():
         for mat in self.get_availiable_matings() +other_loop.get_availiable_matings():
             
             if mat in mutual_ava_matings:
-                pieces_inv = new_loop.get_pieces_invovled()
-                if mat.piece_1 in pieces_inv and mat.piece_2 in pieces_inv:
+                # pieces_inv = new_loop.get_pieces_invovled()
+                # if mat.piece_1 in pieces_inv and mat.piece_2 in pieces_inv:
+                if mat.piece_1 in pieces_involved and mat.piece_2 in pieces_involved:
                     new_loop.insert_mating(mat)
                     continue
 
