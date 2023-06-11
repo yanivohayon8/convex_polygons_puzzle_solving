@@ -155,7 +155,6 @@ class TestFixedZeroLoops(unittest.TestCase):
         assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
             
 
-
 class TestProduction(unittest.TestCase):
 
     def _save_cycles(self,cycles,out_path):
@@ -252,7 +251,6 @@ class TestProduction(unittest.TestCase):
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)
     
-
     '''This test has been putted as a note becaues it has conflicts in the matings.
     I.e. it does has one to one matings so this probably a computation or representation 
     of numbers and that the points are not in general position. 
@@ -290,7 +288,6 @@ class TestProduction(unittest.TestCase):
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)
     
-
         
 if __name__ == "__main__":
     unittest.main()
