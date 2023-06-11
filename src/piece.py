@@ -1,5 +1,7 @@
 from shapely import Polygon
 import numpy as np
+import cv2
+
 
 class Piece():
 
@@ -8,7 +10,11 @@ class Piece():
         self.polygon = Polygon(coordinates)
         self.coordinates = coordinates
         self.img_path = img_path
+        self.img = None
         self.features = {}
+
+    def load_image(self):
+        self.img = cv2.imread(self.img_path)
 
     def get_coords(self):
         '''

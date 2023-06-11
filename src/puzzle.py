@@ -2,7 +2,6 @@ import pandas as pd
 from src.piece import Piece
 from shapely.geometry.polygon import orient as orient_as_ccw
 from src.data_structures import Mating
-import cv2
 import glob
 
 
@@ -35,18 +34,17 @@ class Puzzle():
         self.df_solution_rels = pd.read_csv(self.groundtruth_rels_path)
         self.df_pieces = pd.read_csv(self.pieces_path)
     
-    def load_images(self):
+    def _get_pieces2img_path(self,pieces):
         extentions = ["png","jpg"]
         img_paths = []  
         [img_paths.extend(glob.glob(self.puzzle_directory+"\\*."+ext)) for ext in extentions]
 
-        pieces_ids = self.df_pieces["piece"].unique()
-        for id_ in pieces_ids:
-            id_str = str(id_)
+        for piece in pieces:
+            id_str = str(piece.id)
             for path in img_paths:
                 file_name = path.split("\\")[-1].split(".")[0]
                 if file_name == id_str:
-                    self.pieces_images[id_str] = cv2.imread(path,cv2.COLOR_BGR2RGB)
+                    piece.img_path = path
                     continue
         
                 
@@ -56,11 +54,13 @@ class Puzzle():
     def get_bag_of_pieces(self,csv_conv="Ofir"):
         pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
         self._preprocess(pieces)
+        self._get_pieces2img_path(pieces)
         return pieces
 
     def get_final_puzzle(self,csv_conv="Ofir"):
         pieces = self._pieces_pd2list(self.df_solution_locations,csv_conv=csv_conv)
         self._preprocess(pieces)
+        self._get_pieces2img_path(pieces)
         return pieces
 
     def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):

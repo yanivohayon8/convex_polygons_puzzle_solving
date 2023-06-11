@@ -7,6 +7,7 @@ from src.data_structures.hierarchical_loops import Loop,ZeroLoopError,LoopUnionC
 from src.data_structures import Mating
 
 import cv2
+from src.feature_extraction.pictorial import PixelEnviormnetExtractor
 #from src.feature_extraction.
 
 
@@ -279,12 +280,15 @@ class GeometricNoiselessSolver(Solver):
 
 class PictorialSolver(GeometricNoiselessSolver):
 
-    def __init__(self, pieces: list):
+    def __init__(self, pieces: list,pieces_id2images):
         super().__init__(pieces)
+        self.pieces_id2images = pieces_id2images
+        self.pictorial_feature_extractor = PixelEnviormnetExtractor()
 
     def extract_features(self):
         # Extract edges lengths'
         super().extract_features()
+        
 
 
 

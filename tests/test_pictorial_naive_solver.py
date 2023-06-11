@@ -13,16 +13,18 @@ class TestPictorialNaiveSolver(unittest.TestCase):
         loader = Puzzle(puzzle_directory)
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
-        loader.load_images()
-        solver = naive_solvers.PictorialSolver(bag_of_pieces)
-        
-        plt.imshow(loader.pieces_images["0"])
-        plt.close()
+        [piece.load_image() for piece in bag_of_pieces]
 
-        # solver.extract_features()
-        # solver.pairwise()
-        # solver._compute_edges_mating_graph()
-        # solutions = solver.global_optimize()
+        #loader.load_images()
+        solver = naive_solvers.PictorialSolver(bag_of_pieces,loader.pieces_images)
+        
+        # plt.imshow(loader.pieces_images["0"])
+        # plt.close()
+
+        solver.extract_features()
+        solver.pairwise()
+        solver._compute_edges_mating_graph()
+        solutions = solver.global_optimize()
         
 
         # assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
