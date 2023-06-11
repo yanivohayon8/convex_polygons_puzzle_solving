@@ -9,9 +9,10 @@ import networkx as nx
 class TestOld(unittest.TestCase):
     def test_donothing(self):
         puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
-        loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
-                        puzzle_directory + "/ground_truth_rels.csv", 
-                        puzzle_directory + "/pieces.csv")
+        # loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+        #                 puzzle_directory + "/ground_truth_rels.csv", 
+        #                 puzzle_directory + "/pieces.csv")
+        loader = Puzzle(puzzle_directory)
         loader.load()
 
         # pieces = loader.get_chaos_pieces()        
@@ -31,9 +32,12 @@ class TestOld(unittest.TestCase):
         puzzle_directory = direrctory + "0"
         #puzzle_directory = direrctory + "simplest_puzzle"
         #puzzle_directory = direrctory + "simplest_puzzle_v2"
-        loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
-                        puzzle_directory + "/ground_truth_rels.csv", 
-                        puzzle_directory + "/pieces.csv")
+        # loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+        #                 puzzle_directory + "/ground_truth_rels.csv", 
+        #                 puzzle_directory + "/pieces.csv")
+
+        loader = Puzzle(puzzle_directory)
+
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
         solver = solvers.GeometricNoiselessSolver(bag_of_pieces)
@@ -68,9 +72,11 @@ class TestOld(unittest.TestCase):
 class TestFixedZeroLoops(unittest.TestCase):
 
     def _load_fixed_zeroloops_solver(self,puzzle_directory):
-        loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
-                        puzzle_directory + "/ground_truth_rels.csv", 
-                        puzzle_directory + "/pieces.csv")
+        # loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+        #                 puzzle_directory + "/ground_truth_rels.csv", 
+        #                 puzzle_directory + "/pieces.csv")
+
+        loader = Puzzle(puzzle_directory)
         
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
@@ -170,9 +176,11 @@ class TestProduction(unittest.TestCase):
              expected_num_zero_loops=-1,expected_num_solutions=-1,is_save_cycles=False):
         # direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
         # puzzle_directory = direrctory + "0"
-        loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
-                        puzzle_directory + "/ground_truth_rels.csv", 
-                        puzzle_directory + "/pieces.csv")
+        # loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
+        #                 puzzle_directory + "/ground_truth_rels.csv", 
+        #                 puzzle_directory + "/pieces.csv")
+
+        loader = Puzzle(puzzle_directory)
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
         

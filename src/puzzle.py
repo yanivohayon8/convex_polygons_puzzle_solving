@@ -2,22 +2,28 @@ import pandas as pd
 from src.piece import Piece
 from shapely.geometry.polygon import orient as orient_as_ccw
 from src.data_structures import Mating
+import cv2
+import glob
+
 
 class Puzzle():
 
-    def __init__(self,location_path,rels_path,pieces_path) -> None:
+    def __init__(self,puzzle_directory):#,location_path,rels_path,pieces_path) -> None:
         '''
             df_locations - the file path of the csv file ground_truth_puzzle.csv
             rels_path - the file path of the csv file ground_truth_rels.csv
             pieces_path - the file path of the csv file pieces.csv
         '''
-        self.groundtruth_location_path = location_path
-        self.groundtruth_rels_path = rels_path
-        self.pieces_path = pieces_path
+        self.puzzle_directory = puzzle_directory
+        self.groundtruth_location_path = puzzle_directory + "/ground_truth_puzzle.csv"
+        self.groundtruth_rels_path = puzzle_directory + "/ground_truth_rels.csv"
+        self.pieces_path = puzzle_directory + "/pieces.csv"
         self.df_solution_locations = None
         self.df_solution_rels = None
         self.rels_as_mating = []
         self.df_pieces = None
+        self.pieces_images = {}
+
 
         # Because we give new edge numbers in ccw order for efficient code and debug, 
         # we maintain the original "messed order" of the indexing of the ground truth, for evaluation.
@@ -28,6 +34,24 @@ class Puzzle():
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
         self.df_solution_rels = pd.read_csv(self.groundtruth_rels_path)
         self.df_pieces = pd.read_csv(self.pieces_path)
+    
+    def load_images(self):
+        extentions = ["png","jpg"]
+        img_paths = []  
+        [img_paths.extend(glob.glob(self.puzzle_directory+"\\*."+ext)) for ext in extentions]
+
+        pieces_ids = self.df_pieces["piece"].unique()
+        for id_ in pieces_ids:
+            id_str = str(id_)
+            for path in img_paths:
+                file_name = path.split("\\")[-1].split(".")[0]
+                if file_name == id_str:
+                    self.pieces_images[id_str] = cv2.imread(path,cv2.COLOR_BGR2RGB)
+                    continue
+        
+                
+
+
 
     def get_bag_of_pieces(self,csv_conv="Ofir"):
         pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)

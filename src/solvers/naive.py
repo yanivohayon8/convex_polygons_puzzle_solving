@@ -6,6 +6,10 @@ import networkx as nx
 from src.data_structures.hierarchical_loops import Loop,ZeroLoopError,LoopUnionConflictError
 from src.data_structures import Mating
 
+import cv2
+#from src.feature_extraction.
+
+
 CIRCLE_DEGREES = 360
 
 class GeometricNoiselessSolver(Solver):
@@ -277,9 +281,15 @@ class PictorialSolver(GeometricNoiselessSolver):
 
     def __init__(self, pieces: list):
         super().__init__(pieces)
-    
+
     def extract_features(self):
-        return super().extract_features()
+        # Extract edges lengths'
+        super().extract_features()
+
+
+
+
+
 
     
             
