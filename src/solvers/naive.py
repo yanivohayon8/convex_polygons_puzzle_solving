@@ -272,8 +272,16 @@ class GeometricNoiselessSolver(Solver):
         return solutions_as_mating
         
         
-        
 
+class PictorialSolver(GeometricNoiselessSolver):
+
+    def __init__(self, pieces: list):
+        super().__init__(pieces)
+    
+    def extract_features(self):
+        return super().extract_features()
+
+    
             
         
 
