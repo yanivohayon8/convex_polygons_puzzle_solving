@@ -16,7 +16,7 @@ class TestPictorialNaiveSolver(unittest.TestCase):
         [piece.load_image() for piece in bag_of_pieces]
 
         #loader.load_images()
-        solver = naive_solvers.PictorialSolver(bag_of_pieces,loader.pieces_images)
+        solver = naive_solvers.PictorialSolver(bag_of_pieces)
         
         # plt.imshow(loader.pieces_images["0"])
         # plt.close()

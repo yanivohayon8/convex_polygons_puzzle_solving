@@ -280,21 +280,18 @@ class GeometricNoiselessSolver(Solver):
 
 class PictorialSolver(GeometricNoiselessSolver):
 
-    def __init__(self, pieces: list,pieces_id2images):
+    def __init__(self, pieces: list):
         super().__init__(pieces)
-        self.pieces_id2images = pieces_id2images
         self.pictorial_feature_extractor = PixelEnviormnetExtractor()
 
     def extract_features(self):
         # Extract edges lengths'
         super().extract_features()
-        
 
 
-
-
-
-
+        for piece in self.pieces:
+            for coord,next_coord in zip(piece.coordinates[1:],piece.coordinates + [piece.coordinates[0]]):
+                self.pictorial_feature_extractor.get_pixel_env()
     
             
         
