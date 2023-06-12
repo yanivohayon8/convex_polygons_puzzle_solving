@@ -8,6 +8,7 @@ from src.data_structures import Mating
 
 import cv2
 from src.feature_extraction.pictorial import PixelEnviormnetExtractor
+import matplotlib.pyplot as plt
 #from src.feature_extraction.
 
 
@@ -291,7 +292,13 @@ class PictorialSolver(GeometricNoiselessSolver):
 
         for piece in self.pieces:
             for coord,next_coord in zip(piece.coordinates[1:],piece.coordinates + [piece.coordinates[0]]):
-                self.pictorial_feature_extractor.get_pixel_env()
+                x = int((coord[0]+next_coord[0])//2)
+                y = int((coord[1]+next_coord[1])//2)
+                test_radiius = 150 
+                cropped_img = self.pictorial_feature_extractor.get_pixel_env(piece.img,x,y,test_radiius)
+                plt.imshow(cropped_img)
+                break
+            break
     
             
         

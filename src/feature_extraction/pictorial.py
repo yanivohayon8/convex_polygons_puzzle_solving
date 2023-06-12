@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class PixelEnviormnetExtractor():
 
     def __init__(self) -> None:
@@ -13,11 +14,11 @@ class PixelEnviormnetExtractor():
             center - the pixel around to compute the enviorment
             radius - how far going from the center...
         '''
-        padded_img = img
+        # padded_img = img
 
-        if is_repad_img or self.padded_img is None:
-             padded_img = self.pad_img(radius)
+        # if is_repad_img or self.padded_img is None:
+        #      padded_img = self.pad_img(img,radius)
         
 
-        return padded_img[center_x-radius:center_x+radius,center_y-radius:radius+center_y]
+        return img[center_x-radius:center_x+radius,center_y-radius:radius+center_y]
 

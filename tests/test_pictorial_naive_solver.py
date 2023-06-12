@@ -22,9 +22,9 @@ class TestPictorialNaiveSolver(unittest.TestCase):
         # plt.close()
 
         solver.extract_features()
-        solver.pairwise()
-        solver._compute_edges_mating_graph()
-        solutions = solver.global_optimize()
+        # solver.pairwise()
+        # solver._compute_edges_mating_graph()
+        # solutions = solver.global_optimize()
         
 
         # assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
