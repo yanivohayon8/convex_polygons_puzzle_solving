@@ -2,7 +2,7 @@ import unittest
 import cv2
 from src.piece import Piece
 import matplotlib.pyplot as plt
-from src.feature_extraction.pictorial import slice_image
+from src.feature_extraction.pictorial import slice_image,rotate_and_crop
 import numpy as np
 
 class TestPictorialFeatureExtractor(unittest.TestCase):
@@ -22,15 +22,15 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
         piece.load_image()
 
         #plt.imshow(piece.img)
-        center_x = piece.img.shape[0]/2 #216
-        center_y = piece.img.shape[1]/2
+        center_col = piece.img.shape[1]/2 #216
+        center_row = piece.img.shape[0]/2
         angle = 0
-        width = piece.img.shape[0]#300
-        height = piece.img.shape[1]
+        width = piece.img.shape[1]#300
+        height = piece.img.shape[0]
         scale = 1
 
         fig, axs = plt.subplots(1,2)
-        pictorial_content = slice_image(piece.img,center_x,center_y,angle,width,height,scale=scale)
+        pictorial_content = slice_image(piece.img,center_col,center_row,angle,width,height,scale=scale)
         axs[0].imshow(pictorial_content)
         axs[1].imshow(piece.img)
         plt.show()
@@ -50,31 +50,68 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
         piece = Piece(piece_id,coordinates,img_path)
         piece.load_image()
 
-        curr_coord_x = coordinates[0][0]
-        curr_coord_y = coordinates[0][1]
-        next_coord_x = coordinates[1][0]
-        next_coord_y = coordinates[1][1]
+        row1 = coordinates[0][1]
+        col1 = coordinates[0][0]
+        row2 = coordinates[1][1]
+        col2 = coordinates[1][0]
 
         #plt.imshow(piece.img)
-        center_x = 500#int((curr_coord_x+next_coord_x)/2)#piece.img.shape[0]/2 #216
-        center_y = 500#int((curr_coord_y+next_coord_y)/2)
-        width = 400
-        
-        # vector_x = next_coord_x-curr_coord_x
-        # vector_y = next_coord_y-curr_coord_y
-        height = 600#int(np.sqrt(vector_x**2+vector_y**2))
+        center_x = int((col1+col2)/2)#piece.img.shape[0]/2 #216
+        center_y = int((row1+row2)/2)
+        width = abs(col1-col2)
+        height = abs(row2-row1)
 
-        angle = 0#np.arctan2(vector_y,vector_x) * 180/np.pi
+        # angle = 0
+        angle = np.arctan((row2-row1)/(col2-col1))*180/np.pi
 
         fig, axs = plt.subplots(1,2)
-        pictorial_content = slice_image(piece.img,center_x,center_y,angle,
-                                        width,height)
+        pictorial_content = slice_image(piece.img,center_x,center_y,angle,width,height)
         axs[0].imshow(pictorial_content)
         axs[1].imshow(piece.img)
         plt.show()
-        raise("Not working")
         pass
+    
+    def test_other_whole_image(self):
+        puzzleDirectory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+        piece_id = "0"
+        img_path = puzzleDirectory+f"/{piece_id}.png"
+        image = cv2.imread(img_path,cv2.COLOR_BGR2RGB)
 
+
+        coordinates = [
+            (0,1144),
+            (433,1369),
+            (1939,845),
+            (1191,0)
+        ]
+
+        # row1 = 0
+        # col1 = 0
+        # row2 = image.shape[0]
+        # col2 = image.shape[1]
+        # angle = 0 #45  # In degrees
+        # rotated,cropped_image = rotate_and_crop(image,(row1,col1,col2,row2),angle)
+
+        # # # switch from cartesian to image coordinates
+        row1 = 1144
+        col1 = 0
+        row2 = 1369
+        col2 = 433
+
+        #angle = 0 #45  # In degrees
+        angle = np.arctan(col2-col1/row2-row1)*180/np.pi
+        rotated,cropped_image = rotate_and_crop(image,(col1,row1,col2,row2),angle)
+
+        fig, axs = plt.subplots(2,2)
+        axs[0,0].set_title("cropped_image")
+        axs[0,0].imshow(cropped_image)
+        axs[0,1].set_title("rotated")
+        axs[0,1].imshow(rotated)
+        axs[1,0].set_title("Original Image")
+        axs[1,0].imshow(image)
+        plt.show()
+
+        
 
 if __name__ == "__main__":
     unittest.main()

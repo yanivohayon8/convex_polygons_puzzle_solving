@@ -26,12 +26,28 @@ class PixelEnviormnetExtractor():
 def slice_image(img,center_x,center_y,degrees,width,height,scale=1):
     shape = ( img.shape[1], img.shape[0] ) # cv2.warpAffine expects shape in (length, height)
 
-    matrix = cv2.getRotationMatrix2D( center=(center_x,center_y), angle=degrees, scale=scale )
+    matrix = cv2.getRotationMatrix2D(center=(center_x,center_y), angle=degrees, scale=scale )
     image = cv2.warpAffine( src=img, M=matrix, dsize=shape )
 
-    x = int( center_x - width/2  )
+    x = int( center_x - width/2  ) # switching because warpAffine?
     y = int( center_y - height/2 )
 
-    return image[  x:x+width,y:y+height ]#image[ y:y+height, x:x+width ]
+    return image[ y:y+height, x:x+width ]
 
     
+def rotate_and_crop(image, rectangle, angle):
+    # Unpack the rectangle coordinates
+    x1, y1, x2, y2 = rectangle
+    
+    cropped_image = image[y1:y2, x1:x2] # image coordinages are from top left
+        
+    # Get the center of the cropped image
+    center = (int((x2 - x1) / 2), int((y2 - y1) / 2)) # 
+    
+    # Prepare the rotation matrix
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    
+    # Perform the rotation
+    rotated = cv2.warpAffine(cropped_image, M, (x2 - x1, y2 - y1))#  x and y "opposite according to the documentation"
+    
+    return rotated,cropped_image
