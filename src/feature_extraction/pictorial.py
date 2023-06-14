@@ -34,13 +34,14 @@ def slice_image(img,center_x,center_y,degrees,width,height,scale=1):
 
     return image[ y:y+height, x:x+width ]
 
-def trans_image(img,center_x,center_y,degrees,tx,ty,scale=1):
+def trans_image(img,center_x,center_y,degrees,t_row,t_col,scale=1):
     shape = ( img.shape[1], img.shape[0] ) # cv2.warpAffine expects shape in (length, height)
 
     matrix = cv2.getRotationMatrix2D(center=(center_x,center_y), angle=degrees, scale=scale )
-    matrix[0,2] -=tx
-    matrix[1,2] -=ty
+    matrix[0,2] -= t_col
+    matrix[1,2] -= t_row
     image = cv2.warpAffine( src=img, M=matrix, dsize=shape )
+
     return image
 
     

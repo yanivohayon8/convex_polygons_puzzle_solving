@@ -50,29 +50,41 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
         piece = Piece(piece_id,coordinates,img_path)
         piece.load_image()
 
-        row1 = coordinates[0][1]
-        col1 = coordinates[0][0]
-        row2 = coordinates[1][1]
-        col2 = coordinates[1][0]
+        curr_row = coordinates[1][1]
+        curr_col = coordinates[1][0]
+        next_row = coordinates[2][1]
+        next_col = coordinates[2][0]
 
         #plt.imshow(piece.img)
-        center_x = int((col1+col2)/2)#piece.img.shape[0]/2 #216
-        center_y = int((row1+row2)/2)
-        width = abs(col1-col2)
-        height = abs(row2-row1)
+        center_x = int((curr_col+next_col)/2)#piece.img.shape[0]/2 #216
+        center_y = int((curr_row+next_row)/2)
+        width = abs(curr_col-next_col)
+        #height = abs(next_row-curr_row)
+        height_sampling = 100
+        
+        angle = np.arctan((next_row-curr_row)/(next_col-curr_col))*180/np.pi
+        img_only_rotate_from_center = trans_image(piece.img,center_x,center_y,angle,0,0) # 
+        img_only_rotate = trans_image(piece.img,curr_col,curr_row,angle,0,0) # center_x,center_y
 
-        # angle = 0
-        angle = np.arctan((row2-row1)/(col2-col1))*180/np.pi
-        # pictorial_content = slice_image(piece.img,center_x,center_y,angle,width,height)
+        img_rot_and_trans = trans_image(piece.img,curr_col,curr_row,angle,curr_row,curr_col) # this should result as the image is hidding right above the top left corner
+        img_height_as_param = trans_image(piece.img,curr_col,curr_row,angle,curr_row-height_sampling,curr_col)
+        
+        content = img_height_as_param[:height_sampling,:width]
 
-        transed_image = trans_image(piece.img,center_x,center_y,angle,col1,row1)
-        #half_width = int(width/2)
-        content = transed_image[:height//2,:width//2]
-
-        fig, axs = plt.subplots(2,2)
+        fig, axs = plt.subplots(2,3)
+        axs[0,0].set_title("piece.img")
         axs[0,0].imshow(piece.img)
-        axs[1,0].imshow(transed_image)
-        axs[1,1].imshow(content)
+        axs[0,1].set_title("results")
+        axs[0,1].imshow(content)
+        axs[0,2].set_title("img_only_rotate_from_center")
+        axs[0,2].imshow(img_only_rotate_from_center)
+        axs[1,0].set_title("img_only_rotate_from_vertex")
+        axs[1,0].imshow(img_only_rotate)
+        axs[1,1].set_title("img_rot_and_trans")
+        axs[1,1].imshow(img_rot_and_trans)
+        axs[1,2].set_title("img_height_as_param")
+        axs[1,2].imshow(img_height_as_param)
+        
         plt.show()
         pass
     
