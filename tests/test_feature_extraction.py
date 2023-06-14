@@ -58,7 +58,7 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
         #plt.imshow(piece.img)
         center_x = int((curr_col+next_col)/2)#piece.img.shape[0]/2 #216
         center_y = int((curr_row+next_row)/2)
-        width = abs(curr_col-next_col)
+        width = int(np.sqrt((curr_col-next_col)**2 + (curr_row-next_row)**2)) #abs(curr_col-next_col)
         #height = abs(next_row-curr_row)
         height_sampling = 100
         
