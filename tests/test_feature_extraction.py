@@ -2,7 +2,7 @@ import unittest
 import cv2
 from src.piece import Piece
 import matplotlib.pyplot as plt
-from src.feature_extraction.pictorial import slice_image,rotate_and_crop
+from src.feature_extraction.pictorial import slice_image,rotate_and_crop,trans_image
 import numpy as np
 
 class TestPictorialFeatureExtractor(unittest.TestCase):
@@ -63,11 +63,16 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
 
         # angle = 0
         angle = np.arctan((row2-row1)/(col2-col1))*180/np.pi
+        # pictorial_content = slice_image(piece.img,center_x,center_y,angle,width,height)
 
-        fig, axs = plt.subplots(1,2)
-        pictorial_content = slice_image(piece.img,center_x,center_y,angle,width,height)
-        axs[0].imshow(pictorial_content)
-        axs[1].imshow(piece.img)
+        transed_image = trans_image(piece.img,center_x,center_y,angle,col1,row1)
+        #half_width = int(width/2)
+        content = transed_image[:height//2,:width//2]
+
+        fig, axs = plt.subplots(2,2)
+        axs[0,0].imshow(piece.img)
+        axs[1,0].imshow(transed_image)
+        axs[1,1].imshow(content)
         plt.show()
         pass
     
