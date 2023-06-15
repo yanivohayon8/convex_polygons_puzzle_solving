@@ -7,7 +7,7 @@ import numpy as np
 
 class TestPictorialFeatureExtractor(unittest.TestCase):
     
-    def test_sample_whole_image(self):
+    def test_slice_image_func(self):
         puzzleDirectory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
         piece_id = "0"
         img_path = puzzleDirectory+f"/{piece_id}.png"
@@ -50,19 +50,26 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
         piece = Piece(piece_id,coordinates,img_path)
         piece.load_image()
 
-        curr_row = coordinates[1][1]
-        curr_col = coordinates[1][0]
-        next_row = coordinates[2][1]
-        next_col = coordinates[2][0]
+        curr_index = 1
+        next_index = 2
+
+        curr_row = coordinates[curr_index][1]
+        curr_col = coordinates[curr_index][0]
+        next_row = coordinates[next_index][1]
+        next_col = coordinates[next_index][0]
 
         #plt.imshow(piece.img)
         center_x = int((curr_col+next_col)/2)#piece.img.shape[0]/2 #216
         center_y = int((curr_row+next_row)/2)
         width = int(np.sqrt((curr_col-next_col)**2 + (curr_row-next_row)**2)) #abs(curr_col-next_col)
         #height = abs(next_row-curr_row)
-        height_sampling = 100
+        height_sampling = 500
         
         angle = np.arctan((next_row-curr_row)/(next_col-curr_col))*180/np.pi
+
+        if next_col-curr_col < 0:
+            angle +=180
+
         img_only_rotate_from_center = trans_image(piece.img,center_x,center_y,angle,0,0) # 
         img_only_rotate = trans_image(piece.img,curr_col,curr_row,angle,0,0) # center_x,center_y
 
@@ -88,7 +95,7 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
         plt.show()
         pass
     
-    def test_other_whole_image(self):
+    def test_crop_then_rotate(self):
         puzzleDirectory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
         piece_id = "0"
         img_path = puzzleDirectory+f"/{piece_id}.png"
