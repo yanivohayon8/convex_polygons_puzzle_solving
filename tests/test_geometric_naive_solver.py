@@ -198,7 +198,7 @@ class TestProduction(unittest.TestCase):
         assert len(solutions)==expected_num_solutions or len(solutions)>0
         assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
 
-    def test_image_Inv9084_puzzle_1_noise_0(self):
+    def test_Inv9084_puzzle_1_noise_0(self):
         direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
         puzzle_directory = direrctory + "0"
         expected_num_cycles = 69
@@ -211,7 +211,7 @@ class TestProduction(unittest.TestCase):
                   expected_num_zero_loops=expected_num_zero_loops,
                   expected_num_solutions=expected_num_solutions)
     
-    def test_image_Inv9084_puzzle_2_noise_0(self):
+    def test_Inv9084_puzzle_2_noise_0(self):
         direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle2/"
         puzzle_directory = direrctory + "0"
         expected_solution_accuracy = 1.0
@@ -223,7 +223,7 @@ class TestProduction(unittest.TestCase):
                   expected_num_solutions=expected_num_solutions,
                   is_save_cycles=False)
     
-    def test_image_Inv9084_puzzle_3_noise_0(self):
+    def test_Inv9084_puzzle_3_noise_0(self):
         direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle3/"
         puzzle_directory = direrctory + "0"
         expected_solution_accuracy = 1.0
@@ -232,7 +232,7 @@ class TestProduction(unittest.TestCase):
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)
     
-    def test_image_Roman009_puzzle_1_noise_0(self):
+    def test_Roman009_puzzle_1_noise_0(self):
         direrctory = "data/ofir/Roman_fresco_Villa_dei_Misteri_Pompeii_009/Puzzle1/"
         puzzle_directory = direrctory + "0"
         expected_solution_accuracy = 1.0
@@ -241,7 +241,7 @@ class TestProduction(unittest.TestCase):
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)
         
-    def test_image_Roman009_puzzle_2_noise_0(self):
+    def test_Roman009_puzzle_2_noise_0(self):
         direrctory = "data/ofir/Roman_fresco_Villa_dei_Misteri_Pompeii_009/Puzzle2/"
         puzzle_directory = direrctory + "0"
         expected_solution_accuracy = 1.0
@@ -250,7 +250,7 @@ class TestProduction(unittest.TestCase):
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)
     
-    def test_image_Roman009_puzzle_3_noise_0(self):
+    def test_Roman009_puzzle_3_noise_0(self):
         direrctory = "data/ofir/Roman_fresco_Villa_dei_Misteri_Pompeii_009/Puzzle3/"
         puzzle_directory = direrctory + "0"
         expected_solution_accuracy = 1.0
@@ -287,7 +287,7 @@ class TestProduction(unittest.TestCase):
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)#,is_save_cycles=True'''
         
-    def test_image_terentius_puzzle_3_noise_0(self):
+    def test_terentius_puzzle_3_noise_0(self):
         direrctory = "data/ofir/Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01/Puzzle3/"
         puzzle_directory = direrctory + "0"
         expected_solution_accuracy = 1.0
@@ -296,6 +296,19 @@ class TestProduction(unittest.TestCase):
                   expected_solution_accuracy,
                   expected_num_solutions=expected_num_solutions)
     
-        
+    def test_Inv9084_puzzle_1_noise_1(self):
+        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        puzzle_directory = direrctory + "1"
+        expected_num_cycles = 69
+        expected_num_zero_loops = 5
+        expected_num_solutions = 1 
+        expected_solution_accuracy = 1.0
+        self._run(puzzle_directory,
+                  expected_solution_accuracy,
+                  expected_num_cycles=expected_num_cycles,
+                  expected_num_zero_loops=expected_num_zero_loops,
+                  expected_num_solutions=expected_num_solutions)
+
+
 if __name__ == "__main__":
     unittest.main()
