@@ -8,7 +8,7 @@ class GeometricPairwiseMatcher(PairwiseMatcher):
         super().__init__()
         self.match_edges = {}
 
-    def pairwise_edges_lengths(self,edge_lengths:np.array,confidence_interval=20.0):
+    def pairwise_edges_lengths(self,edge_lengths:np.array,confidence_interval=1.0):
         num_pieces = len(edge_lengths)
         matching_edges = [[] for _ in range(num_pieces**2)]
         matching_scores = [[] for _ in range(num_pieces**2)]
@@ -27,3 +27,9 @@ class GeometricPairwiseMatcher(PairwiseMatcher):
 
         self.match_edges = np.array(matching_edges,dtype="object").reshape((num_pieces,num_pieces))
         self.match_pieces_score = np.array(matching_scores,dtype="object").reshape((num_pieces,num_pieces))
+    
+    
+
+
+
+                
