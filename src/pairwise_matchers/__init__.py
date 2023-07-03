@@ -22,7 +22,7 @@ class PairwiseMatcher():
         return self.piece_adj_mat
     
     def plot_heat_map(self,ax,fig,pieces_labels=None):
-        ax.imshow(self.piece_adj_mat,cmap="cool_r") #alpha=0.7
+        ax.imshow(self.piece_adj_mat,cmap="hot") #alpha=0.7
 
         num_pieces = self.piece_adj_mat.shape[0]
         ax.set_xticks(np.arange(num_pieces),labels=pieces_labels) # , labels=
@@ -32,7 +32,7 @@ class PairwiseMatcher():
         
         for piece_i in range(num_pieces):
             for piece_j in range(num_pieces):
-                ax.text(piece_j,piece_i, round(self.piece_adj_mat[piece_i,piece_j],2),
+                ax.text(piece_j,piece_i, round(self.piece_adj_mat[piece_i,piece_j],3),
                         ha="center",va="center",color="w")
         
         ax.set_title("Piece adjacency heat map")

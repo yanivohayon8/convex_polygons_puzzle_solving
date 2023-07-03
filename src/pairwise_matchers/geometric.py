@@ -1,6 +1,7 @@
 
 import numpy as np
 from src.pairwise_matchers import PairwiseMatcher
+import matplotlib.pyplot as plt
 
 class GeometricPairwiseMatcher(PairwiseMatcher):
 
@@ -28,10 +29,48 @@ class GeometricPairwiseMatcher(PairwiseMatcher):
         self.match_edges = np.array(matching_edges,dtype="object").reshape((num_pieces,num_pieces))
         self.match_pieces_score = np.array(matching_scores,dtype="object").reshape((num_pieces,num_pieces))
     
+
+    def adjacency_matrix(self):
+        self.piece_adj_mat = np.zeros(self.match_pieces_score.shape[:2])
+        num_pieces = self.match_pieces_score.shape[0]
+        for i in range(num_pieces):
+            for j in range(num_pieces):
+                
+                if i == j:
+                    # self.piece_adj_mat[i,j] = 0
+                    continue
+
+                matching = self.match_pieces_score[i,j]
+                if len(matching) > 0:
+                    self.piece_adj_mat[i,j] = np.min(matching) #5/(np.min(self.match_pieces_score[i,j]) + 1e-1)# this is the difference from parent class
+                    continue
+
+        # self.piece_adj_mat*=0.1
+        self.piece_adj_mat = (self.piece_adj_mat-np.min(self.piece_adj_mat))/(np.max(self.piece_adj_mat)-np.min(self.piece_adj_mat))
+        self.piece_adj_mat = np.where(self.piece_adj_mat>0,1-self.piece_adj_mat,0)
+
+        return self.piece_adj_mat
     
-    # def adjacency_matrix(self):
-    #     piece_adj_mat = super().adjacency_matrix()
-    #     self.piece_adj_mat = 1/(piece_adj_mat+1e-3)
+    def plot_heat_map(self,ax,fig,pieces_labels=None):
+        ax.imshow(self.piece_adj_mat,cmap="hot") #alpha=0.7 ,cmap="hot"
+
+        num_pieces = self.piece_adj_mat.shape[0]
+        ax.set_xticks(np.arange(num_pieces),labels=pieces_labels) # , labels=
+        ax.set_yticks(np.arange(num_pieces),labels=pieces_labels) # , labels=
+
+        plt.setp(ax.get_xticklabels(),rotation=45,ha="right",rotation_mode="anchor")
+        
+        for piece_i in range(num_pieces):
+            for piece_j in range(num_pieces):
+                val = round(self.piece_adj_mat[piece_i,piece_j],3)
+
+                text_color = 'black' if val > 0.5 else 'white'
+
+                ax.text(piece_j,piece_i, val ,
+                        ha="center",va="center",color=text_color)
+        
+        ax.set_title("Piece adjacency heat map")
+        fig.tight_layout()
 
     
 

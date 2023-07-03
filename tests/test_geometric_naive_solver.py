@@ -316,6 +316,7 @@ class TestProduction(unittest.TestCase):
                   expected_num_cycles=expected_num_cycles,
                   expected_num_zero_loops=expected_num_zero_loops,
                   expected_num_solutions=expected_num_solutions,
+                  is_save_cycles=True,
                   noise=noise)
 
 

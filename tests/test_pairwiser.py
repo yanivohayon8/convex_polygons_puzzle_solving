@@ -5,6 +5,29 @@ import matplotlib.pyplot as plt
 
 class TestGeometric(unittest.TestCase):
     
+    def test_Inv9084_puzzle_1_noise_0(self):
+        edges_lengths = np.array([
+            np.array([1652.17413843, 1129.10319381, 1595.22517657,  488.18193589]),
+            np.array([488.18193145, 806.35067968, 973.67087051]),
+            np.array([806.35069792, 160.42254484, 692.30414656]),
+            np.array([ 692.30415948,  756.87697074, 1235.6577307 ]),
+            np.array([1235.65771389, 1024.56403487, 2220.85045619]),
+            np.array([1595.22519874, 1022.96451656,  756.87695689,  160.4225449 ]),
+            np.array([1022.96451726,  748.60088725, 1024.56403076]),
+            np.array([1062.97593227,  674.18139265,  932.33867735]),
+            np.array([ 932.33868471,  264.66809436, 1129.10323532]),
+            np.array([ 674.18138322, 1527.09691397,  748.60088748,  264.66808857])
+
+        ])
+
+        noise = 1e-3
+
+        pairwiser = GeometricPairwiseMatcher()
+        pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=noise)
+        pairwiser.adjacency_matrix()
+        fig,ax = plt.subplots()
+        pairwiser.plot_heat_map(ax,fig)
+        plt.waitforbuttonpress()
 
     def test_Inv9084_puzzle_1_noise_1(self):
         edges_lengths = np.array([
@@ -23,7 +46,7 @@ class TestGeometric(unittest.TestCase):
 
         puzzle_diameter = 3007.6720313778787
         xi = 3.007672031377879
-        noise = xi*puzzle_diameter/100
+        noise = xi#*puzzle_diameter/100
 
         pairwiser = GeometricPairwiseMatcher()
         pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=noise)
@@ -31,8 +54,6 @@ class TestGeometric(unittest.TestCase):
         fig,ax = plt.subplots()
         pairwiser.plot_heat_map(ax,fig)
         plt.waitforbuttonpress()
-
-        print(pairwiser.match_edges)
         
 
 if __name__ == "__main__":
