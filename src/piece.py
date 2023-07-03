@@ -14,7 +14,8 @@ class Piece():
         self.features = {}
 
     def load_image(self):
-        self.img = cv2.imread(self.img_path,cv2.COLOR_BGR2RGB)
+        self.img = cv2.imread(self.img_path)
+        self.img = self.img[...,::-1] # BGR to RGB
 
     def get_coords(self):
         '''
