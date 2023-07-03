@@ -36,9 +36,9 @@ class GeometricNoiselessSolver(Solver):
             piece.features["poly_degree"] = len(coords)-1
             piece.features["angles"] = self.geomteric_feature_extractor.get_polygon_angles(np.array(coords))
             
-    def pairwise(self):        
+    def pairwise(self,confidence=1):        
         edges_lengths = [piece.features["edges_lengths"] for piece in self.pieces]
-        self.geometric_pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=1)
+        self.geometric_pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=confidence)
 
     def _compute_edges_mating_graph(self):
         '''

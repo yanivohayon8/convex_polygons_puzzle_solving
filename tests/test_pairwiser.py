@@ -27,9 +27,7 @@ class TestGeometric(unittest.TestCase):
 
         pairwiser = GeometricPairwiseMatcher()
         pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=noise)
-
-        heat_map = pairwiser.adjacency_matrix()
-
+        pairwiser.adjacency_matrix()
         fig,ax = plt.subplots()
         pairwiser.plot_heat_map(ax,fig)
         plt.waitforbuttonpress()

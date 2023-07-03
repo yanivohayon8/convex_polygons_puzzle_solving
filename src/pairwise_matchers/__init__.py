@@ -5,6 +5,7 @@ class PairwiseMatcher():
 
     def __init__(self) -> None:
         self.match_pieces_score = {}
+        self.piece_adj_mat = None
 
 
     def adjacency_matrix(self):
@@ -21,7 +22,7 @@ class PairwiseMatcher():
         return self.piece_adj_mat
     
     def plot_heat_map(self,ax,fig,pieces_labels=None):
-        ax.imshow(self.piece_adj_mat)
+        ax.imshow(self.piece_adj_mat,cmap="cool_r") #alpha=0.7
 
         num_pieces = self.piece_adj_mat.shape[0]
         ax.set_xticks(np.arange(num_pieces),labels=pieces_labels) # , labels=

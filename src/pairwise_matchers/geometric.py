@@ -5,7 +5,7 @@ from src.pairwise_matchers import PairwiseMatcher
 class GeometricPairwiseMatcher(PairwiseMatcher):
 
     def __init__(self) -> None:
-        super().__init__()
+        super(GeometricPairwiseMatcher,self).__init__()
         self.match_edges = {}
 
     def pairwise_edges_lengths(self,edge_lengths:np.array,confidence_interval=1.0):
@@ -29,7 +29,11 @@ class GeometricPairwiseMatcher(PairwiseMatcher):
         self.match_pieces_score = np.array(matching_scores,dtype="object").reshape((num_pieces,num_pieces))
     
     
+    # def adjacency_matrix(self):
+    #     piece_adj_mat = super().adjacency_matrix()
+    #     self.piece_adj_mat = 1/(piece_adj_mat+1e-3)
 
+    
 
 
                 
