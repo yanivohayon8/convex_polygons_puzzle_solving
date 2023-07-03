@@ -50,8 +50,8 @@ class TestPictorialFeatureExtractor(unittest.TestCase):
         piece = Piece(piece_id,coordinates,img_path)
         piece.load_image()
 
-        curr_index = 1
-        next_index = 2
+        curr_index = 3
+        next_index = 0
 
         curr_row = coordinates[curr_index][1]
         curr_col = coordinates[curr_index][0]
