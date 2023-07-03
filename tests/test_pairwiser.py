@@ -23,7 +23,7 @@ class TestGeometric(unittest.TestCase):
 
         puzzle_diameter = 3007.6720313778787
         xi = 3.007672031377879
-        noise = 1 #xi*puzzle_diameter/100
+        noise = xi*puzzle_diameter/100
 
         pairwiser = GeometricPairwiseMatcher()
         pairwiser.pairwise_edges_lengths(edges_lengths,confidence_interval=noise)
@@ -44,7 +44,7 @@ class TestGeometric(unittest.TestCase):
                 ax.text(piece_j,piece_i, round(heat_map[piece_i,piece_j],2),
                         ha="center",va="center",color="w")
         
-        ax.set_title("Piece Adjacency heat map")
+        ax.set_title("Piece adjacency heat map")
         fig.tight_layout()
 
         #plt.show()
