@@ -110,6 +110,17 @@ class Puzzle():
 
         return self.rels_as_mating 
     
+    def reverse_edge_ids(self,solver_matings):
+        return [
+            Mating(
+                piece_1=mate.piece_1,
+                piece_2=mate.piece_2,
+                edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
+                edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)]
+            ) 
+            for mate in solver_matings
+            ]
+
     def evaluate_rels(self,solver_matings:list):
         '''
             solver_matings : list of matings (Mating classes instances)
@@ -122,12 +133,32 @@ class Puzzle():
             return 0
  
         for mate in solver_matings:
-            new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
-                              edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
-                              edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
+            # new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
+            #                   edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
+            #                   edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
 
-            if new_mate not in ground_truth_matings:
-                #print(f"The ground truth does not have the mating {mate}")
+            if mate not in ground_truth_matings:
                 count_wrong+=1
         
         return 1-count_wrong/len(ground_truth_matings)
+    
+    def evaluate_correct_rels(self,solver_matings:list):
+        '''
+            solver_matings : list of matings (Mating classes instances)
+        '''
+        ground_truth_matings = self.get_final_rels()
+        count_correct=0
+        debug_incorrect = []
+
+        for mate in solver_matings:
+            # new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
+            #                   edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
+            #                   edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
+
+            if mate in ground_truth_matings:
+                count_correct+=1
+            else:
+                debug_incorrect.append(mate)
+        
+        
+        return count_correct/len(ground_truth_matings)
