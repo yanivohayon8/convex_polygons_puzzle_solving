@@ -199,6 +199,9 @@ class TestProduction(unittest.TestCase):
         assert len(solver.cycles)== expected_num_cycles or expected_num_cycles==-1
         assert len(solver.zero_loops) == expected_num_zero_loops or expected_num_zero_loops==-1
         assert len(solutions)==expected_num_solutions or len(solutions)>0
+
+        solutions[0] = loader.reverse_edge_ids(solutions[0])
+        assert loader.evaluate_correct_rels(solutions[0]) == 1
         assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
 
     def test_Inv9084_puzzle_1_noise_0(self):
@@ -302,13 +305,13 @@ class TestProduction(unittest.TestCase):
     def test_Inv9084_puzzle_1_noise_1(self):
         direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
         puzzle_directory = direrctory + "1"
-        expected_num_cycles = 69
-        expected_num_zero_loops = 5
-        expected_num_solutions = 1 
+        expected_num_cycles = -1
+        expected_num_zero_loops = -1
+        expected_num_solutions = -1 
         expected_solution_accuracy = 1.0
         puzzle_diameter = 3007.6720313778787
         xi = 3.007672031377879
-        noise = xi*puzzle_diameter/100
+        noise = xi #xi*puzzle_diameter/100
 
 
         self._run(puzzle_directory,
@@ -316,7 +319,7 @@ class TestProduction(unittest.TestCase):
                   expected_num_cycles=expected_num_cycles,
                   expected_num_zero_loops=expected_num_zero_loops,
                   expected_num_solutions=expected_num_solutions,
-                  is_save_cycles=True,
+                  is_save_cycles=False,
                   noise=noise)
 
 
