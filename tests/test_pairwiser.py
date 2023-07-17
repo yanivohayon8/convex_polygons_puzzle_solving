@@ -3,6 +3,7 @@ from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Todo: write unit test for EdgeMatcher class
 
 '''
 Old
