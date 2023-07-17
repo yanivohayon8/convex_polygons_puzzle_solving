@@ -1,6 +1,6 @@
 from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
-
+from src.pairwise_matchers import geometric as geo_pairwiser
 
 class FirstSolver():
     def __init__(self,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
@@ -14,11 +14,14 @@ class FirstSolver():
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces()
 
-        length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
-        length_extractor.run()
+        edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
+        edge_length_extractor.run()
         
         angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
         angles_extractor.run()
 
+        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
+        edge_length_pairwiser.pairwise(loader.noise+1e-3)
 
-        
+
+

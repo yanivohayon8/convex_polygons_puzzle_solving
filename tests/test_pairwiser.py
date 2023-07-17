@@ -3,7 +3,11 @@ from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import matplotlib.pyplot as plt
 
-class TestGeometric(unittest.TestCase):
+
+'''
+Old
+'''
+class TestGeometric_Old(unittest.TestCase):
     
     def test_Inv9084_puzzle_1_noise_0(self):
         edges_lengths = np.array([

@@ -3,6 +3,42 @@ import numpy as np
 from src.pairwise_matchers import PairwiseMatcher
 import matplotlib.pyplot as plt
 
+class EdgeMatcher():
+    
+    def __init__(self,pieces) -> None:
+        self.pieces = pieces
+        self.match_edges = None
+        self.match_pieces_score = None
+
+    def pairwise(self, confidence_interval):
+        '''
+        confidence_interval - the max noise applied on the edge
+        '''
+        edge_lengths = [piece.features["edges_length"] for piece in self.pieces]
+        num_pieces = len(edge_lengths)
+        matching_edges = [[] for _ in range(num_pieces**2)]
+        matching_scores = [[] for _ in range(num_pieces**2)]
+
+        for i in range(num_pieces):
+            for j in range(num_pieces):
+                if i!=j:
+                    piece_i = edge_lengths[i].reshape(-1,1)
+                    piece_j = edge_lengths[j].reshape(1,-1)
+                    subs = np.abs(piece_i-piece_j) # tiling
+                    match_edges_diff = subs[subs<confidence_interval]
+
+                    if match_edges_diff.size > 0:
+                        matching_edges[i*num_pieces+j].append(np.argwhere(subs<confidence_interval))
+                        score = confidence_interval*np.ones_like(match_edges_diff) - match_edges_diff
+                        score[score<0] = 0
+                        matching_scores[i*num_pieces+j] = score
+
+        self.match_edges = np.array(matching_edges,dtype="object").reshape((num_pieces,num_pieces))
+        self.match_pieces_score = np.array(matching_scores,dtype="object").reshape((num_pieces,num_pieces))
+
+''' 
+    Old 
+'''
 class GeometricPairwiseMatcher(PairwiseMatcher):
 
     def __init__(self) -> None:
