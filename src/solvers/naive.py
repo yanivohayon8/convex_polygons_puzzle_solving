@@ -11,12 +11,13 @@ from src.feature_extraction.pictorial import PixelEnviormnetExtractor
 import matplotlib.pyplot as plt
 #from src.feature_extraction.
 
+from src.my_http_client import HTTPClient
 
 CIRCLE_DEGREES = 360
 
 class GeometricNoiselessSolver(Solver):
 
-    def __init__(self, pieces: list):
+    def __init__(self, pieces: list, http_client:HTTPClient):
         super().__init__(pieces)
         self.geomteric_feature_extractor = GeometricFeatureExtractor()
         self.geometric_pairwiser = GeometricPairwiseMatcher()
@@ -24,6 +25,7 @@ class GeometricNoiselessSolver(Solver):
         self.piece2matings = {}
         self.cycles = []  # For debug (For questioning when testing)
         self.zero_loops = [] # For debug (For questioning when testing)
+        self.http_client = http_client
 
     def extract_features(self):
         super().extract_features()

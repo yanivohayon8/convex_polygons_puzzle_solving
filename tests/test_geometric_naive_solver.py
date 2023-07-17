@@ -6,6 +6,8 @@ from src.visualizers.cv2_wrapper import Frame
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from src.my_http_client import HTTPClient
+
 class TestOld(unittest.TestCase):
     def test_donothing(self):
         puzzle_directory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
@@ -172,7 +174,10 @@ class TestProduction(unittest.TestCase):
                 # write each item on a new line
                 fp.write("%s\n" % item)
 
-    def _run(self,puzzle_directory:str,
+    def _run(self,
+             puzzle_image,
+             puzzle_num,
+             puzzle_noise,
              expected_solution_accuracy:float,expected_num_cycles=-1,
              expected_num_zero_loops=-1,expected_num_solutions=-1,
              noise = 1,
@@ -183,11 +188,14 @@ class TestProduction(unittest.TestCase):
         #                 puzzle_directory + "/ground_truth_rels.csv", 
         #                 puzzle_directory + "/pieces.csv")
 
+        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise}"
         loader = Puzzle(puzzle_directory)
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
         
-        solver = solvers.GeometricNoiselessSolver(bag_of_pieces)
+        http = HTTPClient(puzzle_image,puzzle_num,puzzle_noise)
+
+        solver = solvers.GeometricNoiselessSolver(bag_of_pieces,http)
         solver.extract_features()
         solver.pairwise(confidence=noise)
         solver._compute_edges_mating_graph()
@@ -303,7 +311,10 @@ class TestProduction(unittest.TestCase):
                   expected_num_solutions=expected_num_solutions)
     
     def test_Inv9084_puzzle_1_noise_1(self):
-        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 1
+        puzzle_noise = 0
+        direrctory = f"data/ofir/{image}/Puzzle1/"
         puzzle_directory = direrctory + "1"
         expected_num_cycles = -1
         expected_num_zero_loops = -1
@@ -314,7 +325,9 @@ class TestProduction(unittest.TestCase):
         noise = xi #xi*puzzle_diameter/100
 
 
-        self._run(puzzle_directory,
+        self._run(image,
+                  puzzle_num,
+                  puzzle_noise,
                   expected_solution_accuracy,
                   expected_num_cycles=expected_num_cycles,
                   expected_num_zero_loops=expected_num_zero_loops,
