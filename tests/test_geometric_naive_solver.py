@@ -182,12 +182,7 @@ class TestProduction(unittest.TestCase):
              expected_num_zero_loops=-1,expected_num_solutions=-1,
              noise = 1,
              is_save_cycles=False):
-        # direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
-        # puzzle_directory = direrctory + "0"
-        # loader = Puzzle(puzzle_directory + "/ground_truth_puzzle.csv",
-        #                 puzzle_directory + "/ground_truth_rels.csv", 
-        #                 puzzle_directory + "/pieces.csv")
-
+    
         puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise}"
         loader = Puzzle(puzzle_directory)
         loader.load()
@@ -213,13 +208,19 @@ class TestProduction(unittest.TestCase):
         assert loader.evaluate_rels(solutions[0])==expected_solution_accuracy
 
     def test_Inv9084_puzzle_1_noise_0(self):
-        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
-        puzzle_directory = direrctory + "0"
+        #direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        #puzzle_directory = direrctory + "0"
+        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 1
+        puzzle_noise = 0
+
         expected_num_cycles = 69
         expected_num_zero_loops = 5
         expected_num_solutions = 1 
         expected_solution_accuracy = 1.0
-        self._run(puzzle_directory,
+        self._run(image,
+                  puzzle_num,
+                  puzzle_noise,
                   expected_solution_accuracy,
                   expected_num_cycles=expected_num_cycles,
                   expected_num_zero_loops=expected_num_zero_loops,
@@ -313,7 +314,7 @@ class TestProduction(unittest.TestCase):
     def test_Inv9084_puzzle_1_noise_1(self):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
-        puzzle_noise = 0
+        puzzle_noise = 1
         direrctory = f"data/ofir/{image}/Puzzle1/"
         puzzle_directory = direrctory + "1"
         expected_num_cycles = -1

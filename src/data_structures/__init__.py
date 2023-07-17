@@ -35,3 +35,6 @@ class Mating():
         
         return False
     
+    # def get_as_comma_string_repr(self):
+    #     return f"{self.piece_1},{self.edge_1},{self.piece_2},{self.edge_2}"
+

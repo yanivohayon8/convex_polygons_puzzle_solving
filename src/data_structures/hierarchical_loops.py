@@ -171,6 +171,5 @@ class Loop():
                 return True
             
         return False
-
-             
+         
 
