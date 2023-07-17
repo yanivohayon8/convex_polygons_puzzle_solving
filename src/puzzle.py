@@ -22,6 +22,7 @@ class Puzzle():
         self.rels_as_mating = []
         self.df_pieces = None
         self.pieces_images = {}
+        self.noise = None
 
 
         # Because we give new edge numbers in ccw order for efficient code and debug, 
@@ -33,6 +34,7 @@ class Puzzle():
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
         self.df_solution_rels = pd.read_csv(self.groundtruth_rels_path)
         self.df_pieces = pd.read_csv(self.pieces_path)
+        self._get_noise_on_puzzle()
     
     def _get_pieces2img_path(self,pieces):
         extentions = ["png","jpg"]
@@ -47,8 +49,19 @@ class Puzzle():
                     piece.img_path = path
                     continue
         
-                
-
+    
+    def _get_noise_on_puzzle(self):
+        try:
+            with open(self.puzzle_directory+"/puzzle_details.txt", "r") as file:
+                for line in file:
+                    if line.startswith("Global noise level (Xi):"):
+                        value = line.split(":")[1].strip()
+                        self.noise = float(value)
+                        return self.noise
+        except FileNotFoundError:
+            print("File not found.")
+        except Exception as e:
+            print("An error occurred:", str(e))
 
 
     def get_bag_of_pieces(self,csv_conv="Ofir"):
