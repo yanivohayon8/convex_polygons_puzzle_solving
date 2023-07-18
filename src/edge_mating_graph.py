@@ -35,7 +35,7 @@ class Cycle():
 
 class EdgeMatingGraph():
     
-    def __init__(self,pieces,match_edges,match_pieces_score) -> None:
+    def __init__(self,pieces,match_edges=None,match_pieces_score=None) -> None:
         '''
         pieces - bag of pieces
         match_edges - the attribute from the pairwiser
@@ -46,6 +46,7 @@ class EdgeMatingGraph():
         self.match_pieces_score = match_pieces_score
         self.edges_mating_graph = nx.DiGraph()
         self.cycles = None
+        self.raw_cycles = None
 
     def _bulid_relationship_nodes(self):
         for piece in self.pieces:
@@ -89,7 +90,7 @@ class EdgeMatingGraph():
                                     for mating in mat_edge]
                         self.edges_mating_graph.add_edges_from(new_links)
 
-    def build(self):
+    def build_graph(self):
         '''
             Computes the mating graph (direct graph) between edges. 
             It was design in the following way to allow the nx package to find zero loops.
@@ -103,11 +104,22 @@ class EdgeMatingGraph():
         self._bulid_enviorments_nodes()
         self._connect_relationship_nodes()
     
+    def load_raw_cycles(self,path_to_load):
+        #Because the nx package would brings random results, make the test deterministic
+        with open(path_to_load, 'r') as f:
+            self.raw_cycles = [eval(line.rstrip('\n')) for line in f]
+
+    def compute_raw_cycles(self):
+        self.raw_cycles = list(nx.simple_cycles(self.edges_mating_graph))
+
     def find_cycles(self):
-        raw_cycles = list(nx.simple_cycles(self.edges_mating_graph))
+
+        if self.raw_cycles is None:
+            raise ("You need to load or compute the raw cycles")
+        
         self.cycles = []
 
-        for cycle in raw_cycles:
+        for cycle in self.raw_cycles:
             edges_involved = [edge for edge in cycle if "RELS" in edge]
             piece2occurence = {}
             matings_chain = []
@@ -145,5 +157,8 @@ class EdgeMatingGraph():
         
         return self.cycles
 
-                
+    def save_raw_cycles(self,output_path):
+        with open(output_path, 'w') as fp:
+            for item in self.raw_cycles:
+                fp.write("%s\n" % item)
 

@@ -9,24 +9,44 @@ class FirstSolver():
         self.puzzle_image = puzzle_image
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
+        self.bag_of_pieces = None
+        self.puzzle_directory = None
+        self.mating_graph = None
 
-    def run(self):
-        puzzle_directory = f"data/ofir/{self.puzzle_image}/Puzzle{self.puzzle_num}/{self.puzzle_noise_level}"
-        loader = Puzzle(puzzle_directory)
-        loader.load()
-        bag_of_pieces = loader.get_bag_of_pieces()
+    def load_bag_of_pieces(self):
+        self.puzzle_directory = f"data/ofir/{self.puzzle_image}/Puzzle{self.puzzle_num}/{self.puzzle_noise_level}"
+        self.loader = Puzzle(self.puzzle_directory)
+        self.loader.load()
 
-        edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
+        self.bag_of_pieces = self.loader.get_bag_of_pieces()
+
+    def extract_features(self):
+        edge_length_extractor = geo_extractor.EdgeLengthExtractor(self.bag_of_pieces)
         edge_length_extractor.run()
-        angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
+        angles_extractor = geo_extractor.AngleLengthExtractor(self.bag_of_pieces)
         angles_extractor.run()
 
-        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
-        edge_length_pairwiser.pairwise(loader.noise+1e-3)
+    def load_cycles(self):
+        self.mating_graph = EdgeMatingGraph(self.bag_of_pieces)
+        self.mating_graph.load_raw_cycles(self.puzzle_directory+"/cycles.txt")
+        self.mating_graph.find_cycles()
+    
+    def compute_cycles(self,is_save_cycles=True):
+        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
+        edge_length_pairwiser.pairwise(self.loader.noise+1e-3)
+        
+        self.mating_graph = EdgeMatingGraph(self.bag_of_pieces,edge_length_pairwiser.match_edges,edge_length_pairwiser.match_pieces_score)
+        self.mating_graph.build_graph()
+        self.mating_graph.compute_raw_cycles()
 
-        mating_graph = EdgeMatingGraph(bag_of_pieces,edge_length_pairwiser.match_edges,edge_length_pairwiser.match_pieces_score)
-        mating_graph.build()
-        mating_graph.find_cycles()
+        if is_save_cycles:
+            self.mating_graph.save_raw_cycles(self.puzzle_directory+"/cycles.txt")
+        
+        self.mating_graph.find_cycles()
+
+    def build_zero_loops(self):
+        pass
+
 
 
 
