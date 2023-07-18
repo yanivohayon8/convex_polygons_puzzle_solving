@@ -4,6 +4,8 @@ from src.pairwise_matchers import geometric as geo_pairwiser
 from src.edge_mating_graph import EdgeMatingGraph
 from src.data_structures import Mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
+from src.data_structures.loop_merger import BasicLoopMerger
+
 
 class FirstSolver():
     def __init__(self,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
@@ -76,7 +78,21 @@ class FirstSolver():
         zero_loops_loader = ZeroLoopAroundVertexLoader(self.id2piece,self.cycles,self.piece2potential_matings)
         self.zero_loops = zero_loops_loader.load(0.5)
 
+    def global_optimize(self):
+        merger = BasicLoopMerger()
+        previous_loops = self.zero_loops
+        next_level_loops = []
+        
+        for i in range(len(previous_loops)):
+            loop_i = previous_loops[i]
+            
+            for j in range(i+1,len(previous_loops)):
+                loop_j = previous_loops[j]
+                new_loop = merger.merge(loop_i,loop_j)
 
+                if new_loop is not None:
+                    
+                    next_level_loops.append(new_loop)
 
 
 

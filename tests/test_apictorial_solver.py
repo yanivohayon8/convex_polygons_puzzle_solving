@@ -19,6 +19,7 @@ class TestIntegration(unittest.TestCase):
             solver.compute_cycles(True)
         
         solver.build_zero_loops()
+        solver.global_optimize()
         
 
 
