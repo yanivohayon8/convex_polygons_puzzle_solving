@@ -1,0 +1,149 @@
+import networkx as nx
+from src.data_structures import Mating
+
+class Cycle():
+
+    def __init__(self, matings_chain:list, piece2occurence:dict) -> None:
+        self.matings_chain = matings_chain
+        self.piece2occurence = piece2occurence
+    
+    def get_pieces_involved(self):
+        return self.piece2occurence.keys()
+
+    def get_num_pieces(self):
+        return len(self.piece2occurence.keys())
+
+    def is_has_piece_duplicate_occurence(self):
+
+        for piece_id in self.piece2occurence.keys():
+            
+            if self.piece2occurence[piece_id] > 2:
+                return  True
+        
+        return False
+    
+    def __repr__(self) -> str:
+        acc = ""
+        delimiter = "==>"
+
+        for mate in self.matings_chain:
+            acc = acc + delimiter + repr(mate)
+        
+        return acc[len(delimiter):]
+
+
+
+class EdgeMatingGraph():
+    
+    def __init__(self,pieces,match_edges,match_pieces_score) -> None:
+        '''
+        pieces - bag of pieces
+        match_edges - the attribute from the pairwiser
+        match_pieces_score - the attribute from the pairwiser
+        '''
+        self.pieces = pieces
+        self.match_edges = match_edges
+        self.match_pieces_score = match_pieces_score
+        self.edges_mating_graph = nx.DiGraph()
+        self.cycles = None
+
+    def _bulid_relationship_nodes(self):
+        for piece in self.pieces:
+            coords = piece.get_coords()
+            
+            self.edges_mating_graph.add_nodes_from(
+                [f"P_{piece.id}_RELS_E_{edge_index}" for edge_index in range(len(coords))]
+            )
+
+    def _bulid_enviorments_nodes(self):
+        for piece in self.pieces:
+            num_vertices = len(piece.get_coords())
+            for edge_index in range(num_vertices):
+                central_edge = f"P_{piece.id}_ENV_{edge_index}"
+
+                '''Since the polygons are oriented counter clockwise (ccw) than we need to check only one adjacent edge (and not both)'''
+                adj_edge_index = (edge_index+1)%num_vertices
+                adj_edge = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_index}"
+                
+                self.edges_mating_graph.add_nodes_from(
+                    [central_edge,adj_edge]
+                )
+
+                self.edges_mating_graph.add_edges_from(
+                    [
+                    (central_edge,adj_edge),
+                    (f"P_{piece.id}_RELS_E_{edge_index}",central_edge),
+                    (adj_edge,f"P_{piece.id}_RELS_E_{adj_edge_index}")
+                    ]
+                )
+
+    def _connect_relationship_nodes(self):
+        num_pieces = len(self.pieces)
+        for piece_i in range(num_pieces):
+            for piece_j in range(num_pieces):
+                mating_edges = self.match_edges[piece_i,piece_j]
+                if len(mating_edges)>0:
+                    for mat_edge in mating_edges:
+                        new_links = [
+                            (f"P_{self.pieces[piece_i].id}_RELS_E_{mating[0]}",f"P_{self.pieces[piece_j].id}_RELS_E_{mating[1]}") \
+                                    for mating in mat_edge]
+                        self.edges_mating_graph.add_edges_from(new_links)
+
+    def build(self):
+        '''
+            Computes the mating graph (direct graph) between edges. 
+            It was design in the following way to allow the nx package to find zero loops.
+            Each edge has the following nodes in the graphs:
+            1. Relationships node. P_{piece.id}_RELS_E_{edge_index}: a node that represents the pairwise matching of the edge.
+                 It has links (edges in the mating graph) to other edges that pairwise it
+            2. P_{piece.id}_ENV_{edge_index}: it has in a in-link to relationship node and out link to two nodes that represent adjacent edge to it.
+            3. P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_index}: represent an edge that adjacent to another edge. the link from the type 2 to this type has weight with the value of the angle.        
+        '''
+        self._bulid_relationship_nodes()
+        self._bulid_enviorments_nodes()
+        self._connect_relationship_nodes()
+    
+    def find_cycles(self):
+        raw_cycles = list(nx.simple_cycles(self.edges_mating_graph))
+        self.cycles = []
+
+        for cycle in raw_cycles:
+            edges_involved = [edge for edge in cycle if "RELS" in edge]
+            piece2occurence = {}
+            matings_chain = []
+
+            for edge_prev,edge_next in zip(edges_involved,edges_involved[1:] + [edges_involved[0]]):
+                '''The convention of node of edge rels in the mating graph is the following:
+                f"P_{piece.id}_RELS_E_{edge_index}"'''
+                split_prev = edge_prev.split("_")
+                piece_1 = split_prev[1]
+                edge_1 = eval(split_prev[-1])
+                split_next = edge_next.split("_")
+                piece_2 = split_next[1]
+                edge_2 = eval(split_next[-1])
+
+                # internal jump between adjacent edges inside a piece
+                if piece_1 == piece_2:
+                    continue
+                
+                piece2occurence.setdefault(piece_1,0)
+                piece2occurence[piece_1]+=1
+                piece2occurence.setdefault(piece_2,0)
+                piece2occurence[piece_2]+=1
+
+                matings_chain.append(Mating(piece_1=piece_1,edge_1=edge_1,piece_2=piece_2,edge_2=edge_2))
+
+            next_cycle = Cycle(matings_chain,piece2occurence)
+
+            if next_cycle.get_num_pieces() <=2:
+                continue
+
+            # if next_cycle.is_has_piece_duplicate_occurence():
+            #     continue
+
+            self.cycles.append(next_cycle)
+        
+        return self.cycles
+
+                
+
