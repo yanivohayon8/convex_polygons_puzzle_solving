@@ -101,6 +101,8 @@ class Loop():
     def union(self,other_loop):
         '''
             Unions between the self loop and another loop
+
+            Deprecated function!
         '''
 
         if not isinstance(other_loop,Loop):
