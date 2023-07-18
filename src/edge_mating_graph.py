@@ -13,6 +13,14 @@ class Cycle():
     def get_num_pieces(self):
         return len(self.piece2occurence.keys())
 
+    def is_all_piece_occur(self,occurence_num):
+        for piece_id in self.piece2occurence.keys():
+            
+            if self.piece2occurence[piece_id] != occurence_num:
+                return  False
+        
+        return True
+
     def is_has_piece_duplicate_occurence(self):
 
         for piece_id in self.piece2occurence.keys():

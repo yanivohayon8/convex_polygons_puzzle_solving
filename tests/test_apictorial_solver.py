@@ -8,7 +8,8 @@ class TestIntegration(unittest.TestCase):
 
         solver.load_bag_of_pieces()
         solver.extract_features()
-        
+        solver.pairwise()
+
         if is_load_cycles:
             try:
                 solver.load_cycles()
