@@ -5,7 +5,8 @@ from src.edge_mating_graph import EdgeMatingGraph
 from src.data_structures import Mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
-
+from src.my_http_client import HTTPClient
+from src.data_structures.physical_assember import PhysicalAssembler
 
 class FirstSolver():
     def __init__(self,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
@@ -18,6 +19,8 @@ class FirstSolver():
         self.mating_graph = None
         self.cycles = None
         self.piece2potential_matings = {}
+        self.http = None
+        self.physical_assembler = None
 
     def load_bag_of_pieces(self):
         self.puzzle_directory = f"data/ofir/{self.puzzle_image}/Puzzle{self.puzzle_num}/{self.puzzle_noise_level}"
@@ -79,19 +82,22 @@ class FirstSolver():
         self.zero_loops = zero_loops_loader.load(0.5)
 
     def global_optimize(self):
+        self.http = HTTPClient(self.puzzle_image,self.puzzle_num,self.puzzle_noise_level)
+        self.physical_assembler = PhysicalAssembler(self.http, self.id2piece)
         merger = BasicLoopMerger()
+
         previous_loops = self.zero_loops
         next_level_loops = []
         
         for i in range(len(previous_loops)):
             loop_i = previous_loops[i]
-            
+
             for j in range(i+1,len(previous_loops)):
                 loop_j = previous_loops[j]
                 new_loop = merger.merge(loop_i,loop_j)
 
                 if new_loop is not None:
-                    
+                    physical_result = self.physical_assembler.phyiscal_assembly(new_loop)
                     next_level_loops.append(new_loop)
 
 
