@@ -34,27 +34,8 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         #
         #plt.waitforbuttonpress()
 
-    def test_two_pieces_overlap_Inv9084_1(self):
-
-        polygon_6 = [(317.0016030246443,972.6080337150197),
-                    (747.3753572848327,42.81779674124118),
-                    (0.0,0.0)]
-        piece_6 = Piece(6,polygon_6)
-        polygon_9 = [(967.0356002382177,255.9119595492084),
-                    (738.532991218126,122.36138943672267),
-                    (0.0,0.0),
-                    (1259.6811080818297,863.2661759857438)]
-        piece_9 = Piece(9,polygon_9)
-        edge6_vertices = [1, 2] # [1,2]
-        edge9_vertices = [1, 2]#[2, 1]
-
-        # overlap_area = move_and_rotate_polygons(polygon_6,edge6_vertices,polygon_9,edge9_vertices)
-        angle_sign = 1
-        overlap_area,polygon_1,polygon_2 = piece_6.align_pieces_origin_coords_and_compute_overlap_area(edge6_vertices,piece_9.original_coordinates,edge9_vertices,angle_sign=angle_sign)
-        print(overlap_area)
-        self._plot(list(polygon_1.exterior.coords),list(polygon_2.exterior.coords))
-
-    def test_two_pieces_overlap_Inv9084_2(self):
+    
+    def test_hardcoded(self):
         polygon_8 = [(0.0,0.0),
                     (1012.0741665619662,500.5796613721416),
                     (894.3125757357866,263.5534858178564)]
@@ -132,7 +113,7 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         # plt.grid()
         plt.show()
 
-    def test_function_8_9(self):
+    def test_Inv9084_8_9(self):
         polygon_8 = [(0.0,0.0),
                     (1012.0741665619662,500.5796613721416),
                     (894.3125757357866,263.5534858178564)]
@@ -148,7 +129,7 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         # area,poly8,poly9 = piece_8.align_pieces_on_edge_and_compute_overlap_area(piece_9,edge8_vertices,edge9_vertices)
         
         edge8_vertices = [1, 2]
-        edge9_vertices = [0,1]
+        edge9_vertices = [1,0]
         area,poly8,poly9 = piece_8.align_pieces_on_edge_and_compute_overlap_area(piece_9,edge8_vertices,edge9_vertices)
 
         ax = plt.subplot()
@@ -159,7 +140,31 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         ax.grid()
         plt.show()
 
-        
+    def test_Inv9084_6_9(self):
+
+        polygon_6 = [(317.0016030246443,972.6080337150197),
+                    (747.3753572848327,42.81779674124118),
+                    (0.0,0.0)]
+        piece_6 = Piece(6,polygon_6)
+        polygon_9 = [(967.0356002382177,255.9119595492084),
+                    (738.532991218126,122.36138943672267),
+                    (0.0,0.0),
+                    (1259.6811080818297,863.2661759857438)]
+        piece_9 = Piece(9,polygon_9)
+        edge6_vertices = [1, 2] # [1,2]
+        edge9_vertices = [2, 1]#[2, 1]
+
+        # overlap_area = move_and_rotate_polygons(polygon_6,edge6_vertices,polygon_9,edge9_vertices)
+        area,poly6,poly9 = piece_6.align_pieces_on_edge_and_compute_overlap_area(piece_9,edge6_vertices,edge9_vertices)
+
+        ax = plt.subplot()
+        self._plot(ax,poly6,poly9)
+        xs = [poly6[edge6_vertices[0]][0],poly6[edge6_vertices[1]][0],poly9[edge9_vertices[0]][0],poly9[edge9_vertices[1]][0]]
+        ys = [poly6[edge6_vertices[0]][1],poly6[edge6_vertices[1]][1],poly9[edge9_vertices[0]][1],poly9[edge9_vertices[1]][1]]
+        ax.scatter(xs,ys)
+        ax.grid()
+        plt.show()
+
 
 
     
