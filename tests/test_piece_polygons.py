@@ -3,13 +3,14 @@ import unittest
 from src.piece import Piece
 from matplotlib.patches import Polygon as MatplotlibPolygon
 import matplotlib.pyplot as plt
-
-
+import numpy as np
+from shapely import Polygon
+from shapely import affinity
 
 class TestTwoPolygonsAlign(unittest.TestCase):
     
-    def _plot(self,polygon1_coords,polygon2_coords):
-        fig, ax = plt.subplots()
+    def _plot(self,ax,polygon1_coords,polygon2_coords):
+        #fig, ax = plt.subplots()
         # Convert polygon coordinates to Matplotlib polygons
         polygon1 = MatplotlibPolygon(polygon1_coords, edgecolor='blue', facecolor='none', linewidth=2)
         polygon2 = MatplotlibPolygon(polygon2_coords, edgecolor='red', facecolor='none', linewidth=2)
@@ -27,11 +28,10 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         # Set axis labels and title
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
-        ax.set_title('Two Polygons')
+        #ax.set_title('Two Polygons')
 
         # Display the plot
-        plt.grid()
-        plt.show()
+        #
         #plt.waitforbuttonpress()
 
     def test_two_pieces_overlap_Inv9084_1(self):
@@ -49,7 +49,7 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         edge9_vertices = [1, 2]#[2, 1]
 
         # overlap_area = move_and_rotate_polygons(polygon_6,edge6_vertices,polygon_9,edge9_vertices)
-        angle_sign = -1
+        angle_sign = 1
         overlap_area,polygon_1,polygon_2 = piece_6.align_pieces_origin_coords_and_compute_overlap_area(edge6_vertices,piece_9.original_coordinates,edge9_vertices,angle_sign=angle_sign)
         print(overlap_area)
         self._plot(list(polygon_1.exterior.coords),list(polygon_2.exterior.coords))
@@ -65,18 +65,99 @@ class TestTwoPolygonsAlign(unittest.TestCase):
                     (1259.6811080818297,863.2661759857438)]
         piece_9 = Piece(9,polygon_9)
         edge8_vertices = [1, 2]
-        edge9_vertices = [0, 1]#[0, 1]
+        edge9_vertices = [1,0]
+        # edge8_vertices = [1, 2]
+        # edge9_vertices = [0,1]
 
-        # overlap_area = move_and_rotate_polygons(polygon_6,edge6_vertices,polygon_9,edge9_vertices)
-        angle_sign = 1
-        overlap_area,polygon_8,polygon_9 = piece_8.align_pieces_origin_coords_and_compute_overlap_area(edge8_vertices,
-                                                                                                       piece_9.original_coordinates,
-                                                                                                       edge9_vertices,angle_sign=angle_sign)
-        print(overlap_area)
+        fig, ax = plt.subplots(2,2)
 
-        polygon1_coords = list(polygon_8.exterior.coords)
-        polygon2_coords = list(polygon_9.exterior.coords)
-        self._plot(polygon1_coords,polygon2_coords)
+        ax[0,0].set_title("Start")
+        xs_0_0 = [polygon_8[vert_i][0] for vert_i in  edge8_vertices]
+        xs_0_0 += [polygon_9[vert_i][0] for vert_i in edge9_vertices]
+        ys_0_0 = [polygon_8[vert_i][1] for vert_i in  edge8_vertices]
+        ys_0_0 += [polygon_9[vert_i][1] for vert_i in edge9_vertices]
+        ax[0,0].scatter(xs_0_0,ys_0_0)
+        self._plot(ax[0,0],polygon_8,polygon_9)
+        ax[0,0].grid()
+
+        edge8_vertex_1_i = edge8_vertices[0]
+        p_8_set_vertex_8_1 =  piece_8.move_coords(polygon_8,polygon_8[edge8_vertex_1_i])
+        p_9_set_vertex_8_1 = piece_9.move_coords(polygon_9,polygon_8[edge8_vertex_1_i])
+        ax[0,1].set_title("Move pieces: vertex of piece8 is in origin")
+        xs_0_1 = [p_8_set_vertex_8_1[vert_i][0] for vert_i in  edge8_vertices]
+        xs_0_1 += [p_9_set_vertex_8_1[vert_i][0] for vert_i in edge9_vertices]
+        ys_0_1 = [p_8_set_vertex_8_1[vert_i][1] for vert_i in  edge8_vertices]
+        ys_0_1 += [p_9_set_vertex_8_1[vert_i][1] for vert_i in edge9_vertices]
+        ax[0,1].scatter(xs_0_1,ys_0_1)
+        self._plot(ax[0,1],p_8_set_vertex_8_1,p_9_set_vertex_8_1)
+        ax[0,1].grid()
+
+        edge9_vertex_1_i = edge9_vertices[0]
+        p_9_set_vertex_9_1 = piece_9.move_coords(p_9_set_vertex_8_1,p_9_set_vertex_8_1[edge9_vertex_1_i])
+        ax[1,0].set_title("Move pieces 9 (2) to origin")
+        xs_1_0 = [p_8_set_vertex_8_1[vert_i][0] for vert_i in  edge8_vertices]
+        xs_1_0 += [p_9_set_vertex_9_1[vert_i][0] for vert_i in edge9_vertices]
+        ys_1_0 = [p_8_set_vertex_8_1[vert_i][1] for vert_i in  edge8_vertices]
+        ys_1_0 += [p_9_set_vertex_9_1[vert_i][1] for vert_i in edge9_vertices]
+        ax[1,0].scatter(xs_1_0,ys_1_0)
+        self._plot(ax[1,0],p_8_set_vertex_8_1,p_9_set_vertex_9_1)
+        ax[1,0].grid()
+
+        p_8_v_2 = np.array(p_8_set_vertex_8_1[edge8_vertices[1]])
+        p_9_v_2 = np.array(p_9_set_vertex_9_1[edge9_vertices[1]])
+        cos_angle = p_8_v_2.dot(p_9_v_2)/(np.linalg.norm(p_8_v_2)*np.linalg.norm(p_9_v_2))
+        angle = np.degrees(np.arccos(cos_angle))
+
+        origin = (0,0)
+        is_right = (p_8_v_2[0] - origin[0])*(p_9_v_2[1] - origin[0]) - (p_8_v_2[1] - origin[1])*(p_9_v_2[0] - origin[0]) > 0
+        if is_right:
+            angle *= -1
+        
+        p_9_polygon = Polygon(p_9_set_vertex_9_1)
+        p_9_polygon = affinity.rotate(p_9_polygon,angle,origin=p_9_set_vertex_9_1[edge9_vertices[0]])
+        p_9_rotated = list(p_9_polygon.exterior.coords)
+
+        
+
+
+        ax[1,1].set_title("Rotate Piece 2 to align piece 1")
+        xs_1_1 = [p_8_set_vertex_8_1[vert_i][0] for vert_i in  edge8_vertices]
+        xs_1_1 += [p_9_rotated[vert_i][0] for vert_i in edge9_vertices]
+        ys_1_1 = [p_8_set_vertex_8_1[vert_i][1] for vert_i in  edge8_vertices]
+        ys_1_1 += [p_9_rotated[vert_i][1] for vert_i in edge9_vertices]
+        ax[1,1].scatter(xs_1_1,ys_1_1)
+        self._plot(ax[1,1],p_8_set_vertex_8_1,p_9_rotated)
+        ax[1,1].grid()
+
+        # plt.grid()
+        plt.show()
+
+    def test_function_8_9(self):
+        polygon_8 = [(0.0,0.0),
+                    (1012.0741665619662,500.5796613721416),
+                    (894.3125757357866,263.5534858178564)]
+        piece_8 = Piece(6,polygon_8)
+        polygon_9 = [(967.0356002382177,255.9119595492084),
+                    (738.532991218126,122.36138943672267),
+                    (0.0,0.0),
+                    (1259.6811080818297,863.2661759857438)]
+        piece_9 = Piece(9,polygon_9)
+        
+        # edge8_vertices = [1, 2]
+        # edge9_vertices = [1,0]
+        # area,poly8,poly9 = piece_8.align_pieces_on_edge_and_compute_overlap_area(piece_9,edge8_vertices,edge9_vertices)
+        
+        edge8_vertices = [1, 2]
+        edge9_vertices = [0,1]
+        area,poly8,poly9 = piece_8.align_pieces_on_edge_and_compute_overlap_area(piece_9,edge8_vertices,edge9_vertices)
+
+        ax = plt.subplot()
+        self._plot(ax,poly8,poly9)
+        xs = [poly8[edge8_vertices[0]][0],poly8[edge8_vertices[1]][0],poly9[edge9_vertices[0]][0],poly9[edge9_vertices[1]][0]]
+        ys = [poly8[edge8_vertices[0]][1],poly8[edge8_vertices[1]][1],poly9[edge9_vertices[0]][1],poly9[edge9_vertices[1]][1]]
+        ax.scatter(xs,ys)
+        ax.grid()
+        plt.show()
 
         
 
