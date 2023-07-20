@@ -1,5 +1,5 @@
 from src.data_structures.hierarchical_loops import Loop
-from src.piece import overlapping_area
+from src.piece import semi_dice_coef_overlapping
 
 class PhysicalAssembler():
 
@@ -57,5 +57,5 @@ class PhysicalAssembler():
                 AfterEnableCollision: springs sum + springs lengths
         '''
         polygons_coords = [piece_json["coordinates"] for piece_json in response["piecesBeforeEnableCollision"] ]
-        overalap_area = overlapping_area(polygons_coords)
+        overalap_area = semi_dice_coef_overlapping(polygons_coords)
         return overalap_area + response["AfterEnableCollision"]["sumSpringsLength"]

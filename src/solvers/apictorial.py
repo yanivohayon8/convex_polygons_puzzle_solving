@@ -89,16 +89,20 @@ class FirstSolver():
         previous_loops = self.zero_loops
         next_level_loops = []
         
-        for i in range(len(previous_loops)):
-            loop_i = previous_loops[i]
+        while True:
+            for i in range(len(previous_loops)):
+                loop_i = previous_loops[i]
 
-            for j in range(i+1,len(previous_loops)):
-                loop_j = previous_loops[j]
-                new_loop = merger.merge(loop_i,loop_j)
+                for j in range(i+1,len(previous_loops)):
+                    loop_j = previous_loops[j]
+                    new_loop = merger.merge(loop_i,loop_j)
 
-                if new_loop is not None:
-                    physical_result = self.physical_assembler.phyiscal_assembly(new_loop)
-                    next_level_loops.append(new_loop)
+                    if new_loop is not None:
+                        response = self.physical_assembler.run(new_loop)
+                        loop_score = self.physical_assembler.score_assembly(response)
+                        next_level_loops.append(new_loop)
+                
+            previous_loops = next_level_loops
 
 
 

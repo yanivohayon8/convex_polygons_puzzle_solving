@@ -2,8 +2,8 @@ from shapely import Polygon
 import numpy as np
 import cv2
 from shapely import affinity
-from shapely.ops import cascaded_union
-
+from shapely.ops import unary_union #cascaded_union
+from functools import reduce
 
 class Piece():
 
@@ -75,12 +75,34 @@ def overlapping_area(polygons:list):
     '''
         polygons: list of lists of tuples
     '''
-
     # Convert the list of polygons to Shapely Polygon objects
     shapely_polygons = [Polygon(poly) for poly in polygons]
 
     # Calculate the overlapping area by taking the union of all polygons
-    overlapping_polygon = cascaded_union(shapely_polygons)
+    overlapping_polygon = unary_union(shapely_polygons) #cascaded_union(shapely_polygons)
 
     # Return the area of the overlapping polygon
     return overlapping_polygon.area
+
+
+def compute_iou(polygons):
+    polygons = [Polygon(p) for p in polygons]
+    
+    # The reduce may fail ....
+    intersection = reduce(lambda x, y: x.intersection(y), polygons)
+    union = reduce(lambda x, y: x.union(y), polygons)
+    
+    iou = intersection.area / union.area
+    return iou
+
+def semi_dice_coef_overlapping(polygons:list):
+    shapely_polygons = [Polygon(poly) for poly in polygons]
+    dice_sum = 0
+
+    for i in range(len(shapely_polygons)):
+        other_polygons = [shapely_polygons[j] for j in range(len(shapely_polygons)) if i!=j]    
+        other_union = unary_union(other_polygons)
+        curr_intersect_with_other = shapely_polygons[i].intersection(other_union)
+        dice_sum+= curr_intersect_with_other.area/shapely_polygons[i].area
+
+    return dice_sum
