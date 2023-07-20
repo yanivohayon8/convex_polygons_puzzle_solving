@@ -44,7 +44,9 @@ class PhysicalAssembler():
 
         return data            
 
-    def phyiscal_assembly(self, loop):
+    def run(self, loop):
         body = self._generate_payload_body(loop)
         response = self.http.send_reconstruct_request(body)
         return response
+    
+    
