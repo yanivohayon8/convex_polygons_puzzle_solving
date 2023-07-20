@@ -19,7 +19,10 @@ class Loop():
         self.piece2edge2matings = piece2edge2matings
         self.availible_matings = availiable_matings
         self.unions_history = [] # For Debug
+        self.score = None
     
+    def set_score(self,score):
+        self.score = score
 
     def get_pieces_invovled(self):
         return self.piece2edge2matings.keys()
