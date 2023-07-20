@@ -50,7 +50,7 @@ class PhysicalAssembler():
         response = self.http.send_reconstruct_request(body)
         return response
     
-    def score_assembly(self,response):
+    def score_assembly(self,response,area_weight=0.5):
         '''
             response- a json of the following fields
                 piecesBeforeEnableCollision: list of polygons (list of tuples)
@@ -58,4 +58,7 @@ class PhysicalAssembler():
         '''
         polygons_coords = [piece_json["coordinates"] for piece_json in response["piecesBeforeEnableCollision"] ]
         overalap_area = semi_dice_coef_overlapping(polygons_coords)
-        return overalap_area + response["AfterEnableCollision"]["sumSpringsLength"]
+        sum_springs_length = response["AfterEnableCollision"]["sumSpringsLength"]
+        
+        # Notice: overalap_area is a small a number, and sum_springs_length is a big number....
+        return area_weight*overalap_area +  (1-area_weight)*sum_springs_length

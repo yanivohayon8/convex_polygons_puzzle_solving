@@ -42,7 +42,8 @@ class Puzzle():
         [img_paths.extend(glob.glob(self.puzzle_directory+"\\*."+ext)) for ext in extentions]
 
         for piece in pieces:
-            id_str = str(piece.id)
+            #id_str = str(piece.id)
+            id_str = str(int(float(piece.id))) # The id is int written as double in Ofir ground truth, but the image name is in int...
             for path in img_paths:
                 file_name = path.split("\\")[-1].split(".")[0]
                 if file_name == id_str:
@@ -85,7 +86,8 @@ class Puzzle():
         for _id in pieces_ids:
             vertices = df[df["piece"] == _id]
             coordinates = [(_x,_y) for _x,_y in zip(vertices["x"].values.tolist(),vertices["y"].values.tolist())]
-            pieces.append(Piece(str(int(_id)),coordinates)) # The id is int in Ofir ground truth
+            #pieces.append(Piece(str(int(_id)),coordinates)) # The id is int written as double in Ofir ground truth
+            pieces.append(Piece(str(_id),coordinates)) # The id is int written as double in Ofir ground truth
 
         return pieces
 

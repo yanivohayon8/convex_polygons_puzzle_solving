@@ -20,6 +20,8 @@ class TestIntegration(unittest.TestCase):
         
         solver.build_zero_loops()
         solver.global_optimize()
+
+        
         
 
 

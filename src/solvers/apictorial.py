@@ -101,16 +101,15 @@ class FirstSolver():
                     new_loop = merger.merge(loop_i,loop_j)
 
                     if new_loop is not None:
-                        response = self.physical_assembler.run(new_loop)
-                        new_loop.set_score(self.physical_assembler.score_assembly(response))
-
                         if new_loop not in potential_next_level_loops:
+                            response = self.physical_assembler.run(new_loop)
+                            new_loop.set_score(self.physical_assembler.score_assembly(response))
                             potential_next_level_loops.append(new_loop)
                         else:
                             debug_num_of_redundant_potential+=1
                     
             next_level_loops = []
-            debug_total_num_potential_loops = len(previous_loops) * (len(previous_loops) - 1)/2
+            debug_total_num_potential_loops = len(previous_loops) * (len(previous_loops) - 1)/2 + 1e-5
             debug_percent_redundant = 100 * debug_num_of_redundant_potential/debug_total_num_potential_loops
             print(f"Found redundant potential loops {debug_percent_redundant}%")
 
