@@ -2,6 +2,8 @@ from shapely import Polygon
 import numpy as np
 import cv2
 from shapely import affinity
+from shapely.ops import cascaded_union
+
 
 class Piece():
 
@@ -68,4 +70,17 @@ class Piece():
         return area, list(self_polygon.exterior.coords),list(other_polygon.exterior.coords)
 
 
-        
+
+def overlapping_area(polygons:list):
+    '''
+        polygons: list of lists of tuples
+    '''
+
+    # Convert the list of polygons to Shapely Polygon objects
+    shapely_polygons = [Polygon(poly) for poly in polygons]
+
+    # Calculate the overlapping area by taking the union of all polygons
+    overlapping_polygon = cascaded_union(shapely_polygons)
+
+    # Return the area of the overlapping polygon
+    return overlapping_polygon.area

@@ -1,6 +1,7 @@
 import unittest
 # from src.piece import move_and_rotate_polygons
 from src.piece import Piece
+from src.piece import overlapping_area
 from matplotlib.patches import Polygon as MatplotlibPolygon
 import matplotlib.pyplot as plt
 import numpy as np
@@ -165,6 +166,14 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         ax.grid()
         plt.show()
 
+class TestPolygonsOverlap(unittest.TestCase):
+
+    def test_toy_example(self):
+        poly1 = Polygon([(0,0),(2,0),(2,2),(0,2)])
+        poly2 = Polygon([(0,1),(2,1),(2,0)])
+
+        polys = [poly1,poly2]
+        print(overlapping_area(polys))
 
 
     
