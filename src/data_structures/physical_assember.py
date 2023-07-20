@@ -1,4 +1,5 @@
 from src.data_structures.hierarchical_loops import Loop
+from src.piece import overlapping_area
 
 class PhysicalAssembler():
 
@@ -49,4 +50,12 @@ class PhysicalAssembler():
         response = self.http.send_reconstruct_request(body)
         return response
     
-    
+    def score_assembly(self,response):
+        '''
+            response- a json of the following fields
+                piecesBeforeEnableCollision: list of polygons (list of tuples)
+                AfterEnableCollision: springs sum + springs lengths
+        '''
+        polygons_coords = [piece_json["coordinates"] for piece_json in response["piecesBeforeEnableCollision"] ]
+        overalap_area = overlapping_area(polygons_coords)
+        return overalap_area + response["AfterEnableCollision"]["sumSpringsLength"]
