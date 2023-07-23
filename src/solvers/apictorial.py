@@ -7,15 +7,18 @@ from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
+from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
+
 
 class FirstSolver():
-    def __init__(self,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
+    def __init__(self,puzzle:Puzzle,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
+        self.puzzle = puzzle
         self.puzzle_image = puzzle_image
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
         self.bag_of_pieces = None
         self.id2piece = {}
-        self.puzzle_directory = None
+        #self.puzzle_directory = None
         self.mating_graph = None
         self.cycles = None
         self.piece2potential_matings = {}
@@ -23,11 +26,9 @@ class FirstSolver():
         self.physical_assembler = None
 
     def load_bag_of_pieces(self):
-        self.puzzle_directory = f"data/ofir/{self.puzzle_image}/Puzzle{self.puzzle_num}/{self.puzzle_noise_level}"
-        self.loader = Puzzle(self.puzzle_directory)
-        self.loader.load()
+        self.puzzle.load()
 
-        self.bag_of_pieces = self.loader.get_bag_of_pieces()
+        self.bag_of_pieces = self.puzzle.get_bag_of_pieces()
 
         for piece in self.bag_of_pieces:
             self.id2piece[piece.id] = piece
@@ -40,7 +41,7 @@ class FirstSolver():
 
     def pairwise(self):
         self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
-        self.edge_length_pairwiser.pairwise(self.loader.noise+1e-3)
+        self.edge_length_pairwiser.pairwise(self.puzzle.noise+1e-3)
         num_pieces = len(self.bag_of_pieces)
 
         for piece_i in range(num_pieces):
@@ -62,7 +63,7 @@ class FirstSolver():
             For deterministric runs...
         '''
         self.mating_graph = EdgeMatingGraph(self.bag_of_pieces)
-        self.mating_graph.load_raw_cycles(self.puzzle_directory+"/cycles.txt")
+        self.mating_graph.load_raw_cycles(self.puzzle.puzzle_directory+"/cycles.txt")
         self.cycles = self.mating_graph.find_cycles()
     
     def compute_cycles(self,is_save_cycles=True):
@@ -73,7 +74,7 @@ class FirstSolver():
         self.mating_graph.compute_raw_cycles()
 
         if is_save_cycles:
-            self.mating_graph.save_raw_cycles(self.puzzle_directory+"/cycles.txt")
+            self.mating_graph.save_raw_cycles(self.puzzle.puzzle_directory+"/cycles.txt")
         
         self.cycles = self.mating_graph.find_cycles()
 
@@ -102,7 +103,9 @@ class FirstSolver():
 
                     if new_loop is not None:
                         if new_loop not in potential_next_level_loops:
-                            response = self.physical_assembler.run(new_loop)
+                            matings_csv = get_loop_matings_as_csv(new_loop,self.id2piece)
+                            new_loop.set_matings_as_csv(matings_csv)
+                            response = self.physical_assembler.run(matings_csv)
                             new_loop.set_score(self.physical_assembler.score_assembly(response))
                             potential_next_level_loops.append(new_loop)
                         else:
@@ -131,5 +134,9 @@ class FirstSolver():
 
             previous_loops = next_level_loops
 
-
-        return solutions
+        solutions_as_mating = []
+        for i,loop in enumerate(solutions):
+            self.physical_assembler.run(loop.get_matings_as_csv(),screenshot_name=f"sol_{i}")
+            solutions_as_mating.append(loop.get_as_mating_list())
+         
+        return solutions_as_mating

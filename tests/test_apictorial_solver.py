@@ -1,10 +1,14 @@
 import unittest
 from src.solvers.apictorial import FirstSolver
+from src.puzzle import Puzzle
+
 
 class TestIntegration(unittest.TestCase):
     
     def _run(self,puzzle_image,puzzle_num,puzzle_noise_level, is_load_cycles=True):
-        solver = FirstSolver(puzzle_image,puzzle_num,puzzle_noise_level)
+        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle = Puzzle(puzzle_directory)
+        solver = FirstSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
 
         solver.load_bag_of_pieces()
         solver.extract_features()
@@ -19,7 +23,13 @@ class TestIntegration(unittest.TestCase):
             solver.compute_cycles(True)
         
         solver.build_zero_loops()
-        solver.global_optimize()
+        solutions = solver.global_optimize()
+
+        # This should done like this.... you should use piece class directly
+        print(solutions[0])
+        solutions[0] = puzzle.reverse_edge_ids(solutions[0]) 
+        print(solutions[0])
+        assert puzzle.evaluate_correct_rels(solutions[0]) == 1
 
         
         
