@@ -103,7 +103,7 @@ class Puzzle():
                 # curr_i2org_i[i] = org_coords.index(curr)
                 curr_i2org_i[(i-1)%len(current_coords)] = org_coords.index(curr) # Tfira: I don't know why it is working
             
-            # self.pieces2original_edges[piece.id] = curr_i2org_i
+            self.pieces2original_edges[piece.id] = curr_i2org_i
             piece.ccw_edge2origin_edge = curr_i2org_i
 
             
