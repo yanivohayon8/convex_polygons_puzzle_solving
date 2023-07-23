@@ -22,8 +22,12 @@ class FirstSolver():
         self.mating_graph = None
         self.cycles = None
         self.piece2potential_matings = {}
-        self.http = None
-        self.physical_assembler = None
+        # self.http = None
+        # self.physical_assembler = None
+
+        self.http = HTTPClient(self.puzzle_image,self.puzzle_num,self.puzzle_noise_level)
+        self.physical_assembler = PhysicalAssembler(self.http, self.id2piece)
+        self.merger = BasicLoopMerger()
 
     def load_bag_of_pieces(self):
         self.puzzle.load()
@@ -83,14 +87,20 @@ class FirstSolver():
         self.zero_loops = zero_loops_loader.load(0.5)
 
     def global_optimize(self):
-        self.http = HTTPClient(self.puzzle_image,self.puzzle_num,self.puzzle_noise_level)
-        self.physical_assembler = PhysicalAssembler(self.http, self.id2piece)
-        merger = BasicLoopMerger()
-
         previous_loops = self.zero_loops   
         solutions = []
+        loop_level = 0
         
+        for i,zero_loop in enumerate(self.zero_loops):
+            matings_csv = get_loop_matings_as_csv(zero_loop,self.id2piece)
+            zero_loop.set_matings_as_csv(matings_csv)
+            response = self.physical_assembler.run(matings_csv,screenshot_name=f"level_{loop_level}_loop_{i}")
+            zero_loop.set_score(self.physical_assembler.score_assembly(response))
+
+
         while True:
+            loop_level+=1
+            print(f"Start computing {loop_level}-loops")
             potential_next_level_loops = []
             debug_num_of_redundant_potential = 0
 
@@ -99,13 +109,13 @@ class FirstSolver():
 
                 for j in range(i+1,len(previous_loops)):
                     loop_j = previous_loops[j]
-                    new_loop = merger.merge(loop_i,loop_j)
+                    new_loop = self.merger.merge(loop_i,loop_j)
 
                     if new_loop is not None:
                         if new_loop not in potential_next_level_loops:
                             matings_csv = get_loop_matings_as_csv(new_loop,self.id2piece)
                             new_loop.set_matings_as_csv(matings_csv)
-                            response = self.physical_assembler.run(matings_csv)
+                            response = self.physical_assembler.run(matings_csv,screenshot_name=f"level_{loop_level}_loop_{i}_loop_{j}")
                             new_loop.set_score(self.physical_assembler.score_assembly(response))
                             potential_next_level_loops.append(new_loop)
                         else:

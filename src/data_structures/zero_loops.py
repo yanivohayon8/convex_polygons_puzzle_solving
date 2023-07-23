@@ -67,3 +67,8 @@ class ZeroLoopAroundVertexLoader():
             self.zero_loops.append(loop_single_piece)
         
         return self.zero_loops
+    
+class ZeroLoopKeepCycleAsIs(ZeroLoopAroundVertexLoader):
+
+    def _is_valid(self, cycle, accumulated_angle_err):
+        return True
