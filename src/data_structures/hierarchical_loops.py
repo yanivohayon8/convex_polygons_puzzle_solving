@@ -32,6 +32,7 @@ class Loop():
         piece1,edge1,piece2,edge2
         '''
         self.matings_as_csv = string_lines
+   
     def get_matings_as_csv(self):
         return self.matings_as_csv
                            
