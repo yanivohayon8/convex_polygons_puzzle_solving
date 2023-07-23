@@ -26,7 +26,7 @@ class HTTPClient():
         return response.data.decode('utf-8')
         
 
-    def send_reconstruct_request(self,body, api_version="v0"):
+    def send_reconstruct_request(self,body,screenshot_name="", api_version="v0"):
 
         query_parameters = {
             "noise":self.target_puzzle_noise,
@@ -34,6 +34,9 @@ class HTTPClient():
             "dataset":"ConvexDrawing",
             "image":self.target_puzzle_image
         }
+
+        if screenshot_name !="":
+            query_parameters["screenShotName"] = screenshot_name
 
         encoded_args = urlencode(query_parameters)
 
