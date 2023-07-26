@@ -79,9 +79,6 @@ class AreaOverlappingEvaluator():
         
         return score_sum
 
-
-
-
     def evaluate(self):
         self._compute_weights()
         self._compute_transformation()

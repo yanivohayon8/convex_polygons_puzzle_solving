@@ -30,6 +30,7 @@ class Puzzle():
         # we have here implicit assumption that the edges ids are indexes..
         self.pieces2original_edges ={} # for example {P_0:[2,0,1]}
 
+    
     def load(self):
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
         self.df_solution_rels = pd.read_csv(self.groundtruth_rels_path)
@@ -71,11 +72,13 @@ class Puzzle():
         self._get_pieces2img_path(pieces)
         return pieces
 
-    def get_final_puzzle(self,csv_conv="Ofir"):
+    def get_ground_truth_puzzle(self,csv_conv="Ofir"):
+        self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
         pieces = self._pieces_pd2list(self.df_solution_locations,csv_conv=csv_conv)
         self._preprocess(pieces)
-        self._get_pieces2img_path(pieces)
-        return pieces
+        #self._get_pieces2img_path(pieces)
+        polygons = [piece.polygon for piece in pieces]
+        return polygons
 
     def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
         if csv_conv!="Ofir":
