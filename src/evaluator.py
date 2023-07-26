@@ -1,6 +1,7 @@
 import numpy as np
 from src.piece import Piece
 from functools import reduce
+from shapely import affinity
 
 def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_weights:np.array):
     '''
@@ -36,8 +37,8 @@ class AreaOverlappingEvaluator():
 
     def __init__(self,solution_coordinates:list,ground_truth_pieces:list) -> None:
         '''
-        solution_coordinates - list of pieces coordinates(numpy array of <POLYGON_DEGREE>x2)
-        ground_truth_coordinates - list of pieces 
+        solution_coordinates - list of shapely polygons
+        ground_truth_coordinates - list of shapely polygons
         '''
         self.solution_pieces = solution_coordinates
         self.ground_truth_pieces = ground_truth_pieces
@@ -58,9 +59,35 @@ class AreaOverlappingEvaluator():
         self.R,self.t = least_square_rigid_motion_svd(solution_points,ground_truth_points,self.weights)
         return self.R,self.t
 
+    def _transform_solution_polygons(self):
+        self.transfomed_polygons_solution = []
+        transformation_params = [self.R[0,0],self.R[0,1],self.R[1,0],self.R[1,1],self.t[0],self.t[1]]
+
+        for piece in self.solution_pieces:
+            self.transfomed_polygons_solution.append(affinity.affine_transform(piece.polygon,transformation_params))
+        
+        return self.transfomed_polygons_solution
+    
+    def _score(self):
+        score_sum = 0
+
+        for poly_index in range(len(self.transfomed_polygons_solution)):                                
+            solution_poly = self.transfomed_polygons_solution[poly_index]
+            ground_truth_poly = self.ground_truth_pieces[poly_index]
+            intersection_area = solution_poly.intersection(ground_truth_poly.polygon).area
+            score_sum += intersection_area/(solution_poly.area+1e-5)
+        
+        return score_sum
+
+
+
+
     def evaluate(self):
         self._compute_weights()
         self._compute_transformation()
+        self._transform_solution_polygons()
+
+
         
-        
+    
 

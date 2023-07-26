@@ -69,6 +69,11 @@ class TestAreaOverlappingEvaluator(unittest.TestCase):
         assert np.array_equal(t,np.array([0,0]))
         assert np.linalg.norm(R) - np.linalg.norm(np.identity(2)) < 1e-4
     
+        evaluator._transform_solution_polygons()
+        eval_score = evaluator._score()
+
+        assert abs(eval_score -1*len(ground_truth_solution)) < 1e-5
+
 
 
 if __name__ == "__main__":
