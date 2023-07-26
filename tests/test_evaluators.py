@@ -59,9 +59,9 @@ class TestAreaOverlappingEvaluator(unittest.TestCase):
         puzzle_noise_level = 0
         puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
-        ground_truth_solution = puzzle.get_ground_truth_puzzle()
+        ground_truth_polygons = puzzle.get_ground_truth_puzzle()
 
-        evaluator = AreaOverlappingEvaluator(ground_truth_solution,ground_truth_solution)
+        evaluator = AreaOverlappingEvaluator(ground_truth_polygons,ground_truth_polygons)
         evaluator._compute_weights()
         assert 1-sum(evaluator.weights)<1e-3
 
@@ -72,7 +72,7 @@ class TestAreaOverlappingEvaluator(unittest.TestCase):
         evaluator._transform_solution_polygons()
         eval_score = evaluator._score()
 
-        assert abs(eval_score -1*len(ground_truth_solution)) < 1e-5
+        assert abs(eval_score -1*len(ground_truth_polygons)) < 1e-5
 
 
 

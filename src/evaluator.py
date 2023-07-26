@@ -35,27 +35,27 @@ def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_w
 
 class AreaOverlappingEvaluator():
 
-    def __init__(self,solution_coordinates:list,ground_truth_pieces:list) -> None:
+    def __init__(self,solution_polygons:list,ground_truth_polygons:list) -> None:
         '''
         solution_coordinates - list of shapely polygons
         ground_truth_coordinates - list of shapely polygons
         '''
-        self.solution_pieces = solution_coordinates
-        self.ground_truth_pieces = ground_truth_pieces
+        self.solution_polygons = solution_polygons
+        self.ground_truth_polygons = ground_truth_polygons
         self.weights = []
         self.R = None
         self.t = None
     
     def _compute_weights(self):
-        total_area = reduce(lambda acc,piece: acc+piece.polygon.area,self.ground_truth_pieces,0)
-        self.weights = np.array([piece.polygon.area/(total_area+1e-5) for piece in self.ground_truth_pieces for _ in piece.get_coords()])
+        total_area = reduce(lambda acc,polygon: acc+polygon.area,self.ground_truth_polygons,0)
+        self.weights = np.array([polygon.area/(total_area+1e-5) for polygon in self.ground_truth_polygons for _ in list(polygon.exterior.coords)])
 
     def _compute_transformation(self):
         if len(self.weights)==0:
             raise ("Call _compute_weights first")
         
-        solution_points = np.array([coord for piece in self.solution_pieces for coord in piece.get_coords()])
-        ground_truth_points = np.array([coord for piece in self.ground_truth_pieces for coord in piece.get_coords()])
+        solution_points = np.array([coord for polygon in self.solution_polygons for coord in list(polygon.exterior.coords)])
+        ground_truth_points = np.array([coord for polygon in self.ground_truth_polygons for coord in list(polygon.exterior.coords)])
         self.R,self.t = least_square_rigid_motion_svd(solution_points,ground_truth_points,self.weights)
         return self.R,self.t
 
@@ -63,8 +63,8 @@ class AreaOverlappingEvaluator():
         self.transfomed_polygons_solution = []
         transformation_params = [self.R[0,0],self.R[0,1],self.R[1,0],self.R[1,1],self.t[0],self.t[1]]
 
-        for piece in self.solution_pieces:
-            self.transfomed_polygons_solution.append(affinity.affine_transform(piece.polygon,transformation_params))
+        for polygon in self.solution_polygons:
+            self.transfomed_polygons_solution.append(affinity.affine_transform(polygon,transformation_params))
         
         return self.transfomed_polygons_solution
     
@@ -73,8 +73,8 @@ class AreaOverlappingEvaluator():
 
         for poly_index in range(len(self.transfomed_polygons_solution)):                                
             solution_poly = self.transfomed_polygons_solution[poly_index]
-            ground_truth_poly = self.ground_truth_pieces[poly_index]
-            intersection_area = solution_poly.intersection(ground_truth_poly.polygon).area
+            ground_truth_poly = self.ground_truth_polygons[poly_index]
+            intersection_area = solution_poly.intersection(ground_truth_poly).area
             score_sum += intersection_area/(solution_poly.area+1e-5)
         
         return score_sum
@@ -86,6 +86,7 @@ class AreaOverlappingEvaluator():
         self._compute_weights()
         self._compute_transformation()
         self._transform_solution_polygons()
+        return self._score()
 
 
         
