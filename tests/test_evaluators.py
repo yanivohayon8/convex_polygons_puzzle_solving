@@ -61,15 +61,15 @@ class TestAreaOverlappingEvaluator(unittest.TestCase):
         puzzle = Puzzle(puzzle_directory)
         ground_truth_polygons = puzzle.get_ground_truth_puzzle()
 
-        evaluator = AreaOverlappingEvaluator(ground_truth_polygons,ground_truth_polygons)
+        evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
         evaluator._compute_weights()
         assert 1-sum(evaluator.weights)<1e-3
 
-        R,t = evaluator._compute_transformation()
+        R,t = evaluator._compute_transformation(ground_truth_polygons)
         assert np.array_equal(t,np.array([0,0]))
         assert np.linalg.norm(R) - np.linalg.norm(np.identity(2)) < 1e-4
     
-        evaluator._transform_solution_polygons()
+        evaluator._transform_solution_polygons(ground_truth_polygons)
         eval_score = evaluator._score()
 
         assert abs(eval_score -1*len(ground_truth_polygons)) < 1e-5
