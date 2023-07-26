@@ -14,9 +14,11 @@ class HTTPClient():
         self.target_puzzle_noise = target_puzzle_noise
         self.target_puzzle_num = target_puzzle_num
         self.target_puzzle_image = target_puzzle_image
+        self.url_prefix = "v0/ConvexDrawing"
+        self.base_target = f"http://{self.host}:{self.port}/{self.url_prefix}"
 
     def send_sanity(self,api_version="v0"):
-        target = f"http://{self.host}:{self.port}/{api_version}/sanity"
+        target = f"{self.base_target}/sanity"#f"http://{self.host}:{self.port}/{api_version}/sanity"
 
         response = self.http.request('GET', target)
 
@@ -41,7 +43,7 @@ class HTTPClient():
         encoded_args = urlencode(query_parameters)
 
         query_parameters = "reconstructions?"+encoded_args
-        target = f"http://{self.host}:{self.port}/{api_version}/{query_parameters}"
+        target = f"{self.base_target}/{query_parameters}" #f"http://{self.host}:{self.port}/{api_version}/{query_parameters}"
 
         response = self.http.request(
                     'POST',

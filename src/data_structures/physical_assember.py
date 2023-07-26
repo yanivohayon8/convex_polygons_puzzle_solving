@@ -3,10 +3,8 @@ from src.piece import semi_dice_coef_overlapping
 
 class PhysicalAssembler():
 
-    def __init__(self,http,id2piece) -> None:
-        self.http = http
-        self.id2piece = id2piece
-    
+    def __init__(self,http) -> None:
+        self.http = http    
         
     def run(self, body,screenshot_name=""):
         response = self.http.send_reconstruct_request(body,screenshot_name=screenshot_name)

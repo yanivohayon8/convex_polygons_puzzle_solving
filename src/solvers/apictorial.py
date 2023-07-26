@@ -26,7 +26,7 @@ class FirstSolver():
         # self.physical_assembler = None
 
         self.http = HTTPClient(self.puzzle_image,self.puzzle_num,self.puzzle_noise_level)
-        self.physical_assembler = PhysicalAssembler(self.http, self.id2piece)
+        self.physical_assembler = PhysicalAssembler(self.http)#PhysicalAssembler(self.http, self.id2piece)
         self.merger = BasicLoopMerger()
 
     def load_bag_of_pieces(self):
