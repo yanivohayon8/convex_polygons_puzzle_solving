@@ -1,5 +1,7 @@
 from src.data_structures.hierarchical_loops import Loop
 from src.piece import semi_dice_coef_overlapping
+from shapely import Polygon
+
 
 class PhysicalAssembler():
 
@@ -9,6 +11,9 @@ class PhysicalAssembler():
     def run(self, body,screenshot_name=""):
         response = self.http.send_reconstruct_request(body,screenshot_name=screenshot_name)
         return response
+    
+    def get_coordinates_as_polygons(self,response):
+        return [Polygon(piece_json["coordinates"]) for piece_json in response["piecesBeforeEnableCollision"] ]
     
     def score_assembly(self,response,area_weight=0.5):
         '''

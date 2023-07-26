@@ -8,7 +8,7 @@ from src.data_structures.loop_merger import BasicLoopMerger
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
-
+from src.assembly import Assembly
 
 class FirstSolver():
     def __init__(self,puzzle:Puzzle,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
@@ -88,13 +88,14 @@ class FirstSolver():
 
     def global_optimize(self):
         previous_loops = self.zero_loops   
-        solutions = []
+        solutions_loops = []
         loop_level = 0
         
         for i,zero_loop in enumerate(self.zero_loops):
             matings_csv = get_loop_matings_as_csv(zero_loop,self.id2piece)
             zero_loop.set_matings_as_csv(matings_csv)
-            response = self.physical_assembler.run(matings_csv,screenshot_name=f"level_{loop_level}_loop_{i}")
+            screenhost_name = ""#f"level_{loop_level}_loop_{i}"
+            response = self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
             zero_loop.set_score(self.physical_assembler.score_assembly(response))
 
 
@@ -115,7 +116,8 @@ class FirstSolver():
                         if new_loop not in potential_next_level_loops:
                             matings_csv = get_loop_matings_as_csv(new_loop,self.id2piece)
                             new_loop.set_matings_as_csv(matings_csv)
-                            response = self.physical_assembler.run(matings_csv,screenshot_name=f"level_{loop_level}_loop_{i}_loop_{j}")
+                            screenshot_name=""#f"level_{loop_level}_loop_{i}_loop_{j}"
+                            response = self.physical_assembler.run(matings_csv,screenshot_name=screenshot_name)
                             new_loop.set_score(self.physical_assembler.score_assembly(response))
                             potential_next_level_loops.append(new_loop)
                         else:
@@ -128,12 +130,12 @@ class FirstSolver():
 
             for loop in potential_next_level_loops:
                 if len(loop.get_pieces_invovled())==len(self.bag_of_pieces):
-                    if len(solutions) == 0:
-                        solutions.append(loop)
+                    if len(solutions_loops) == 0:
+                        solutions_loops.append(loop)
                     else:
                         tmp = []
-                        [tmp.append(lop) for lop in solutions if lop not in solutions]
-                        solutions = solutions+tmp
+                        [tmp.append(lop) for lop in solutions_loops if lop not in solutions_loops]
+                        solutions_loops = solutions_loops+tmp
                     continue
                 
                 if loop not in next_level_loops:
@@ -144,9 +146,10 @@ class FirstSolver():
 
             previous_loops = next_level_loops
 
-        solutions_as_mating = []
-        for i,loop in enumerate(solutions):
-            self.physical_assembler.run(loop.get_matings_as_csv(),screenshot_name=f"sol_{i}")
-            solutions_as_mating.append(loop.get_as_mating_list())
+        final_solutions = []
+        for i,loop in enumerate(solutions_loops):
+            res = self.physical_assembler.run(loop.get_matings_as_csv(),screenshot_name=f"sol_{i}")
+            polygons = self.physical_assembler.get_coordinates_as_polygons(res)
+            final_solutions.append(Assembly(polygons,loop.get_as_mating_list()))
          
-        return solutions_as_mating
+        return final_solutions

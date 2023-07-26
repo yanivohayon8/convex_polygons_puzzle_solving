@@ -1,7 +1,7 @@
 import unittest
 from src.solvers.apictorial import FirstSolver
 from src.puzzle import Puzzle
-
+from src.evaluator import AreaOverlappingEvaluator
 
 class TestIntegration(unittest.TestCase):
     
@@ -24,14 +24,18 @@ class TestIntegration(unittest.TestCase):
         
         solver.build_zero_loops()
         solutions = solver.global_optimize()
-
-        # This should done like this.... you should use piece class directly
-        print(solutions[0])
-        solutions[0] = puzzle.reverse_edge_ids(solutions[0]) 
-        print(solutions[0])
-        assert puzzle.evaluate_correct_rels(solutions[0]) == 1
-
         
+        ground_truth_polygons = puzzle.get_ground_truth_puzzle()
+        evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
+        
+        for solution in solutions:
+            score = evaluator.evaluate(solution.get_polygons())
+            print(score)
+            
+            solutions[0] = puzzle.reverse_edge_ids(solutions[0]) 
+            print(solutions[0])
+            assert puzzle.evaluate_correct_rels(solutions[0]) == 1
+
         
 
 
