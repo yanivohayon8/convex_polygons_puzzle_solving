@@ -1,8 +1,8 @@
 import numpy as np
+from src.piece import Piece
+from functools import reduce
 
-
-
-def least_square_rigid_motion_svd(points:np.array,points_weights:np.array,ground_truth:np.array):
+def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_weights:np.array):
     '''
         implementation of https://vincentqin.gitee.io/blogresource-3/slam-common-issues-ICP/svd_rot.pdf
     '''
@@ -29,3 +29,38 @@ def least_square_rigid_motion_svd(points:np.array,points_weights:np.array,ground
     t = ground_truth_centroid - R@points_centroid.T
 
     return R,t
+
+
+
+class AreaOverlappingEvaluator():
+
+    def __init__(self,solution_coordinates:list,ground_truth_pieces:list) -> None:
+        '''
+        solution_coordinates - list of pieces coordinates(numpy array of <POLYGON_DEGREE>x2)
+        ground_truth_coordinates - list of pieces 
+        '''
+        self.solution_pieces = solution_coordinates
+        self.ground_truth_pieces = ground_truth_pieces
+        self.weights = []
+        self.R = None
+        self.t = None
+    
+    def _compute_weights(self):
+        total_area = reduce(lambda acc,piece: acc+piece.polygon.area,self.ground_truth_pieces,0)
+        self.weights = np.array([piece.polygon.area/(total_area+1e-5) for piece in self.ground_truth_pieces for _ in piece.get_coords()])
+
+    def _compute_transformation(self):
+        if len(self.weights)==0:
+            raise ("Call _compute_weights first")
+        
+        solution_points = np.array([coord for piece in self.solution_pieces for coord in piece.get_coords()])
+        ground_truth_points = np.array([coord for piece in self.ground_truth_pieces for coord in piece.get_coords()])
+        self.R,self.t = least_square_rigid_motion_svd(solution_points,ground_truth_points,self.weights)
+        return self.R,self.t
+
+    def evaluate(self):
+        self._compute_weights()
+        self._compute_transformation()
+        
+        
+
