@@ -140,28 +140,28 @@ class Puzzle():
             for mate in solver_matings
             ]
 
-    def evaluate_rels(self,solver_matings:list):
-        '''
-            solver_matings : list of matings (Mating classes instances)
-        '''
-        ground_truth_matings = self.get_final_rels()
-        count_wrong=0
+    # def evaluate_rels(self,solver_matings:list):
+    #     '''
+    #         solver_matings : list of matings (Mating classes instances)
+    #     '''
+    #     ground_truth_matings = self.get_final_rels()
+    #     count_wrong=0
 
-        if len(solver_matings)!=len(ground_truth_matings):
-            print(f"The solver has {len(solver_matings)} matings while the ground truth has {len(ground_truth_matings)} matings")
-            return 0
+    #     if len(solver_matings)!=len(ground_truth_matings):
+    #         print(f"The solver has {len(solver_matings)} matings while the ground truth has {len(ground_truth_matings)} matings")
+    #         # return 0
  
-        for mate in solver_matings:
-            # new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
-            #                   edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
-            #                   edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
+    #     for mate in solver_matings:
+    #         # new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
+    #         #                   edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
+    #         #                   edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
 
-            if mate not in ground_truth_matings:
-                count_wrong+=1
+    #         if mate not in ground_truth_matings:
+    #             count_wrong+=1
         
-        return 1-count_wrong/len(ground_truth_matings)
+    #     return 1-count_wrong/len(ground_truth_matings)
     
-    def evaluate_correct_rels(self,solver_matings:list):
+    def evaluate_rels(self,solver_matings:list):
         '''
             solver_matings : list of matings (Mating classes instances)
         '''
@@ -170,14 +170,14 @@ class Puzzle():
         debug_incorrect = []
 
         for mate in solver_matings:
-            # new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
-            #                   edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
-            #                   edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
+            new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
+                              edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
+                              edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
 
-            if mate in ground_truth_matings:
+            if new_mate in ground_truth_matings:
                 count_correct+=1
             else:
-                debug_incorrect.append(mate)
+                debug_incorrect.append(new_mate)
         
         
         return count_correct/len(ground_truth_matings)

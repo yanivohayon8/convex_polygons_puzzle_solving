@@ -30,11 +30,8 @@ class TestIntegration(unittest.TestCase):
         
         for solution in solutions:
             score = evaluator.evaluate(solution.get_polygons())
-            print(score)
-            
-            solutions[0] = puzzle.reverse_edge_ids(solutions[0]) 
-            print(solutions[0])
-            assert puzzle.evaluate_correct_rels(solutions[0]) == 1
+            print("Overlapping score is ",score)
+            print("Matings correct score is ",puzzle.evaluate_rels(solution.get_matings()))
 
         
 

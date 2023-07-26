@@ -11,5 +11,8 @@ class Assembly():
     def get_polygons(self):
         return self.polygons
     
+    def get_matings(self):
+        return self.matings
+    
     def __eq__(self, __value: object) -> bool:
         pass
