@@ -1,4 +1,4 @@
-from src.solvers import Assembly,Solver
+from src.solvers import Solver
 from src.feature_extraction.geometric import GeometricFeatureExtractor
 from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
