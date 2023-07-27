@@ -149,7 +149,7 @@ class FirstSolver():
         final_solutions = []
         for i,loop in enumerate(solutions_loops):
             res = self.physical_assembler.run(loop.get_matings_as_csv(),screenshot_name=f"sol_{i}")
-            polygons = self.physical_assembler.get_coordinates_as_polygons(res)
+            polygons = self.physical_assembler.get_final_coordinates_as_polygons(res)
             final_solutions.append(Assembly(polygons,loop.get_as_mating_list()))
          
         return final_solutions

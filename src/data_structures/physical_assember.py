@@ -12,8 +12,8 @@ class PhysicalAssembler():
         response = self.http.send_reconstruct_request(body,screenshot_name=screenshot_name)
         return response
     
-    def get_coordinates_as_polygons(self,response):
-        return [Polygon(piece_json["coordinates"]) for piece_json in response["piecesBeforeEnableCollision"] ]
+    def get_final_coordinates_as_polygons(self,response):
+        return [Polygon(piece_json["coordinates"]) for piece_json in response["piecesFinalCoords"] ]
     
     def score_assembly(self,response,area_weight=0.5):
         '''
