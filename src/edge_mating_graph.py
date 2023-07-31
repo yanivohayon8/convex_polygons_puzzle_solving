@@ -183,7 +183,7 @@ class EdgeMatingGraph():
         elif "ENV" in name:
             #E.g P_6_ENV_2_ADJ_3
             if "ADJ" in name:
-                return f"P_{splitted[1]}_e_{splitted[-1]}"
+                return f"P_{splitted[1]}_adj_{splitted[-1]}"
             else:
                 #E.g P_6_ENV_2
                 return f"P_{splitted[1]}_e_{splitted[-1]}"
@@ -201,13 +201,14 @@ class EdgeMatingGraph():
         else:
             return "gray"
         
-    def draw(self,layout="spring", title="Graph", ax=None):
+    def draw(self,layout="spectral", title="Graph", ax=None):
         layouts = {
             "spring": nx.spring_layout,
-            "random": nx.random_layout,
+            "spectral": nx.spectral_layout
+            #"random": nx.random_layout,
             # "circular": nx.circular_layout,
-            "kamada_kawai": nx.kamada_kawai_layout,
-            "multipartite": nx.multipartite_layout
+            #"kamada_kawai": nx.kamada_kawai_layout,
+            #"multipartite": nx.multipartite_layout
             # Add more layout options as needed
         }
 
