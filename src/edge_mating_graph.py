@@ -98,7 +98,7 @@ class EdgeMatingGraph():
                 prev_adj_edge = self._name_inter_node(piece.id,(edge_index-1)%num_vertices)
 
                 self.edges_mating_graph.add_edges_from(
-                    [(env_node,next_adj_edge),(env_node,prev_adj_edge)]
+                    [(env_node,next_adj_edge,{"compatibility":0}),(env_node,prev_adj_edge,{"compatibility":0})]
                 )
 
     def _connect_relationship_nodes(self):
@@ -109,14 +109,17 @@ class EdgeMatingGraph():
                 piece_j_id = self.pieces[piece_j].id
                 mating_edges = self.match_edges[piece_i,piece_j]
                 if len(mating_edges)>0:
-                    for mat_edge in mating_edges:
+                    mating_edges_scores = self.match_pieces_score[piece_i,piece_j]
+                    for k,mat_edge in enumerate(mating_edges):
+                        new_links = []
+
+                        for mating in mat_edge:
+                            inter_node = self._name_inter_node(piece_i_id,mating[0])
+                            env_node = self._name_env_node(piece_j_id,mating[1])
+                            compatibility = mating_edges_scores[k]
+                            new_links.append((inter_node,env_node,{"compatibility":compatibility}))
                         
-                        self.edges_mating_graph.add_edges_from(
-                            [
-                                (self._name_inter_node(piece_i_id,mating[0]),self._name_env_node(piece_j_id,mating[1])) \
-                                    for mating in mat_edge
-                            ]
-                        )
+                        self.edges_mating_graph.add_edges_from(new_links)
 
     def build_graph(self):
         '''
@@ -208,7 +211,7 @@ class EdgeMatingGraph():
         else:
             return "gray"
         
-    def draw(self,layout="spectral", title="Graph", ax=None):
+    def draw(self,layout="kamada_kawai", title="Graph", ax=None):
         layouts = {
             "spring": nx.spring_layout,
             "spectral": nx.spectral_layout,
@@ -232,15 +235,27 @@ class EdgeMatingGraph():
             fig, ax = plt.subplots()
 
         # Create the layout for the nodes
-        pos = layouts[layout](self.edges_mating_graph)
+        # pos = layouts[layout](self.edges_mating_graph)
         
-        pos = nx.spectral_layout(self.edges_mating_graph)
-        # pos = layouts["spring"](self.edges_mating_graph)
-        # pos = layouts["spectral"](self.edges_mating_graph)
+        # env_nodes = [node for node in self.edges_mating_graph.nodes if "ENV" in node]
+        # pos = nx.spring_layout(self.edges_mating_graph,weight="compatibility",fixed=env_nodes)
+        dists = {}
+        for edge in self.edges_mating_graph.edges:
+            src, dst = edge
+            if src not in dists:
+                dists[src] = {}
+
+            if "ENV" in src and "INTER" in dists:
+                dists[src][dst] =1            
+            else:
+                dists[src][dst]=0.5
+
+
+        pos = nx.kamada_kawai_layout(self.edges_mating_graph,dist=dists)
 
         nodes_color = [self._get_node_color(node_name) for node_name in self.edges_mating_graph.nodes()]
-
         nodes_labels = {}
+
         for node_name in self.edges_mating_graph.nodes():
             nodes_labels[node_name] = self._get_node_display_name(node_name)
 
