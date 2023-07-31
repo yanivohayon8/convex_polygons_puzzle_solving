@@ -72,7 +72,14 @@ class TestFirstGraph(unittest.TestCase):
             ],dtype=object)
 
         mating_graph = EdgeMatingGraph(bag_of_pieces,match_edges,match_pieces_score)
-        mating_graph.build_graph()
+        # mating_graph.build_graph()
+        mating_graph._bulid_relationship_nodes()
+        assert len(list(mating_graph.edges_mating_graph.nodes)) == 13
+        mating_graph._bulid_enviorments_nodes()
+        assert len(list(mating_graph.edges_mating_graph.nodes)) == 13*2
+
+        mating_graph._connect_env_nodes()
+        mating_graph._connect_relationship_nodes()
         
         fig, ax = plt.subplots()
         mating_graph.draw(ax=ax)

@@ -28,6 +28,9 @@ class Piece():
         '''
         return list(self.polygon.exterior.coords)#[:-1]
     
+    def get_num_coords(self):
+        return len(list(self.polygon.exterior.coords)[:-1])
+
     def get_vertices_indices(self,edge_index):
         return edge_index,(edge_index+1)%len(self.original_coordinates)
     

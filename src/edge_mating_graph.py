@@ -60,47 +60,63 @@ class EdgeMatingGraph():
         self.cycles = None
         self.raw_cycles = None
 
+    def _name_inter_node(self,piece_name,edge_name):
+        return f"P_{piece_name}_E_{edge_name}_INTER"
+    
+    def _name_env_node(self,piece_name,edge_name):
+        return f"P_{piece_name}_E_{edge_name}_ENV" # In terms of english, could be INTRA instead of ENV, but I found it more confusing
+
+
     def _bulid_relationship_nodes(self):
         for piece in self.pieces:
-            coords = piece.get_coords()
+            num_coords = piece.get_num_coords()
             
             self.edges_mating_graph.add_nodes_from(
-                [f"P_{piece.id}_RELS_E_{edge_index}" for edge_index in range(len(coords))]
+                #[f"P_{piece.id}_RELS_E_{edge_index}" for edge_index in range(len(coords))]
+                [self._name_inter_node(piece.id,edge_index) for edge_index in range(num_coords)]
             )
 
     def _bulid_enviorments_nodes(self):
         for piece in self.pieces:
-            num_vertices = len(piece.get_coords())
+            num_vertices = piece.get_num_coords()
             for edge_index in range(num_vertices):
-                central_edge = f"P_{piece.id}_ENV_{edge_index}"
+                env_node = self._name_env_node(piece.id,edge_index)#f"P_{piece.id}_ENV_{edge_index}"
 
                 '''Since the polygons are oriented counter clockwise (ccw) than we need to check only one adjacent edge (and not both)'''
-                adj_edge_index = (edge_index+1)%num_vertices
-                adj_edge = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_index}"
-                
-                self.edges_mating_graph.add_nodes_from(
-                    [central_edge,adj_edge]
-                )
+                #next_adj_edge = self._get_inter_pieces_node_name(piece.id,(edge_index+1)%num_vertices)
+                #prev_adj_edge = self._get_inter_pieces_node_name((edge_index-1)%num_vertices
+
+                # adj_edge = f"P_{piece.id}_ENV_{edge_index}_ADJ_{adj_edge_index}"
+                self.edges_mating_graph.add_nodes_from([env_node])
+    
+    def _connect_env_nodes(self):
+        for piece in self.pieces:
+            num_vertices = piece.get_num_coords()
+            for edge_index in range(num_vertices):
+                env_node = self._name_env_node(piece.id,edge_index)#f"P_{piece.id}_ENV_{edge_index}"
+                next_adj_edge = self._name_inter_node(piece.id,(edge_index+1)%num_vertices)
+                prev_adj_edge = self._name_inter_node(piece.id,(edge_index-1)%num_vertices)
 
                 self.edges_mating_graph.add_edges_from(
-                    [
-                    (central_edge,adj_edge),
-                    (f"P_{piece.id}_RELS_E_{edge_index}",central_edge),
-                    (adj_edge,f"P_{piece.id}_RELS_E_{adj_edge_index}")
-                    ]
+                    [(env_node,next_adj_edge),(env_node,prev_adj_edge)]
                 )
 
     def _connect_relationship_nodes(self):
         num_pieces = len(self.pieces)
         for piece_i in range(num_pieces):
+            piece_i_id = self.pieces[piece_i].id
             for piece_j in range(num_pieces):
+                piece_j_id = self.pieces[piece_j].id
                 mating_edges = self.match_edges[piece_i,piece_j]
                 if len(mating_edges)>0:
                     for mat_edge in mating_edges:
-                        new_links = [
-                            (f"P_{self.pieces[piece_i].id}_RELS_E_{mating[0]}",f"P_{self.pieces[piece_j].id}_RELS_E_{mating[1]}") \
-                                    for mating in mat_edge]
-                        self.edges_mating_graph.add_edges_from(new_links)
+                        
+                        self.edges_mating_graph.add_edges_from(
+                            [
+                                (self._name_inter_node(piece_i_id,mating[0]),self._name_env_node(piece_j_id,mating[1])) \
+                                    for mating in mat_edge
+                            ]
+                        )
 
     def build_graph(self):
         '''
@@ -114,6 +130,7 @@ class EdgeMatingGraph():
         '''
         self._bulid_relationship_nodes()
         self._bulid_enviorments_nodes()
+        self._connect_env_nodes()
         self._connect_relationship_nodes()
     
     def load_raw_cycles(self,path_to_load):
@@ -177,37 +194,32 @@ class EdgeMatingGraph():
 
     def _get_node_display_name(self,name:str):
         splitted = name.split("_")
-        # E.g P_6_RELS_E_1
-        if "RELS" in name:
-            return f"P_{splitted[1]}_e_{splitted[-1]}"
-        elif "ENV" in name:
-            #E.g P_6_ENV_2_ADJ_3
-            if "ADJ" in name:
-                return f"P_{splitted[1]}_adj_{splitted[-1]}"
-            else:
-                #E.g P_6_ENV_2
-                return f"P_{splitted[1]}_e_{splitted[-1]}"
+        # E.g P_6_E_1_INTER
+        if "INTER" in name or "ENV" in name:
+            return f"P_{splitted[1]}_e_{splitted[3]}"
         else:
-            return "gray"
+            return "None"
 
     def _get_node_color(self,name):
-        if "RELS" in name:
-            return "gold"
+        if "INTER" in name:
+            return "skyblue" #"gold"
         elif "ENV" in name:
-            if "ADJ" in name:
-                return "skyblue"
-            else:
-                return "cyan"
+            return "red" 
         else:
             return "gray"
         
     def draw(self,layout="spectral", title="Graph", ax=None):
         layouts = {
             "spring": nx.spring_layout,
-            "spectral": nx.spectral_layout
-            #"random": nx.random_layout,
-            # "circular": nx.circular_layout,
-            #"kamada_kawai": nx.kamada_kawai_layout,
+            "spectral": nx.spectral_layout,
+            "random": nx.random_layout,
+            "circular": nx.circular_layout,
+            "shell":nx.shell_layout,
+            "rescale":nx.rescale_layout,
+            "spiral":nx.spiral_layout,
+            "kamada_kawai": nx.kamada_kawai_layout
+            # "multipartite":nx.multipartite_layout
+            # "planar":nx.planar_layout
             #"multipartite": nx.multipartite_layout
             # Add more layout options as needed
         }
@@ -221,6 +233,10 @@ class EdgeMatingGraph():
 
         # Create the layout for the nodes
         pos = layouts[layout](self.edges_mating_graph)
+        
+        pos = nx.spectral_layout(self.edges_mating_graph)
+        # pos = layouts["spring"](self.edges_mating_graph)
+        # pos = layouts["spectral"](self.edges_mating_graph)
 
         nodes_color = [self._get_node_color(node_name) for node_name in self.edges_mating_graph.nodes()]
 
