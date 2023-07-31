@@ -197,7 +197,7 @@ class EdgeMatingGraph():
             if "ADJ" in name:
                 return "skyblue"
             else:
-                return "skyblue"
+                return "cyan"
         else:
             return "gray"
         
@@ -205,8 +205,9 @@ class EdgeMatingGraph():
         layouts = {
             "spring": nx.spring_layout,
             "random": nx.random_layout,
-            "circular": nx.circular_layout,
+            # "circular": nx.circular_layout,
             "kamada_kawai": nx.kamada_kawai_layout,
+            "multipartite": nx.multipartite_layout
             # Add more layout options as needed
         }
 
@@ -234,43 +235,4 @@ class EdgeMatingGraph():
         ax.set_title(title)
 
 
-def plot_graph(graph, layout="spring", title="Graph", ax=None):
-    """
-    Plot a graph using NetworkX.
 
-    Parameters:
-        graph (nx.Graph or nx.DiGraph): The graph to be plotted.
-        layout (str, optional): Layout algorithm for graph visualization.
-                                Options: "spring" (default), "random", "circular", "kamada_kawai", etc.
-        title (str, optional): Title for the plot.
-        ax (matplotlib.axes.Axes, optional): The existing Matplotlib axis where the graph will be plotted.
-                                             If None, a new figure and axis will be created.
-
-    Returns:
-        None (displays the plot)
-    """
-    # Choose the layout algorithm for graph visualization
-    layouts = {
-        "spring": nx.spring_layout,
-        "random": nx.random_layout,
-        "circular": nx.circular_layout,
-        "kamada_kawai": nx.kamada_kawai_layout,
-        # Add more layout options as needed
-    }
-
-    if layout not in layouts:
-        raise ValueError(f"Invalid layout option. Choose one of: {', '.join(layouts.keys())}")
-
-    if ax is None:
-        # If no existing axis is provided, create a new figure and axis
-        fig, ax = plt.subplots()
-
-    # Create the layout for the nodes
-    pos = layouts[layout](graph)
-
-    # Draw the nodes and edges of the graph on the provided axis
-    nx.draw(graph, pos, with_labels=True, node_size=500, node_color="skyblue",
-             font_size=10, ax=ax)
-
-    # Set the title for the plot
-    ax.set_title(title)

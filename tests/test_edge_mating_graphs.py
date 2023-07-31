@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from src.piece import Piece
-from src.edge_mating_graph import EdgeMatingGraph,plot_graph
+from src.edge_mating_graph import EdgeMatingGraph
 # from src.puzzle import Puzzle
 
 import networkx as nx
@@ -16,8 +16,26 @@ class TestNXPloting(unittest.TestCase):
         # Create a new figure and axis
         fig, ax = plt.subplots()
 
-        # Plot the graph using the function
-        plot_graph(G, layout="spring", title="Sample Graph", ax=ax)
+        layout="spring"
+        title="Sample Graph"
+        layouts = {
+        "spring": nx.spring_layout,
+        "random": nx.random_layout,
+        "circular": nx.circular_layout,
+        "kamada_kawai": nx.kamada_kawai_layout,
+        # Add more layout options as needed
+         }
+
+
+        # Create the layout for the nodes
+        pos = layouts[layout](G)
+
+        # Draw the nodes and edges of the graph on the provided axis
+        nx.draw(G, pos, with_labels=True, node_size=500, node_color="skyblue",
+                font_size=10, ax=ax)
+
+        # Set the title for the plot
+        ax.set_title(title)
 
         # Display the plot
         plt.show()
