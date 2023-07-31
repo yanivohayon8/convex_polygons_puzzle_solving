@@ -59,7 +59,7 @@ class TestFirstGraph(unittest.TestCase):
         fig, ax = plt.subplots()
         mating_graph.draw(ax=ax)
         plt.show()
-        plt.waitforbuttonpress()
+        # plt.waitforbuttonpress()
 
 
 

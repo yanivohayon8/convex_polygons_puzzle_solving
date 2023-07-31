@@ -175,14 +175,29 @@ class EdgeMatingGraph():
                 fp.write("%s\n" % item)
 
 
+    def _get_node_display_name(self,name:str):
+        splitted = name.split("_")
+        # E.g P_6_RELS_E_1
+        if "RELS" in name:
+            return f"P_{splitted[1]}_e_{splitted[-1]}"
+        elif "ENV" in name:
+            #E.g P_6_ENV_2_ADJ_3
+            if "ADJ" in name:
+                return f"P_{splitted[1]}_e_{splitted[-1]}"
+            else:
+                #E.g P_6_ENV_2
+                return f"P_{splitted[1]}_e_{splitted[-1]}"
+        else:
+            return "gray"
+
     def _get_node_color(self,name):
         if "RELS" in name:
-            return "blue"
+            return "gold"
         elif "ENV" in name:
             if "ADJ" in name:
-                return "red"
+                return "skyblue"
             else:
-                return "purple"
+                return "skyblue"
         else:
             return "gray"
         
@@ -206,10 +221,13 @@ class EdgeMatingGraph():
         pos = layouts[layout](self.edges_mating_graph)
 
         nodes_color = [self._get_node_color(node_name) for node_name in self.edges_mating_graph.nodes()]
+
         nodes_labels = {}
+        for node_name in self.edges_mating_graph.nodes():
+            nodes_labels[node_name] = self._get_node_display_name(node_name)
 
         # Draw the nodes and edges of the graph on the provided axis
-        nx.draw(self.edges_mating_graph, pos, with_labels=True, node_size=500, node_color=nodes_color,
+        nx.draw(self.edges_mating_graph, pos, labels=nodes_labels, node_size=500, node_color=nodes_color,
                 font_size=10, ax=ax)
 
         # Set the title for the plot
