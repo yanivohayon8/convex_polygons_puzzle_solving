@@ -43,6 +43,8 @@ class Cycle():
 
 
 
+
+
 class EdgeMatingGraph():
     
     def __init__(self,pieces,match_edges=None,match_pieces_score=None) -> None:
@@ -173,7 +175,45 @@ class EdgeMatingGraph():
                 fp.write("%s\n" % item)
 
 
+    def _get_node_color(self,name):
+        if "RELS" in name:
+            return "blue"
+        elif "ENV" in name:
+            if "ADJ" in name:
+                return "red"
+            else:
+                return "purple"
+        else:
+            return "gray"
+        
+    def draw(self,layout="spring", title="Graph", ax=None):
+        layouts = {
+            "spring": nx.spring_layout,
+            "random": nx.random_layout,
+            "circular": nx.circular_layout,
+            "kamada_kawai": nx.kamada_kawai_layout,
+            # Add more layout options as needed
+        }
 
+        if layout not in layouts:
+            raise ValueError(f"Invalid layout option. Choose one of: {', '.join(layouts.keys())}")
+
+        if ax is None:
+            # If no existing axis is provided, create a new figure and axis
+            fig, ax = plt.subplots()
+
+        # Create the layout for the nodes
+        pos = layouts[layout](self.edges_mating_graph)
+
+        nodes_color = [self._get_node_color(node_name) for node_name in self.edges_mating_graph.nodes()]
+        nodes_labels = {}
+
+        # Draw the nodes and edges of the graph on the provided axis
+        nx.draw(self.edges_mating_graph, pos, with_labels=True, node_size=500, node_color=nodes_color,
+                font_size=10, ax=ax)
+
+        # Set the title for the plot
+        ax.set_title(title)
 
 
 def plot_graph(graph, layout="spring", title="Graph", ax=None):
