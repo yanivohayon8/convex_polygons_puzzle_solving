@@ -1,6 +1,7 @@
 import networkx as nx
 from src.data_structures import Mating
 import matplotlib.pyplot as plt
+import math
 
 
 class Cycle():
@@ -210,8 +211,9 @@ class EdgeMatingGraph():
             return "red" 
         else:
             return "gray"
-        
-    def draw(self,layout="kamada_kawai", title="Graph", ax=None):
+    
+
+    def draw_all(self,layout="kamada_kawai", title="Complete_Graph", ax=None):
         layouts = {
             "spring": nx.spring_layout,
             "spectral": nx.spectral_layout,
@@ -235,12 +237,24 @@ class EdgeMatingGraph():
             fig, ax = plt.subplots()
 
         # Create the layout for the nodes
-        # pos = layouts[layout](self.edges_mating_graph)
-        
+        pos = layouts[layout](self.edges_mating_graph)
+
+        nodes_color = [self._get_node_color(node_name) for node_name in self.edges_mating_graph.nodes()]
+        nodes_labels = {}
+
+        for node_name in self.edges_mating_graph.nodes():
+            nodes_labels[node_name] = self._get_node_display_name(node_name)
+
+        # Draw the nodes and edges of the graph on the provided axis
+        nx.draw(self.edges_mating_graph, pos, labels=nodes_labels, node_size=500, node_color=nodes_color,
+                font_size=10, ax=ax)
+
+        # Set the title for the plot
+        ax.set_title(title)
 
 
+    def _important_subgraph(self):
         subgraph = nx.DiGraph()
-        inter_nodes = []
 
         for node in self.edges_mating_graph.nodes:
 
@@ -256,22 +270,49 @@ class EdgeMatingGraph():
                         dst_inter_node = edge[1]
                         if len(list(self.edges_mating_graph.out_edges(dst_inter_node))) > 0:
                             subgraph.add_edge(edge[0],edge[1])
-                    
 
+        return subgraph                    
+
+    def draw_compressed_piece_clustered(self,title="Compressed_and_Clustered", ax=None):
+
+        if ax is None:
+            # If no existing axis is provided, create a new figure and axis
+            fig, ax = plt.subplots()
+
+        # Create the layout for the nodes
+        # pos = layouts[layout](self.edges_mating_graph)
+        
+
+        subgraph = self._important_subgraph()
 
     
         # Get the nodes containing "ENV" and "INTER"
-        nodes_env = [node for node in subgraph.nodes() if "ENV" in node]
-        nodes_inter = [node for node in subgraph.nodes() if "INTER" in node]
+        # Create a dictionary to store the clusters (pieces) of nodes
+        clusters = {}
 
-        # Create the layout for "ENV" nodes using Kamada-Kawai layout
-        pos_env = nx.kamada_kawai_layout(subgraph.subgraph(nodes_env), scale=5)
+        for node in subgraph.nodes():
+            if node.startswith("P_"):
+                piece_number = node.split("_")[1]
+                if piece_number not in clusters:
+                    clusters[piece_number] = []
+                clusters[piece_number].append(node)
 
-        # Create the layout for "INTER" nodes using Spring layout
-        pos_inter = nx.spring_layout(subgraph.subgraph(nodes_inter))
+        # Calculate the number of clusters and assign them to different positions
+        num_clusters = len(clusters)
+        positions = nx.spring_layout(subgraph, k=10, seed=42) #k=0.1
 
-        # Merge the two layouts
-        pos = {**pos_env, **pos_inter}
+        cluster_positions = {}
+        for idx, cluster in enumerate(clusters.values()):
+            angle = 2 * idx * 3.14 / num_clusters
+            for node in cluster:
+                x, y = positions[node]
+                x_new = x * 0.1 * num_clusters + 0.9 * num_clusters * math.cos(angle)
+                y_new = y * 0.1 * num_clusters + 0.9 * num_clusters * math.sin(angle)
+                cluster_positions[node] = (x_new, y_new)
+
+        pos = cluster_positions
+
+        # pos = nx.planar_layout(subgraph)
 
         nodes_color = [self._get_node_color(node_name) for node_name in subgraph.nodes()]
         nodes_labels = {}
@@ -287,4 +328,27 @@ class EdgeMatingGraph():
         ax.set_title(title)
 
 
+    def draw_compressed_planar(self, title="Compressed_and_Planar", ax=None):
+
+        if ax is None:
+            # If no existing axis is provided, create a new figure and axis
+            fig, ax = plt.subplots()
+
+
+        subgraph = self._important_subgraph()
+
+        pos = nx.planar_layout(subgraph)
+
+        nodes_color = [self._get_node_color(node_name) for node_name in subgraph.nodes()]
+        nodes_labels = {}
+
+        for node_name in subgraph.nodes():
+            nodes_labels[node_name] = self._get_node_display_name(node_name)
+
+        # Draw the nodes and edges of the graph on the provided axis
+        nx.draw(subgraph, pos, labels=nodes_labels, node_size=500, node_color=nodes_color,
+                font_size=10, ax=ax)
+
+        # Set the title for the plot
+        ax.set_title(title)
 

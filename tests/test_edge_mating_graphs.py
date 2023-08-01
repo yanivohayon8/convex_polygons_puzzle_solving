@@ -82,8 +82,10 @@ class TestFirstGraph(unittest.TestCase):
         mating_graph._connect_relationship_nodes()
         assert len(list(mating_graph.edges_mating_graph.nodes)) == 13*2
         
-        fig, ax = plt.subplots()
-        mating_graph.draw(ax=ax)
+        #fig, ax = plt.subplots()
+        mating_graph.draw_all()
+        mating_graph.draw_compressed_piece_clustered()
+        mating_graph.draw_compressed_planar()
         plt.show()
         # plt.waitforbuttonpress()
 
