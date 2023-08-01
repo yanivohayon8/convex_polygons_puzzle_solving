@@ -214,62 +214,6 @@ class EdgeMatingGraph():
             return "gray"
     
 
-    def draw_all(self,layout="kamada_kawai", title="Complete_Graph", ax=None):
-        layouts = {
-            "spring": nx.spring_layout,
-            "spectral": nx.spectral_layout,
-            "random": nx.random_layout,
-            "circular": nx.circular_layout,
-            "shell":nx.shell_layout,
-            "rescale":nx.rescale_layout,
-            "spiral":nx.spiral_layout,
-            "kamada_kawai": nx.kamada_kawai_layout
-            # "multipartite":nx.multipartite_layout
-            # "planar":nx.planar_layout
-            #"multipartite": nx.multipartite_layout
-            # Add more layout options as needed
-        }
-
-        if layout not in layouts:
-            raise ValueError(f"Invalid layout option. Choose one of: {', '.join(layouts.keys())}")
-
-        if ax is None:
-            # If no existing axis is provided, create a new figure and axis
-            fig, ax = plt.subplots()
-
-        # Create the layout for the nodes
-        pos = layouts[layout](self.edges_mating_graph)
-
-        nodes_color = [self._get_node_color(node_name) for node_name in self.edges_mating_graph.nodes()]
-        nodes_labels = {}
-
-        for node_name in self.edges_mating_graph.nodes():
-            nodes_labels[node_name] = self._get_node_display_name(node_name)
-
-        # Get edge weights from the graph
-        edge_weights = [self.edges_mating_graph[u][v]['compatibility'] for u, v in self.edges_mating_graph.edges()]
-
-        # Draw the nodes and edges of the graph on the provided axis
-        nx.draw_networkx_nodes(self.edges_mating_graph, pos, node_size=500, node_color=nodes_color, ax=ax)
-        nx.draw_networkx_labels(self.edges_mating_graph, pos, labels=nodes_labels, font_size=10, ax=ax)
-
-        cmap = plt.cm.get_cmap('plasma')
-        # Draw edges separately to get a mappable for colorbar
-        edges = nx.draw_networkx_edges(self.edges_mating_graph, pos, edge_color=edge_weights, edge_cmap=cmap,
-                                    width=2.0, ax=ax, edge_vmin=min(edge_weights), edge_vmax=max(edge_weights))
-
-        
-        pc = mpc.PatchCollection(edges, cmap=cmap)
-        pc.set_array(edge_weights)
-
-        # Add a color bar to show the mapping of edge weights to colors
-        cb = plt.colorbar(pc, ax=ax, label='Comptatibility')
-        cb.set_ticks([min(edge_weights), max(edge_weights)]) 
-
-        # Set the title for the plot
-        ax.set_title(title)
-
-
     def _important_subgraph(self):
         subgraph = nx.DiGraph()
 
@@ -364,8 +308,8 @@ class EdgeMatingGraph():
         # Set the title for the plot
         ax.set_title(title)
 
-
-    def draw_compressed(self,layout="planar", title="Compressed_and_Planar", ax=None):
+    
+    def _draw_general_layout(self,graph,layout="spectral",title="Graph",ax=None):
         layouts = {
             "spring": nx.spring_layout,
             "spectral": nx.spectral_layout,
@@ -375,37 +319,38 @@ class EdgeMatingGraph():
             "rescale":nx.rescale_layout,
             "spiral":nx.spiral_layout,
             "kamada_kawai": nx.kamada_kawai_layout,
-            # "multipartite":nx.multipartite_layout
             "planar":nx.planar_layout
+            # "multipartite":nx.multipartite_layout
             #"multipartite": nx.multipartite_layout
             # Add more layout options as needed
         }
+
+        if layout not in layouts:
+            raise ValueError(f"Invalid layout option. Choose one of: {', '.join(layouts.keys())}")
 
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
             fig, ax = plt.subplots()
 
+        # Create the layout for the nodes
+        pos = layouts[layout](graph)
 
-        subgraph = self._important_subgraph()
-
-        pos = layouts[layout](subgraph)
-
-        nodes_color = [self._get_node_color(node_name) for node_name in subgraph.nodes()]
+        nodes_color = [self._get_node_color(node_name) for node_name in graph.nodes()]
         nodes_labels = {}
 
-        for node_name in subgraph.nodes():
+        for node_name in graph.nodes():
             nodes_labels[node_name] = self._get_node_display_name(node_name)
 
         # Get edge weights from the graph
-        edge_weights = [subgraph[u][v]['compatibility'] for u, v in subgraph.edges()]
+        edge_weights = [graph[u][v]['compatibility'] for u, v in graph.edges()]
 
         # Draw the nodes and edges of the graph on the provided axis
-        nx.draw_networkx_nodes(subgraph, pos, node_size=500, node_color=nodes_color, ax=ax)
-        nx.draw_networkx_labels(subgraph, pos, labels=nodes_labels, font_size=10, ax=ax)
+        nx.draw_networkx_nodes(graph, pos, node_size=500, node_color=nodes_color, ax=ax)
+        nx.draw_networkx_labels(graph, pos, labels=nodes_labels, font_size=10, ax=ax)
 
         cmap = plt.cm.get_cmap('plasma')
         # Draw edges separately to get a mappable for colorbar
-        edges = nx.draw_networkx_edges(subgraph, pos, edge_color=edge_weights, edge_cmap=cmap,
+        edges = nx.draw_networkx_edges(graph, pos, edge_color=edge_weights, edge_cmap=cmap,
                                     width=2.0, ax=ax, edge_vmin=min(edge_weights), edge_vmax=max(edge_weights))
 
         
@@ -418,4 +363,13 @@ class EdgeMatingGraph():
 
         # Set the title for the plot
         ax.set_title(title)
+
+
+    def draw_all(self,layout="spectral", title="Complete_Graph", ax=None):
+        self._draw_general_layout(self.edges_mating_graph,layout=layout,title=title,ax=ax)
+        
+    def draw_compressed(self,layout="spring", title="Compressed_and_Planar", ax=None):
+        subgraph = self._important_subgraph()
+        self._draw_general_layout(subgraph,layout=layout,title=title,ax=ax)
+
 

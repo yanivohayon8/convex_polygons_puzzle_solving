@@ -84,8 +84,8 @@ class TestFirstGraph(unittest.TestCase):
         
         #fig, ax = plt.subplots()
         mating_graph.draw_all()
-        mating_graph.draw_compressed_piece_clustered()
-        mating_graph.draw_compressed_planar()
+        mating_graph.draw_compressed(layout="planar")
+        # mating_graph.draw_compressed_piece_clustered()
         plt.show()
         # plt.waitforbuttonpress()
 
