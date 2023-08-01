@@ -5,7 +5,7 @@ from src.evaluator import AreaOverlappingEvaluator
 
 class TestIntegration(unittest.TestCase):
     
-    def _run(self,puzzle_image,puzzle_num,puzzle_noise_level, is_load_cycles=True):
+    def _run(self,puzzle_image,puzzle_num,puzzle_noise_level, is_load_cycles=False):
         puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         solver = FirstSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
@@ -20,7 +20,12 @@ class TestIntegration(unittest.TestCase):
             except OSError:
                 solver.compute_cycles(True)
         else:
-            solver.compute_cycles(True)
+            solver.build_mating_graph()
+            solver.mating_graph.draw_compressed_piece_clustered()
+            solver.mating_graph.draw_all(layout="spectral")
+            solver.mating_graph.draw_compressed(layout="spectral")
+            solver.compute_cycles(is_save_cycles=False)
+            
         
         solver.build_zero_loops()
         solutions = solver.global_optimize()

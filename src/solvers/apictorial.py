@@ -70,11 +70,13 @@ class FirstSolver():
         self.mating_graph.load_raw_cycles(self.puzzle.puzzle_directory+"/cycles.txt")
         self.cycles = self.mating_graph.find_cycles()
     
-    def compute_cycles(self,is_save_cycles=True):
+    def build_mating_graph(self):
         self.mating_graph = EdgeMatingGraph(self.bag_of_pieces,
-                                            self.edge_length_pairwiser.match_edges,
-                                            self.edge_length_pairwiser.match_pieces_score)
+                                    self.edge_length_pairwiser.match_edges,
+                                    self.edge_length_pairwiser.match_pieces_score)
         self.mating_graph.build_graph()
+
+    def compute_cycles(self,is_save_cycles=True):
         self.mating_graph.compute_raw_cycles()
 
         if is_save_cycles:

@@ -365,7 +365,21 @@ class EdgeMatingGraph():
         ax.set_title(title)
 
 
-    def draw_compressed_planar(self, title="Compressed_and_Planar", ax=None):
+    def draw_compressed(self,layout="planar", title="Compressed_and_Planar", ax=None):
+        layouts = {
+            "spring": nx.spring_layout,
+            "spectral": nx.spectral_layout,
+            "random": nx.random_layout,
+            "circular": nx.circular_layout,
+            "shell":nx.shell_layout,
+            "rescale":nx.rescale_layout,
+            "spiral":nx.spiral_layout,
+            "kamada_kawai": nx.kamada_kawai_layout,
+            # "multipartite":nx.multipartite_layout
+            "planar":nx.planar_layout
+            #"multipartite": nx.multipartite_layout
+            # Add more layout options as needed
+        }
 
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
@@ -374,7 +388,7 @@ class EdgeMatingGraph():
 
         subgraph = self._important_subgraph()
 
-        pos = nx.planar_layout(subgraph)
+        pos = layouts[layout](subgraph)
 
         nodes_color = [self._get_node_color(node_name) for node_name in subgraph.nodes()]
         nodes_labels = {}
