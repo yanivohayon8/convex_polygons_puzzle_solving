@@ -77,7 +77,7 @@ class FirstSolver():
         self.mating_graph.build_graph()
 
     def compute_cycles(self,is_save_cycles=True):
-        self.mating_graph.compute_raw_cycles()
+        self.mating_graph.compute_raw_cycles(max_length_cycle=2*len(self.bag_of_pieces))
 
         if is_save_cycles:
             self.mating_graph.save_raw_cycles(self.puzzle.puzzle_directory+"/cycles.txt")
