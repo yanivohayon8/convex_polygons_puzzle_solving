@@ -1,6 +1,7 @@
 import networkx as nx
 from src.data_structures import Mating
 import matplotlib.pyplot as plt
+import matplotlib.collections as mpc
 import math
 
 
@@ -245,9 +246,26 @@ class EdgeMatingGraph():
         for node_name in self.edges_mating_graph.nodes():
             nodes_labels[node_name] = self._get_node_display_name(node_name)
 
+        # Get edge weights from the graph
+        edge_weights = [self.edges_mating_graph[u][v]['compatibility'] for u, v in self.edges_mating_graph.edges()]
+
         # Draw the nodes and edges of the graph on the provided axis
-        nx.draw(self.edges_mating_graph, pos, labels=nodes_labels, node_size=500, node_color=nodes_color,
-                font_size=10, ax=ax)
+        nx.draw_networkx_nodes(self.edges_mating_graph, pos, node_size=500, node_color=nodes_color, ax=ax)
+        nx.draw_networkx_labels(self.edges_mating_graph, pos, labels=nodes_labels, font_size=10, ax=ax)
+
+        cmap = plt.cm.get_cmap('plasma')
+        # Draw edges separately to get a mappable for colorbar
+        edges = nx.draw_networkx_edges(self.edges_mating_graph, pos, edge_color=edge_weights, edge_cmap=cmap,
+                                    width=2.0, ax=ax, edge_vmin=min(edge_weights), edge_vmax=max(edge_weights))
+
+        
+        pc = mpc.PatchCollection(edges, cmap=cmap)
+        #edge_colors = range(int(min(edge_weights)),int(math.ceil(max(edge_weights))))
+        pc.set_array(edge_weights)
+
+        # Add a color bar to show the mapping of edge weights to colors
+        cb = plt.colorbar(pc, ax=ax, label='Comptatibility')
+        cb.set_ticks([min(edge_weights), max(edge_weights)]) 
 
         # Set the title for the plot
         ax.set_title(title)
