@@ -260,7 +260,6 @@ class EdgeMatingGraph():
 
         
         pc = mpc.PatchCollection(edges, cmap=cmap)
-        #edge_colors = range(int(min(edge_weights)),int(math.ceil(max(edge_weights))))
         pc.set_array(edge_weights)
 
         # Add a color bar to show the mapping of edge weights to colors
@@ -280,14 +279,18 @@ class EdgeMatingGraph():
                 in_edges = list(self.edges_mating_graph.in_edges(node))
                 if len(in_edges) > 0:
                     subgraph.add_node(node)
-                    subgraph.add_edges_from(in_edges)
+
+                    for in_edg in in_edges:
+                        comp = self.edges_mating_graph.get_edge_data(in_edg[0],in_edg[1])["compatibility"]
+                        subgraph.add_edge(in_edg[0],in_edg[1],compatibility=comp)
                 
                     out_edges = list(self.edges_mating_graph.out_edges(node))
 
                     for edge in out_edges:
                         dst_inter_node = edge[1]
                         if len(list(self.edges_mating_graph.out_edges(dst_inter_node))) > 0:
-                            subgraph.add_edge(edge[0],edge[1])
+                            comp = self.edges_mating_graph.get_edge_data(edge[0],edge[1])["compatibility"]
+                            subgraph.add_edge(edge[0],edge[1],compatibility=comp)
 
         return subgraph                    
 
@@ -338,9 +341,25 @@ class EdgeMatingGraph():
         for node_name in subgraph.nodes():
             nodes_labels[node_name] = self._get_node_display_name(node_name)
 
+        # Get edge weights from the graph
+        edge_weights = [subgraph[u][v]['compatibility'] for u, v in subgraph.edges()]
+
         # Draw the nodes and edges of the graph on the provided axis
-        nx.draw(subgraph, pos, labels=nodes_labels, node_size=500, node_color=nodes_color,
-                font_size=10, ax=ax)
+        nx.draw_networkx_nodes(subgraph, pos, node_size=500, node_color=nodes_color, ax=ax)
+        nx.draw_networkx_labels(subgraph, pos, labels=nodes_labels, font_size=10, ax=ax)
+
+        cmap = plt.cm.get_cmap('plasma')
+        # Draw edges separately to get a mappable for colorbar
+        edges = nx.draw_networkx_edges(subgraph, pos, edge_color=edge_weights, edge_cmap=cmap,
+                                    width=2.0, ax=ax, edge_vmin=min(edge_weights), edge_vmax=max(edge_weights))
+
+        
+        pc = mpc.PatchCollection(edges, cmap=cmap)
+        pc.set_array(edge_weights)
+
+        # Add a color bar to show the mapping of edge weights to colors
+        cb = plt.colorbar(pc, ax=ax, label='Comptatibility')
+        cb.set_ticks([min(edge_weights), max(edge_weights)]) 
 
         # Set the title for the plot
         ax.set_title(title)
@@ -363,9 +382,25 @@ class EdgeMatingGraph():
         for node_name in subgraph.nodes():
             nodes_labels[node_name] = self._get_node_display_name(node_name)
 
+        # Get edge weights from the graph
+        edge_weights = [subgraph[u][v]['compatibility'] for u, v in subgraph.edges()]
+
         # Draw the nodes and edges of the graph on the provided axis
-        nx.draw(subgraph, pos, labels=nodes_labels, node_size=500, node_color=nodes_color,
-                font_size=10, ax=ax)
+        nx.draw_networkx_nodes(subgraph, pos, node_size=500, node_color=nodes_color, ax=ax)
+        nx.draw_networkx_labels(subgraph, pos, labels=nodes_labels, font_size=10, ax=ax)
+
+        cmap = plt.cm.get_cmap('plasma')
+        # Draw edges separately to get a mappable for colorbar
+        edges = nx.draw_networkx_edges(subgraph, pos, edge_color=edge_weights, edge_cmap=cmap,
+                                    width=2.0, ax=ax, edge_vmin=min(edge_weights), edge_vmax=max(edge_weights))
+
+        
+        pc = mpc.PatchCollection(edges, cmap=cmap)
+        pc.set_array(edge_weights)
+
+        # Add a color bar to show the mapping of edge weights to colors
+        cb = plt.colorbar(pc, ax=ax, label='Comptatibility')
+        cb.set_ticks([min(edge_weights), max(edge_weights)]) 
 
         # Set the title for the plot
         ax.set_title(title)
