@@ -3,13 +3,15 @@ from src.feature_extraction import geometric as geo_extractor
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.mating_graphs.matching_graph import MatchingGraphAndSpanTree
-from src.mating import Mating
+from src.mating import Mating,convert_mating_to_vertex_mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.assembly import Assembly
+from functools import reduce
+
 
 class FirstSolver():
     def __init__(self,puzzle:Puzzle,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
@@ -171,12 +173,15 @@ class GraphMatchingSolver():
         self.mating_graph = None
         self.http = HTTPClient(self.puzzle_image,self.puzzle_num,self.puzzle_noise_level)
         self.physical_assembler = PhysicalAssembler(self.http)
+        self.id2piece = {}
         #self.piece2potential_matings = {}
-        #self.id2piece = {}
     
     def load_bag_of_pieces(self):
         self.puzzle.load()
         self.bag_of_pieces = self.puzzle.get_bag_of_pieces()
+
+        for piece in self.bag_of_pieces:
+            self.id2piece[piece.id] = piece
 
     def extract_features(self):
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(self.bag_of_pieces)
@@ -195,6 +200,17 @@ class GraphMatchingSolver():
 
     def global_optimize(self):
         
-        matching = self.mating_graph.find_matching()
-        matings
+        matings = self.mating_graph.find_matching()
+
+        matings_csv = ""
+        for mating in matings:
+            piece_1 = self.id2piece[mating.piece_1]
+            piece_2 = self.id2piece[mating.piece_2]
+            matings_csv+= convert_mating_to_vertex_mating(mating,piece_1,piece_2)
+
+        
+        print(matings_csv)
+
+        
+        
 

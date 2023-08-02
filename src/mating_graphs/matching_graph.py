@@ -174,6 +174,15 @@ class MatchingGraphAndSpanTree():
         self.adjacency_graph = self.adjacency_base_graph.copy()
         self.adjacency_graph.add_edges_from(self.matching)
 
-        return self.matching_graph
+        matings = []
+
+        for match in self.matching:
+            piece_1 = self.piece_name(match[0])
+            edge_1 = int(self.edge_name(match[0]))
+            piece_2 = self.piece_name(match[1])
+            edge_2 = int(self.edge_name(match[1]))
+            matings.append(Mating(piece_1=piece_1,edge_1=edge_1,piece_2=piece_2,edge_2=edge_2))
+
+        return matings
 
     

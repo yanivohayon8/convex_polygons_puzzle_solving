@@ -100,7 +100,7 @@ class TestFirstSolver(unittest.TestCase):
 
 class TestMatchingGraphSolver(unittest.TestCase):
 
-    def _run_solver(self,puzzle_image,puzzle_num,puzzle_noise_level,is_debug=True):
+    def _run_solver(self,puzzle_image,puzzle_num,puzzle_noise_level,is_debug=False):
         puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         solver = GraphMatchingSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
@@ -114,6 +114,8 @@ class TestMatchingGraphSolver(unittest.TestCase):
             solver.mating_graph.draw_adjacency_graph()
             solver.mating_graph.draw()
             plt.show()
+        
+        solver.global_optimize()
 
 
     
