@@ -1,5 +1,5 @@
 import networkx as nx
-from src.data_structures import Mating
+from src.mating import Mating
 import matplotlib.pyplot as plt
 import matplotlib.collections as mpc
 import math

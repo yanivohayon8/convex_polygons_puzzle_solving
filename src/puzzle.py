@@ -1,7 +1,7 @@
 import pandas as pd
 from src.piece import Piece
 from shapely.geometry.polygon import orient as orient_as_ccw
-from src.data_structures import Mating
+from src.mating import Mating
 import glob
 import json
 

@@ -3,7 +3,7 @@ from src.feature_extraction import geometric as geo_extractor
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.mating_graphs.matching_graph import MatchingGraphAndSpanTree
-from src.data_structures import Mating
+from src.mating import Mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
 from src.my_http_client import HTTPClient
@@ -192,3 +192,9 @@ class GraphMatchingSolver():
                                                 self.edge_length_pairwiser.match_pieces_score)
         
         self.mating_graph.build_graph()
+
+    def global_optimize(self):
+        
+        matching = self.mating_graph.find_matching()
+        matings
+

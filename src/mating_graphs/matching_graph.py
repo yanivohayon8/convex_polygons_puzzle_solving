@@ -1,5 +1,5 @@
 import networkx as nx
-from src.data_structures import Mating
+from src.mating import Mating
 import matplotlib.pyplot as plt
 import matplotlib.collections as mpc
 from  matplotlib.cm import ScalarMappable
@@ -143,9 +143,13 @@ class MatchingGraphAndSpanTree():
     def draw(self,layout="planar",title="Matching Graph",ax=None):
         self._draw_general_layout(self.matching_graph,layout=layout,title=title,ax=ax)
     
-    def _piece_name(self,node_name:str):
+    def piece_name(self,node_name:str):
         # edge_name P_4_E_2
         return node_name.split("_")[1]
+
+    def edge_name(self,node_name:str):
+        # edge_name P_4_E_2
+        return node_name.split("_")[-1]
 
     def draw_adjacency_graph(self,layout="planar",title="Adjacency Graph",ax=None):
         
@@ -156,7 +160,7 @@ class MatchingGraphAndSpanTree():
         # pos = layouts[layout](self.adjacency_graph)
         pos = self._pos_by_layout(self.adjacency_graph,layout)
      
-        edges_color = ["red" if self._piece_name(edge[0]) ==self._piece_name(edge[1]) else "blue"  for edge in self.adjacency_graph.edges]
+        edges_color = ["red" if self.piece_name(edge[0]) ==self.piece_name(edge[1]) else "blue"  for edge in self.adjacency_graph.edges]
         nx.draw_networkx(self.adjacency_graph,pos,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10,ax=ax)
 

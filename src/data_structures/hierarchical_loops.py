@@ -1,5 +1,5 @@
 from functools import reduce
-from src.data_structures import Mating
+from src.mating import Mating
 
 
 class ZeroLoopError(Exception):
