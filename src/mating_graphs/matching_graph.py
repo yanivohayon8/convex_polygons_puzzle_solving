@@ -109,18 +109,41 @@ class MatchingGraphAndSpanTree():
         # edge_name P_4_E_2
         return node_name.split("_")[1]
 
-    def draw_adjacency_graph(self,title="Adjacency Graph",ax=None):
+    def draw_adjacency_graph(self,layout="planar",title="Adjacency Graph",ax=None):
+        layouts = {
+            "spring": nx.spring_layout,
+            "spectral": nx.spectral_layout,
+            "random": nx.random_layout,
+            "circular": nx.circular_layout,
+            "shell":nx.shell_layout,
+            "rescale":nx.rescale_layout,
+            "spiral":nx.spiral_layout,
+            "kamada_kawai": nx.kamada_kawai_layout,
+            "planar":nx.planar_layout
+            # "multipartite":nx.multipartite_layout
+            #"multipartite": nx.multipartite_layout
+            # Add more layout options as needed
+        }
+
+        if layout not in layouts:
+            raise ValueError(f"Invalid layout option. Choose one of: {', '.join(layouts.keys())}")
+        
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
             fig, ax = plt.subplots()
         
-        pos = nx.planar_layout(self.adjacency_graph)
+        pos = layouts[layout](self.adjacency_graph)
      
         edges_color = ["red" if self._piece_name(edge[0]) ==self._piece_name(edge[1]) else "blue"  for edge in self.adjacency_graph.edges]
         nx.draw_networkx(self.adjacency_graph,pos,with_labels=True,node_color="skyblue",
-                         edge_color=edges_color,font_size=10)
+                         edge_color=edges_color,font_size=10,ax=ax)
 
     def find_matching(self):
-        return list(nx.matching.max_weight_matching(self.matching_graph,weight="compatibility"))
+        self.matching =  list(nx.matching.max_weight_matching(self.matching_graph,weight="compatibility"))
+
+        self.adjacency_graph = self.adjacency_base_graph.copy()
+        self.adjacency_graph.add_edges_from(self.matching)
+
+        return self.matching_graph
 
         

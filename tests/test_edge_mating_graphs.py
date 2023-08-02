@@ -3,10 +3,13 @@ import numpy as np
 from src.piece import Piece
 from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.mating_graphs.matching_graph import MatchingGraphAndSpanTree
-# from src.puzzle import Puzzle
+from src.puzzle import Puzzle
+from src.feature_extraction import geometric as geo_extractor 
+from src.pairwise_matchers import geometric as geo_pairwiser
 
 import networkx as nx
 import matplotlib.pyplot as plt
+
 
 
 class TestNXPloting(unittest.TestCase):
@@ -160,6 +163,38 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         plt.show()
 
+    
+    def _plot_matching_for_length_pairwise(self,puzzle_image,puzzle_num,puzzle_noise_level):
+        puzzle = Puzzle(f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
+        edge_length_extractor.run()
+
+        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
+        edge_length_pairwiser.pairwise(puzzle.noise+1e-3)
+        
+        mating_graph = MatchingGraphAndSpanTree(bag_of_pieces,
+                                                edge_length_pairwiser.match_edges,
+                                                edge_length_pairwiser.match_pieces_score)
+        mating_graph._build_matching_graph()
+        mating_graph._bulid_base_adjacency_graph()
+        matching = mating_graph.find_matching()
+
+        # fig, axs = plt.subplots(1,2)
+        mating_graph.draw() #ax=axs[1]
+        mating_graph.draw_adjacency_graph(layout="spectral") #ax=axs[0]
+
+        print(matching)
+        plt.show()
+
+    def test_len_pair_Inv9084_puzzle_1_noise_1(self):
+        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 1
+        puzzle_noise_level = 1
+        self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
+        
 
 if __name__ == "__main__":
     unittest.main()
