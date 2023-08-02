@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from src.piece import Piece
-from src.edge_mating_graph import EdgeMatingGraph
+from src.mating_graphs.edge_mating_graph import EdgeMatingGraph
 # from src.puzzle import Puzzle
 
 import networkx as nx
