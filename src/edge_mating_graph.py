@@ -144,12 +144,11 @@ class EdgeMatingGraph():
             self.raw_cycles = [eval(line.rstrip('\n')) for line in f]
 
     def compute_raw_cycles(self,max_length_cycle=-1):
-
-        # if max_length_cycle != -1:
-        #     self.raw_cycles = list(nx.simple_cycles(self.edges_mating_graph,length_bound=max_length_cycle))
-        # else:
-        #     self.raw_cycles = list(nx.simple_cycles(self.edges_mating_graph))
-        self.raw_cycles = list(nx.simple_cycles(self.edges_mating_graph))
+        if max_length_cycle != -1:
+            self.raw_cycles = list(nx.simple_cycles(self.edges_mating_graph,length_bound=max_length_cycle))
+        else:
+            self.raw_cycles = list(nx.simple_cycles(self.edges_mating_graph))
+        #self.raw_cycles = list(nx.simple_cycles(self.edges_mating_graph))
 
     def find_cycles(self):
 

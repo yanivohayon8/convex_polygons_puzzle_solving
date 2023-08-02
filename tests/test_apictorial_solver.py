@@ -21,9 +21,9 @@ class TestIntegration(unittest.TestCase):
                 solver.compute_cycles(True)
         else:
             solver.build_mating_graph()
-            solver.mating_graph.draw_compressed_piece_clustered()
-            solver.mating_graph.draw_all(layout="spectral")
-            solver.mating_graph.draw_compressed(layout="spectral")
+            # solver.mating_graph.draw_compressed_piece_clustered()
+            # solver.mating_graph.draw_all(layout="spectral")
+            # solver.mating_graph.draw_compressed(layout="spectral")
             solver.compute_cycles(is_save_cycles=False)
             
         
@@ -90,7 +90,12 @@ class TestIntegration(unittest.TestCase):
 
         self._run(image,puzzle_num,puzzle_noise_level)
 
+    def test_p5_puzzle_1_noise_0(self):
+        image = "p5"
+        puzzle_num = 1
+        puzzle_noise_level = 0
 
+        self._run(image,puzzle_num,puzzle_noise_level)
 
         
 
