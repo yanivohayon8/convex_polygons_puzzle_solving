@@ -115,7 +115,15 @@ class TestMatchingGraphSolver(unittest.TestCase):
             solver.mating_graph.draw()
             plt.show()
         
-        solver.global_optimize()
+        solution = solver.global_optimize()
+
+        ground_truth_polygons = puzzle.get_ground_truth_puzzle()
+        evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
+        
+        overlapping_score = evaluator.evaluate(solution.get_polygons())
+        matings_accuracy = puzzle.evaluate_rels(solution.get_matings())
+        print("Solution overlapping score is ",overlapping_score)
+        print("Solution matings correct score is ",matings_accuracy)
 
 
     

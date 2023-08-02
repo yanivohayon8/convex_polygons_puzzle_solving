@@ -12,7 +12,6 @@ from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.assembly import Assembly
 from functools import reduce
 
-
 class FirstSolver():
     def __init__(self,puzzle:Puzzle,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
         self.puzzle = puzzle
@@ -201,15 +200,18 @@ class GraphMatchingSolver():
     def global_optimize(self):
         
         matings = self.mating_graph.find_matching()
+        matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
 
-        matings_csv = ""
-        for mating in matings:
-            piece_1 = self.id2piece[mating.piece_1]
-            piece_2 = self.id2piece[mating.piece_2]
-            matings_csv+= convert_mating_to_vertex_mating(mating,piece_1,piece_2)
+        screenshot_name = "Matching_1"
+        response = self.physical_assembler.run(matings_csv,screenshot_name=screenshot_name)
+        score = self.physical_assembler.score_assembly(response)
+        print("Loop scoring.....",score)
 
+        solution_polygons = self.physical_assembler.get_final_coordinates_as_polygons(response)
+        solution = Assembly(solution_polygons,matings)
         
-        print(matings_csv)
+        return solution
+        
 
         
         
