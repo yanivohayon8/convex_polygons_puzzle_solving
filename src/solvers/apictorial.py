@@ -2,6 +2,7 @@ from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.inter_env_graph import InterEnvGraph
+from src.mating_graphs.matching_graph import MatchingGraphAndSpanTree
 from src.data_structures import Mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
@@ -155,3 +156,39 @@ class FirstSolver():
             final_solutions.append(Assembly(polygons,loop.get_as_mating_list()))
          
         return final_solutions
+
+
+
+
+class GraphMatchingSolver():
+
+    def __init__(self,puzzle:Puzzle,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
+        self.puzzle = puzzle
+        self.puzzle_image = puzzle_image
+        self.puzzle_num = puzzle_num
+        self.puzzle_noise_level = puzzle_noise_level
+        self.bag_of_pieces = None
+        self.mating_graph = None
+        self.http = HTTPClient(self.puzzle_image,self.puzzle_num,self.puzzle_noise_level)
+        self.physical_assembler = PhysicalAssembler(self.http)
+        #self.piece2potential_matings = {}
+        #self.id2piece = {}
+    
+    def load_bag_of_pieces(self):
+        self.puzzle.load()
+        self.bag_of_pieces = self.puzzle.get_bag_of_pieces()
+
+    def extract_features(self):
+        edge_length_extractor = geo_extractor.EdgeLengthExtractor(self.bag_of_pieces)
+        edge_length_extractor.run()
+
+    def pairwise(self):
+        self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
+        self.edge_length_pairwiser.pairwise(self.puzzle.noise+1e-3)
+    
+    def build_mating_graph(self):
+        self.mating_graph = MatchingGraphAndSpanTree(self.bag_of_pieces,
+                                                self.edge_length_pairwiser.match_edges,
+                                                self.edge_length_pairwiser.match_pieces_score)
+        
+        self.mating_graph.build_graph()

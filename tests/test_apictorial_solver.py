@@ -1,9 +1,10 @@
 import unittest
-from src.solvers.apictorial import FirstSolver
+from src.solvers.apictorial import FirstSolver,GraphMatchingSolver
 from src.puzzle import Puzzle
 from src.evaluator import AreaOverlappingEvaluator
+import matplotlib.pyplot as plt
 
-class TestIntegration(unittest.TestCase):
+class TestFirstSolver(unittest.TestCase):
     
     def _run(self,puzzle_image,puzzle_num,puzzle_noise_level, is_load_cycles=False):
         puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
@@ -39,8 +40,6 @@ class TestIntegration(unittest.TestCase):
             print("Matings correct score is ",puzzle.evaluate_rels(solution.get_matings()))
 
         
-
-
     def test_Inv9084_puzzle_1_noise_0(self):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
@@ -98,6 +97,32 @@ class TestIntegration(unittest.TestCase):
         self._run(image,puzzle_num,puzzle_noise_level)
 
         
+
+class TestMatchingGraphSolver(unittest.TestCase):
+
+    def _run_solver(self,puzzle_image,puzzle_num,puzzle_noise_level,is_debug=True):
+        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle = Puzzle(puzzle_directory)
+        solver = GraphMatchingSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
+
+        solver.load_bag_of_pieces()
+        solver.extract_features()
+        solver.pairwise()
+        solver.build_mating_graph()
+
+        if is_debug:
+            solver.mating_graph.draw_adjacency_graph()
+            solver.mating_graph.draw()
+            plt.show()
+
+
+    
+    def test_Inv9084_puzzle_1(self,puzzle_noise_level=0):
+        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 1
+
+        self._run_solver(image,puzzle_num,puzzle_noise_level)
+
 
 
 if __name__ == "__main__":
