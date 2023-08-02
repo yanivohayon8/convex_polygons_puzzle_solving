@@ -6,11 +6,6 @@ import math
 from src.mating_graphs.cycle import Cycle
 
 
-
-
-
-
-
 class InterEnvGraph():
     
     def __init__(self,pieces,match_edges=None,match_pieces_score=None) -> None:

@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from src.piece import Piece
-from src.mating_graphs.edge_mating_graph import InterEnvGraph
+from src.mating_graphs.inter_env_graph import InterEnvGraph
 # from src.puzzle import Puzzle
 
 import networkx as nx

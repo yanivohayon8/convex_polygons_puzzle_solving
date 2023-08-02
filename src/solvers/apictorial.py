@@ -1,7 +1,7 @@
 from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
-from src.mating_graphs.edge_mating_graph import InterEnvGraph
+from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.data_structures import Mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
