@@ -12,7 +12,8 @@ class MatchingGraphAndSpanTree():
         self.match_edges = match_edges
         self.match_pieces_score = match_pieces_score
         self.matching_graph = nx.Graph()
-        self.adjacency_graph = nx.Graph()
+        self.adjacency_base_graph = nx.Graph()
+        self.adjacency_graph = None
 
     def _name_node(self,piece_name,edge_name):
         return f"P_{piece_name}_E_{edge_name}"
@@ -37,8 +38,20 @@ class MatchingGraphAndSpanTree():
                         
                         self.matching_graph.add_edges_from(new_links)
 
+    def _bulid_base_adjacency_graph(self):
+        for piece in self.pieces:
+            num_vertices = piece.get_num_coords()
+            piece_nodes = [self._name_node(piece.id,edge_index) for edge_index in range(num_vertices)]
+            self.adjacency_base_graph.add_nodes_from(piece_nodes)
+            
+            for prev_node,next_node in zip(piece_nodes,piece_nodes[1:]+[piece_nodes[0]]):
+                self.adjacency_base_graph.add_edge(prev_node,next_node,compatibility=0)
+
+        self.adjacency_graph = self.adjacency_base_graph.copy()
+    
     def build_graph(self):
-        pass
+        self._build_matching_graph()
+        self._bulid_base_adjacency_graph()
     
     def get_matching_graph_nodes(self):
         return list(self.matching_graph.nodes)
@@ -81,18 +94,30 @@ class MatchingGraphAndSpanTree():
         edge_weights = [graph[u][v]['compatibility'] for u, v in graph.edges()]
         cmap = plt.cm.get_cmap('plasma')
         
-        # Draw edges separately to get a mappable for colorbar
         edges = nx.draw_networkx_edges(graph, pos, edge_color=edge_weights, edge_cmap=cmap,
                                     width=2.0, ax=ax, edge_vmin=min(edge_weights), edge_vmax=max(edge_weights))
 
-        # # Add a color bar to show the mapping of edge weights to colors
         cb = plt.colorbar(edges, ax=ax, label='Comptatibility')
-        # cb.set_ticks([min(edge_weights), max(edge_weights)]) 
 
         # Set the title for the plot
         ax.set_title(title)
     
-    
-    
-    def draw(self,layout="spectral",title="Matching Graph",ax=None):
+    def draw(self,layout="planar",title="Matching Graph",ax=None):
         self._draw_general_layout(self.matching_graph,layout=layout,title=title,ax=ax)
+    
+    def _piece_name(self,node_name:str):
+        # edge_name P_4_E_2
+        return node_name.split("_")[1]
+
+    def draw_adjacency_graph(self,title="Adjacency Graph",ax=None):
+        if ax is None:
+            # If no existing axis is provided, create a new figure and axis
+            fig, ax = plt.subplots()
+        
+        pos = nx.planar_layout(self.adjacency_graph)
+     
+        edges_color = ["red" if self._piece_name(edge[0]) ==self._piece_name(edge[1]) else "blue"  for edge in self.adjacency_graph.edges]
+        nx.draw_networkx(self.adjacency_graph,pos,with_labels=True,node_color="skyblue",
+                         edge_color=edges_color,font_size=10)
+
+        

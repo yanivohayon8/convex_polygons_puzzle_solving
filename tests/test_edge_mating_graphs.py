@@ -151,6 +151,9 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         matching_nodes = mating_graph.get_matching_graph_nodes()
         assert len(matching_nodes) == 4*2 # because it is 4 triangles matching around vertex
         mating_graph.draw(layout="planar")
+
+        mating_graph._bulid_base_adjacency_graph()
+        mating_graph.draw_adjacency_graph()
         
         plt.show()
 
