@@ -1,7 +1,7 @@
 from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
-from src.mating_graphs.edge_mating_graph import EdgeMatingGraph
+from src.mating_graphs.edge_mating_graph import InterEnvGraph
 from src.data_structures import Mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
@@ -66,12 +66,12 @@ class FirstSolver():
         '''
             For deterministric runs...
         '''
-        self.mating_graph = EdgeMatingGraph(self.bag_of_pieces)
+        self.mating_graph = InterEnvGraph(self.bag_of_pieces)
         self.mating_graph.load_raw_cycles(self.puzzle.puzzle_directory+"/cycles.txt")
         self.cycles = self.mating_graph.find_cycles()
     
     def build_mating_graph(self):
-        self.mating_graph = EdgeMatingGraph(self.bag_of_pieces,
+        self.mating_graph = InterEnvGraph(self.bag_of_pieces,
                                     self.edge_length_pairwiser.match_edges,
                                     self.edge_length_pairwiser.match_pieces_score)
         self.mating_graph.build_graph()

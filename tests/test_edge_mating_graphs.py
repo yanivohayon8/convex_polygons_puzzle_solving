@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from src.piece import Piece
-from src.mating_graphs.edge_mating_graph import EdgeMatingGraph
+from src.mating_graphs.edge_mating_graph import InterEnvGraph
 # from src.puzzle import Puzzle
 
 import networkx as nx
@@ -71,7 +71,7 @@ class TestFirstGraph(unittest.TestCase):
             [list([]), np.array([0.00099589]), np.array([0.00099931]), list([])]
             ],dtype=object)
 
-        mating_graph = EdgeMatingGraph(bag_of_pieces,match_edges,match_pieces_score)
+        mating_graph = InterEnvGraph(bag_of_pieces,match_edges,match_pieces_score)
         # mating_graph.build_graph()
         mating_graph._bulid_relationship_nodes()
         assert len(list(mating_graph.edges_mating_graph.nodes)) == 13
