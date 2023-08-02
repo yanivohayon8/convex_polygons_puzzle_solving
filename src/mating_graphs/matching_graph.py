@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.collections as mpc
 from  matplotlib.cm import ScalarMappable
 import numpy as np
+import math
 
 class MatchingGraphAndSpanTree():
 
@@ -56,7 +57,7 @@ class MatchingGraphAndSpanTree():
     def get_matching_graph_nodes(self):
         return list(self.matching_graph.nodes)
 
-    def _draw_general_layout(self,graph,layout="spectral",title="Graph",ax=None):
+    def _pos_by_layout(self,graph,layout):
         layouts = {
             "spring": nx.spring_layout,
             "spectral": nx.spectral_layout,
@@ -66,7 +67,8 @@ class MatchingGraphAndSpanTree():
             "rescale":nx.rescale_layout,
             "spiral":nx.spiral_layout,
             "kamada_kawai": nx.kamada_kawai_layout,
-            "planar":nx.planar_layout
+            "planar":nx.planar_layout,
+            "piece_clustered":None
             # "multipartite":nx.multipartite_layout
             #"multipartite": nx.multipartite_layout
             # Add more layout options as needed
@@ -74,12 +76,48 @@ class MatchingGraphAndSpanTree():
 
         if layout not in layouts:
             raise ValueError(f"Invalid layout option. Choose one of: {', '.join(layouts.keys())}")
+        
+        if layout == "piece_clustered":
+            pos = self._pos_nodes_by_pieces(graph)
+        else:
+            pos = layouts[layout](graph)
+        
+        return pos
 
+    def _pos_nodes_by_pieces(self,graph):
+        
+        # Get the nodes containing "ENV" and "INTER"
+        # Create a dictionary to store the clusters (pieces) of nodes
+        clusters = {}
+
+        for node in graph.nodes():
+            if node.startswith("P_"):
+                piece_number = node.split("_")[1]
+                if piece_number not in clusters:
+                    clusters[piece_number] = []
+                clusters[piece_number].append(node)
+
+        # Calculate the number of clusters and assign them to different positions
+        num_clusters = len(clusters)
+        positions = nx.spring_layout(graph, k=10, seed=42) #k=0.1
+
+        cluster_positions = {}
+        for idx, cluster in enumerate(clusters.values()):
+            angle = 2 * idx * 3.14 / num_clusters
+            for node in cluster:
+                x, y = positions[node]
+                x_new = x * 0.1 * num_clusters + 0.9 * num_clusters * math.cos(angle)
+                y_new = y * 0.1 * num_clusters + 0.9 * num_clusters * math.sin(angle)
+                cluster_positions[node] = (x_new, y_new)
+
+        return cluster_positions
+
+    def _draw_general_layout(self,graph,layout="spectral",title="Graph",ax=None):
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
             fig, ax = plt.subplots()
 
-        pos = layouts[layout](graph)
+        pos = self._pos_by_layout(graph,layout)
 
         nodes_color = ["skyblue" for node_name in graph.nodes()]
         nodes_labels = {}
@@ -110,33 +148,21 @@ class MatchingGraphAndSpanTree():
         return node_name.split("_")[1]
 
     def draw_adjacency_graph(self,layout="planar",title="Adjacency Graph",ax=None):
-        layouts = {
-            "spring": nx.spring_layout,
-            "spectral": nx.spectral_layout,
-            "random": nx.random_layout,
-            "circular": nx.circular_layout,
-            "shell":nx.shell_layout,
-            "rescale":nx.rescale_layout,
-            "spiral":nx.spiral_layout,
-            "kamada_kawai": nx.kamada_kawai_layout,
-            "planar":nx.planar_layout
-            # "multipartite":nx.multipartite_layout
-            #"multipartite": nx.multipartite_layout
-            # Add more layout options as needed
-        }
-
-        if layout not in layouts:
-            raise ValueError(f"Invalid layout option. Choose one of: {', '.join(layouts.keys())}")
         
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
             fig, ax = plt.subplots()
         
-        pos = layouts[layout](self.adjacency_graph)
+        # pos = layouts[layout](self.adjacency_graph)
+        pos = self._pos_by_layout(self.adjacency_graph,layout)
      
         edges_color = ["red" if self._piece_name(edge[0]) ==self._piece_name(edge[1]) else "blue"  for edge in self.adjacency_graph.edges]
         nx.draw_networkx(self.adjacency_graph,pos,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10,ax=ax)
+
+
+    
+
 
     def find_matching(self):
         self.matching =  list(nx.matching.max_weight_matching(self.matching_graph,weight="compatibility"))
@@ -146,4 +172,4 @@ class MatchingGraphAndSpanTree():
 
         return self.matching_graph
 
-        
+    
