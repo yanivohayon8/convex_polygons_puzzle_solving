@@ -120,4 +120,7 @@ class MatchingGraphAndSpanTree():
         nx.draw_networkx(self.adjacency_graph,pos,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10)
 
+    def find_matching(self):
+        return list(nx.matching.max_weight_matching(self.matching_graph,weight="compatibility"))
+
         

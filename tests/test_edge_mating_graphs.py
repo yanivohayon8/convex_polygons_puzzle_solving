@@ -155,6 +155,9 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         mating_graph._bulid_base_adjacency_graph()
         mating_graph.draw_adjacency_graph()
         
+        matching = mating_graph.find_matching()
+        assert len(matching) == 4
+
         plt.show()
 
 
