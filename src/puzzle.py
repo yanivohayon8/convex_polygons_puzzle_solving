@@ -3,7 +3,7 @@ from src.piece import Piece
 from shapely.geometry.polygon import orient as orient_as_ccw
 from src.data_structures import Mating
 import glob
-
+import json
 
 class Puzzle():
 
@@ -54,17 +54,24 @@ class Puzzle():
     
     def _get_noise_on_puzzle(self):
         try:
-            with open(self.puzzle_directory+"/puzzle_details.txt", "r") as file:
-                for line in file:
-                    if line.startswith("Global noise level (Xi):"):
-                        value = line.split(":")[1].strip()
-                        self.noise = float(value)
-                        return self.noise
-        except FileNotFoundError:
-            print("File not found.")
+            with open(self.puzzle_directory+"/puzzle_details.json", "r") as file:
+                    data = json.load(file)
+                    self.noise = float(data["xi"])
         except Exception as e:
-            print("An error occurred:", str(e))
+            try:
+                with open(self.puzzle_directory+"/puzzle_details.txt", "r") as file:
+                    for line in file:
+                        if line.startswith("Global noise level (Xi):"):
+                            value = line.split(":")[1].strip()
+                            self.noise = float(value)
+                            return self.noise
+            except FileNotFoundError:
+                print("puzzle_details.txt not found.")    
+            except Exception as e:
+                print("An error occurred:", str(e))
 
+        
+        
 
     def get_bag_of_pieces(self,csv_conv="Ofir"):
         pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
