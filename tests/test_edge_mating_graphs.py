@@ -183,17 +183,25 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         matching = mating_graph.find_matching()
 
         # fig, axs = plt.subplots(1,2)
-        mating_graph.draw(layout="planar") #ax=axs[1]
-        mating_graph.draw_adjacency_graph(layout="spectral") #ax=axs[0]
+        try:
+            mating_graph.draw(layout="planar") #ax=axs[1]
+        except nx.exception.NetworkXException:
+            mating_graph.draw(layout="piece_clustered")
+        mating_graph.draw_adjacency_graph(layout="piece_clustered") #ax=axs[0]
 
         print(matching)
-        plt.show()
+        # plt.show()
 
-    def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level =3):
+    def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level = 6 ):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
-        
+    
+    def test_len_pair_p5_puzzle_1(self):
+        image = "p5"
+        puzzle_num = 1
+        puzzle_noise_level = 0
+        self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
 
 if __name__ == "__main__":
     unittest.main()
