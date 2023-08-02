@@ -1,3 +1,5 @@
+
+
 class Mating():
     '''
         A relationship between two mating (match) edges
@@ -34,3 +36,42 @@ class Mating():
             return (exact_match or flip_match)
 
         return False
+    
+def convert_mating_to_vertex_mating(mating:Mating,piece_1,piece_2):
+    '''
+        Select the right vertex pairing to send for the spring simulation.
+        Send it correctly, there are two possible transformations, select the one without overlap
+    '''
+    data = ""
+
+    edge_1_index_before_ccw = piece_1.get_origin_index(mating.edge_1)
+    piece_1_vertex_1, piece_1_vertex_2 = piece_1.get_vertices_indices(edge_1_index_before_ccw)
+
+    edge_2_index_before_ccw = piece_2.get_origin_index(mating.edge_2)
+    piece_2_vertex_1, piece_2_vertex_2 = piece_2.get_vertices_indices(edge_2_index_before_ccw)
+
+    '''The following way of putting springs might be probelmatic'''
+    overlap_area,_,__ = piece_1.align_pieces_on_edge_and_compute_overlap_area(
+        piece_2,
+        [piece_1_vertex_1, piece_1_vertex_2],
+        [piece_2_vertex_1, piece_2_vertex_2])
+    
+    overlap_area_opp,_,__ = piece_1.align_pieces_on_edge_and_compute_overlap_area(
+        piece_2,
+        [piece_1_vertex_1, piece_1_vertex_2],
+        [piece_2_vertex_2, piece_2_vertex_1])
+
+    epsilon = 1
+
+    if (overlap_area > epsilon and overlap_area_opp > epsilon) or \
+        (overlap_area < epsilon and overlap_area_opp < epsilon):
+        raise("Problematic transformation")
+
+    if overlap_area < epsilon:
+        data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_1}\r\n"
+        data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_2}\r\n"
+    else:
+        data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_2}\r\n"
+        data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_1}\r\n"
+
+    return data 
