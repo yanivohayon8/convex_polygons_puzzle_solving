@@ -10,8 +10,8 @@ import re
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--puzzles_dir", default="")
-parser.add_argument("--noise_level", default=0)
-parser.add_argument("--is_interactive",default=False)
+parser.add_argument("--noise_level", default=3)
+parser.add_argument("--is_interactive",default=True)
 args = parser.parse_args()
 
 
