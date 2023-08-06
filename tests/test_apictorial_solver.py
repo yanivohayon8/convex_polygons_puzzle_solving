@@ -101,7 +101,9 @@ class TestFirstSolver(unittest.TestCase):
 class TestMatchingGraphSolver(unittest.TestCase):
 
     def _run_solver(self,puzzle_image,puzzle_num,puzzle_noise_level,is_debug=False):
-        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        # puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle_directory = f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+
         puzzle = Puzzle(puzzle_directory)
         solver = GraphMatchingSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
 
@@ -117,21 +119,57 @@ class TestMatchingGraphSolver(unittest.TestCase):
         
         solution = solver.global_optimize()
 
-        ground_truth_polygons = puzzle.get_ground_truth_puzzle()
-        evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
+        precision = puzzle.evaluate_precision(solution.get_matings())
+        print("\tmatings precision is ",precision)
+        recall = puzzle.evaluate_recall(solution.get_matings())
+        print("\tmatings recall is ",recall)
         
-        overlapping_score = evaluator.evaluate(solution.get_polygons())
-        matings_accuracy = puzzle.evaluate_rels(solution.get_matings())
-        print("Solution overlapping score is ",overlapping_score)
-        print("Solution matings correct score is ",matings_accuracy)
+        # ground_truth_polygons = puzzle.get_ground_truth_puzzle()
+        # evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
+        # overlapping_score = evaluator.evaluate(solution.get_polygons())
+        # print("Solution overlapping score is ",overlapping_score)
 
 
     
-    def test_Inv9084_puzzle_1(self,puzzle_noise_level=0):
+    def test_Inv9084_puzzle_1(self):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
 
-        self._run_solver(image,puzzle_num,puzzle_noise_level)
+        for puzzle_noise_level in range(1,4):
+            print("******************************************")
+            print(f"\tTest on noise level {puzzle_noise_level}")
+            print("******************************************")
+            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    
+    def test_Terentius_puzzle_1(self):
+        image = "SCALED-3_Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01"
+        puzzle_num = 1
+
+        for puzzle_noise_level in range(1):
+            print("******************************************")
+            print(f"\tTest on noise level {puzzle_noise_level}")
+            print("******************************************")
+            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    
+    def test_Terentius_puzzle_2(self):
+        image = "SCALED-3_Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01"
+        puzzle_num = 2
+
+        for puzzle_noise_level in range(1):
+            print("******************************************")
+            print(f"\tTest on noise level {puzzle_noise_level}")
+            print("******************************************")
+            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    
+    def test_pizza_1(self):
+        image = "SCALED-3_pizza"
+        puzzle_num = 1
+
+        for puzzle_noise_level in range(1):
+            print("******************************************")
+            print(f"\tTest on noise level {puzzle_noise_level}")
+            print("******************************************")
+            self._run_solver(image,puzzle_num,puzzle_noise_level)
 
 
 

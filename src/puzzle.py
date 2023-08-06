@@ -169,13 +169,12 @@ class Puzzle():
         
     #     return 1-count_wrong/len(ground_truth_matings)
     
-    def evaluate_rels(self,solver_matings:list):
+    def evaluate_precision(self,solver_matings:list):
         '''
             solver_matings : list of matings (Mating classes instances)
         '''
         ground_truth_matings = self.get_final_rels()
         count_correct=0
-        debug_incorrect = []
 
         for mate in solver_matings:
             new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
@@ -184,8 +183,24 @@ class Puzzle():
 
             if new_mate in ground_truth_matings:
                 count_correct+=1
-            else:
-                debug_incorrect.append(new_mate)
+        
+        
+        return count_correct/len(solver_matings)
+
+    def evaluate_recall(self,solver_matings:list):
+        '''
+            solver_matings : list of matings (Mating classes instances)
+        '''
+        ground_truth_matings = self.get_final_rels()
+        count_correct=0
+
+        for mate in solver_matings:
+            new_mate = Mating(piece_1=mate.piece_1,piece_2=mate.piece_2,
+                              edge_1=self.pieces2original_edges[mate.piece_1][int(mate.edge_1)],
+                              edge_2=self.pieces2original_edges[mate.piece_2][int(mate.edge_2)])
+
+            if new_mate in ground_truth_matings:
+                count_correct+=1
         
         
         return count_correct/len(ground_truth_matings)
