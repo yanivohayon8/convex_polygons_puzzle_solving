@@ -25,12 +25,7 @@ def run_solver(puzzle_image,puzzle_num,puzzle_noise_level,is_interactive):
     puzzle = Puzzle(puzzle_directory)
     solver = GraphMatchingSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
 
-    solver.load_bag_of_pieces()
-    solver.extract_features()
-    solver.pairwise()
-    solver.build_mating_graph()
-
-    solution = solver.global_optimize()
+    solution = solver.run()
 
     ground_truth_polygons = puzzle.get_ground_truth_puzzle()
     evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
@@ -50,8 +45,8 @@ def run_solver(puzzle_image,puzzle_num,puzzle_noise_level,is_interactive):
             ground_truth_image = glob.glob(puzzle_directory+"/ground_truth.*")[0]
             ax[1].imshow(plt.imread(ground_truth_image))
             ax[1].set_title("ground_truth_image")
-            plt.waitforbuttonpress()
             plt.show()
+            plt.waitforbuttonpress()
         
 
 if __name__ == "__main__":

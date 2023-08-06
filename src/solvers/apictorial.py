@@ -213,6 +213,21 @@ class GraphMatchingSolver():
         return solution
         
 
+    def run(self,is_debug=False):
+        self.load_bag_of_pieces()
+        self.extract_features()
+        self.pairwise()
+        self.build_mating_graph()
+
+        if is_debug:
+            self.mating_graph.draw_adjacency_graph()
+            self.mating_graph.draw()
+            # plt.show()
+        
+        solution = self.global_optimize()
+        
+        return solution
+
         
         
 
