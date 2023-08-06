@@ -56,7 +56,8 @@ class Puzzle():
         try:
             with open(self.puzzle_directory+"/puzzle_details.json", "r") as file:
                     data = json.load(file)
-                    self.noise = float(data["xi"])
+                    # self.noise = float(data["xi"])
+                    self.noise = float(data["epsilon"])
         except Exception as e:
             try:
                 with open(self.puzzle_directory+"/puzzle_details.txt", "r") as file:
