@@ -36,7 +36,6 @@ class MatchingGraphDrawer():
 
         return cluster_positions
 
-
     def _pos_by_layout(self,graph,layout):
         layouts = {
             "spring": nx.spring_layout,
@@ -110,6 +109,10 @@ class MatchingGraphDrawer():
 
     def _draw_ground_truth_adjacency(self):
         self._draw_adjacency_graph(self.noiseless_ground_truth_graph.adjacency_graph)
+
+    def _draw_ground_truth_matching(self,layout="planar",title="Matching Graph",ax=None):
+        self._draw_general_layout(self.noiseless_ground_truth_graph.matching_graph,layout=layout,title=title,ax=ax)
+
 
     def draw_adjacency_graph(self,graph:MatchingGraphAndSpanTree):
         pass

@@ -156,13 +156,9 @@ class MatchingGraphAndSpanTree():
     #                      edge_color=edges_color,font_size=10,ax=ax)
         
 
-    def draw(self,layout="planar",title="Matching Graph",ax=None):
-        self._draw_general_layout(self.matching_graph,layout=layout,title=title,ax=ax)
+    # def draw(self,layout="planar",title="Matching Graph",ax=None):
+    #     self._draw_general_layout(self.matching_graph,layout=layout,title=title,ax=ax)
     
-
-
-    
-
 
     def draw_adjacency_with_potential_matings(self,layout="kamada_kawai",title="Adjacency Graph",ax=None):
         

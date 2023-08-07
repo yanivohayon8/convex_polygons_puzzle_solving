@@ -10,9 +10,8 @@ import matplotlib.pyplot as plt
 
 class TestGraphDrawer(unittest.TestCase):
     
-    def test_draw_ground_truth(self):
-        puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
+    def _load_ground_truth_graph(self,puzzle_image,puzzle_num):
+        
         puzzle = Puzzle(f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/0")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -30,8 +29,15 @@ class TestGraphDrawer(unittest.TestCase):
         ground_truth_graph._bulid_base_adjacency_graph()
         ground_truth_graph.find_matching()
 
+        return ground_truth_graph
+
+    def test_draw_ground_truth(self):
+        puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 1
+        ground_truth_graph = self._load_ground_truth_graph(puzzle_image,puzzle_num)
         drawer = MatchingGraphDrawer(ground_truth_graph)
         drawer._draw_ground_truth_adjacency()
+        drawer._draw_ground_truth_matching()
         plt.show()
 
 if __name__ == "__main__":
