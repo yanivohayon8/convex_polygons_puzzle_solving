@@ -192,9 +192,12 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         #     mating_graph.draw_adjacency_graph(layout="planar")
         # except nx.exception.NetworkXException:
         #     mating_graph.draw_adjacency_graph(layout="spectral") # piece_clustered #ax=axs[0]
+        
         mating_graph.draw_adjacency_graph(layout="kamada_kawai")
 
-        print(matching)
+        mating_graph.draw_adjacency_with_potential_matings(layout="kamada_kawai")
+        
+        # print(matching)
         plt.show()
 
     def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):

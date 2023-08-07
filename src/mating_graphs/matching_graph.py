@@ -154,7 +154,7 @@ class MatchingGraphAndSpanTree():
         # edge_name P_4_E_2
         return node_name.split("_")[-1]
 
-    def draw_adjacency_graph(self,layout="planar",title="Adjacency Graph",ax=None):
+    def draw_adjacency_graph(self,layout="kamada_kawai",title="Adjacency Graph",ax=None):
         
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
@@ -168,6 +168,24 @@ class MatchingGraphAndSpanTree():
                          edge_color=edges_color,font_size=10,ax=ax)
 
 
+    def draw_adjacency_with_potential_matings(self,layout="kamada_kawai",title="Adjacency Graph",ax=None):
+        
+        if ax is None:
+            # If no existing axis is provided, create a new figure and axis
+            fig, ax = plt.subplots()
+        
+        # pos = layouts[layout](self.adjacency_graph)
+        
+
+        pos = self._pos_by_layout(self.adjacency_graph,layout)
+     
+        edges_color = ["red" if self.piece_name(edge[0]) ==self.piece_name(edge[1]) else "blue"  for edge in self.adjacency_graph.edges]
+        nx.draw_networkx(self.adjacency_graph,pos,with_labels=True,node_color="skyblue",
+                         edge_color=edges_color,font_size=10,ax=ax)
+        
+        potential_matings = [edge for edge in self.matching_graph.edges if edge not in self.matching]
+        
+        nx.draw_networkx_edges(self.adjacency_graph,pos,potential_matings,edge_color="purple")
     
 
 
