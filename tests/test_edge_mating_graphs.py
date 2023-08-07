@@ -165,7 +165,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
     
     def _plot_matching_for_length_pairwise(self,puzzle_image,puzzle_num,puzzle_noise_level):
-        puzzle = Puzzle(f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
+        puzzle = Puzzle(f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
@@ -184,19 +184,30 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         # fig, axs = plt.subplots(1,2)
         try:
-            mating_graph.draw(layout="planar") #ax=axs[1]
+            mating_graph.draw(layout="spring") #planar ax=axs[1]
         except nx.exception.NetworkXException:
             mating_graph.draw(layout="piece_clustered")
-        mating_graph.draw_adjacency_graph(layout="spectral") #piece_clustered #ax=axs[0]
+
+        # try:
+        #     mating_graph.draw_adjacency_graph(layout="planar")
+        # except nx.exception.NetworkXException:
+        #     mating_graph.draw_adjacency_graph(layout="spectral") # piece_clustered #ax=axs[0]
+        mating_graph.draw_adjacency_graph(layout="kamada_kawai")
 
         print(matching)
         plt.show()
 
-    def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level = 1 ):
+    def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
     
+    def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
+        image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
+        puzzle_num = 1
+        self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
+
+
     def test_len_pair_p5_puzzle_1(self):
         image = "p5"
         puzzle_num = 1
