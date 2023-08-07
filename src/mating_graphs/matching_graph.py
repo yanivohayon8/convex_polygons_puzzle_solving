@@ -176,16 +176,27 @@ class MatchingGraphAndSpanTree():
         
         # pos = layouts[layout](self.adjacency_graph)
         
+        adjacency_with_potential_graph = self.adjacency_graph.copy()
+        potential_matings = [edge for edge in self.matching_graph.edges if edge not in self.matching]
 
-        pos = self._pos_by_layout(self.adjacency_graph,layout)
+        adjacency_with_potential_graph.add_edges_from(potential_matings)
+
+        pos = self._pos_by_layout(adjacency_with_potential_graph,layout)
      
-        edges_color = ["red" if self.piece_name(edge[0]) ==self.piece_name(edge[1]) else "blue"  for edge in self.adjacency_graph.edges]
-        nx.draw_networkx(self.adjacency_graph,pos,with_labels=True,node_color="skyblue",
+        edges_color = []
+        for edge in adjacency_with_potential_graph.edges:
+            if self.piece_name(edge[0]) == self.piece_name(edge[1]):
+                edges_color.append("red")
+            elif edge in self.adjacency_graph.edges:
+                edges_color.append("blue")
+            else:
+                edges_color.append("gray")
+        
+        nx.draw_networkx(adjacency_with_potential_graph,pos,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10,ax=ax)
         
-        potential_matings = [edge for edge in self.matching_graph.edges if edge not in self.matching]
         
-        nx.draw_networkx_edges(self.adjacency_graph,pos,potential_matings,edge_color="purple")
+        # nx.draw_networkx_edges(self.adjacency_graph,pos,potential_matings,edge_color="purple")
     
 
 
