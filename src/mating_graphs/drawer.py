@@ -94,7 +94,8 @@ class MatchingGraphDrawer():
         # Set the title for the plot
         ax.set_title(title)
 
-    def _draw_adjacency_graph(self,adjacency_graph:MatchingGraphAndSpanTree,layout="kamada_kawai",title="Adjacency Graph",ax=None):
+    def _draw_adjacency_graph(self,adjacency_graph:MatchingGraphAndSpanTree,
+                              layout="kamada_kawai",title="Adjacency Graph",ax=None):
         
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
@@ -106,13 +107,28 @@ class MatchingGraphDrawer():
         nx.draw_networkx(adjacency_graph,pos,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10,ax=ax)
 
-
     def _draw_ground_truth_adjacency(self):
         self._draw_adjacency_graph(self.noiseless_ground_truth_graph.adjacency_graph)
 
     def _draw_ground_truth_matching(self,layout="planar",title="Matching Graph",ax=None):
         self._draw_general_layout(self.noiseless_ground_truth_graph.matching_graph,layout=layout,title=title,ax=ax)
 
+    def draw_adjacency_graph(self,graph:MatchingGraphAndSpanTree,layout="kamada_kawai",title="Adjacency Graph",ax=None):
+        ground_truth_adj_graph = self.noiseless_ground_truth_graph.adjacency_graph
+        pos = self._pos_by_layout(ground_truth_adj_graph,layout=layout)
 
-    def draw_adjacency_graph(self,graph:MatchingGraphAndSpanTree):
-        pass
+        adjacency_with_potential_graph = graph.adjacency_graph.copy()
+        potential_matings = [edge for edge in graph.matching_graph.edges if edge not in graph.matching]
+        adjacency_with_potential_graph.add_edges_from(potential_matings)
+
+        edges_color = []
+        for edge in adjacency_with_potential_graph.edges:
+            if get_piece_name(edge[0]) == get_piece_name(edge[1]):
+                edges_color.append("red")
+            elif edge in graph.adjacency_graph.edges:
+                edges_color.append("blue")
+            else:
+                edges_color.append("gray")
+        
+        nx.draw_networkx(adjacency_with_potential_graph,pos,with_labels=True,node_color="skyblue",
+                         edge_color=edges_color,font_size=10,ax=ax)
