@@ -100,7 +100,7 @@ class TestFirstSolver(unittest.TestCase):
 
 class TestMatchingGraphSolver(unittest.TestCase):
 
-    def _run_solver(self,puzzle_image,puzzle_num,puzzle_noise_level,is_debug=False):
+    def _run_solver(self,puzzle_image,puzzle_num,puzzle_noise_level,is_debug=True):
         # puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle_directory = f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
 
@@ -135,7 +135,17 @@ class TestMatchingGraphSolver(unittest.TestCase):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
 
-        for puzzle_noise_level in range(1,4):
+        for puzzle_noise_level in range(4):
+            print("******************************************")
+            print(f"\tTest on noise level {puzzle_noise_level}")
+            print("******************************************")
+            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    
+    def test_VilladeiMisteri_puzzle_1(self):
+        image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
+        puzzle_num = 1
+
+        for puzzle_noise_level in range(4):
             print("******************************************")
             print(f"\tTest on noise level {puzzle_noise_level}")
             print("******************************************")

@@ -192,7 +192,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         print(matching)
         plt.show()
 
-    def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level = 0 ):
+    def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level = 1 ):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
