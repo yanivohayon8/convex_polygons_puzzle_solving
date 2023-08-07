@@ -182,7 +182,6 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         mating_graph._bulid_base_adjacency_graph()
         matching = mating_graph.find_matching()
 
-        # fig, axs = plt.subplots(1,2)
         try:
             mating_graph.draw(layout="spring") #planar ax=axs[1]
         except nx.exception.NetworkXException:
