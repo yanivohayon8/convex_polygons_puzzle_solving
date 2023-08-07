@@ -79,6 +79,9 @@ class MatchingGraphAndSpanTree():
         
         if layout == "piece_clustered":
             pos = self._pos_nodes_by_pieces(graph)
+        elif layout == "spring":
+            num_nodes = len(list(graph.nodes))
+            pos = nx.spring_layout(graph,k=4/np.sqrt(num_nodes))
         else:
             pos = layouts[layout](graph)
         
