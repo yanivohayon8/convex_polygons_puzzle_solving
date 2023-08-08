@@ -2,7 +2,7 @@ from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.inter_env_graph import InterEnvGraph
-from src.mating_graphs.matching_graph import MatchingGraphAndSpanTree
+from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.mating import Mating,convert_mating_to_vertex_mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
@@ -191,7 +191,7 @@ class GraphMatchingSolver():
         self.edge_length_pairwiser.pairwise(self.puzzle.matings_max_difference+1e-3)
     
     def build_mating_graph(self):
-        self.mating_graph = MatchingGraphAndSpanTree(self.bag_of_pieces,
+        self.mating_graph = MatchingGraphWrapper(self.bag_of_pieces,
                                                 self.edge_length_pairwiser.match_edges,
                                                 self.edge_length_pairwiser.match_pieces_score)
         

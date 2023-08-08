@@ -1,6 +1,6 @@
 import unittest
 from src.puzzle import Puzzle
-from src.mating_graphs.matching_graph import MatchingGraphAndSpanTree
+from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.drawer import MatchingGraphDrawer
@@ -22,7 +22,7 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
-        graph = MatchingGraphAndSpanTree(bag_of_pieces,
+        graph = MatchingGraphWrapper(bag_of_pieces,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
         graph._build_matching_graph()

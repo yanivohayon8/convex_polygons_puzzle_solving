@@ -6,7 +6,7 @@ from  matplotlib.cm import ScalarMappable
 import numpy as np
 import math
 
-class MatchingGraphAndSpanTree():
+class MatchingGraphWrapper():
 
     def __init__(self,pieces,match_edges=None,match_pieces_score=None) -> None:
         self.pieces = pieces

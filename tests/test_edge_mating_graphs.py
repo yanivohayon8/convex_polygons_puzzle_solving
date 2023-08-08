@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from src.piece import Piece
 from src.mating_graphs.inter_env_graph import InterEnvGraph
-from src.mating_graphs.matching_graph import MatchingGraphAndSpanTree
+from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
@@ -149,7 +149,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
             [list([]), np.array([0.00099589]), np.array([0.00099931]), list([])]
             ],dtype=object)
         
-        mating_graph = MatchingGraphAndSpanTree(bag_of_pieces,match_edges,match_pieces_score)
+        mating_graph = MatchingGraphWrapper(bag_of_pieces,match_edges,match_pieces_score)
         mating_graph._build_matching_graph()
         matching_nodes = mating_graph.get_matching_graph_nodes()
         assert len(matching_nodes) == 4*2 # because it is 4 triangles matching around vertex
@@ -175,7 +175,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
-        mating_graph = MatchingGraphAndSpanTree(bag_of_pieces,
+        mating_graph = MatchingGraphWrapper(bag_of_pieces,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
         mating_graph._build_matching_graph()
