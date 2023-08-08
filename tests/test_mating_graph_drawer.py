@@ -22,13 +22,13 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
-        graph = MatchingGraphWrapper(bag_of_pieces,
+        wrapper = MatchingGraphWrapper(bag_of_pieces,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
-        graph.build_graph()
-        # graph.find_matching()
+        wrapper.build_graph()
+        # wrapper.find_matching()
 
-        return graph
+        return wrapper
 
     def _draw(self,wrapper:MatchingGraphWrapper,ground_truth_wrapper:MatchingGraphWrapper,ax1,ax2):
         drawer = MatchingGraphDrawer(ground_truth_wrapper)
@@ -52,15 +52,19 @@ class TestGraphDrawer(unittest.TestCase):
     
     def test_draw_Inv9084_with_noise(self):
         puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 2
+        puzzle_num = 1
         puzzle_noise_level = 1
         
-        ground_truth_graph = self._load_graph(puzzle_image,puzzle_num,0)
-        graph = self._load_graph(puzzle_image,puzzle_num,puzzle_noise_level)
+        ground_truth_wrapper = self._load_graph(puzzle_image,puzzle_num,0)
+        wrapper = self._load_graph(puzzle_image,puzzle_num,puzzle_noise_level)
 
         fig, axs = plt.subplots(1,2)
-        self._draw(graph,ground_truth_graph,axs[0],axs[1])
+        self._draw(wrapper,ground_truth_wrapper,axs[0],axs[1])
+
         plt.show()
+
+        raw_cycles = wrapper.compute_cycles(max_length=10)
+        print(len(list(raw_cycles)))
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         puzzle_image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"

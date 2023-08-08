@@ -82,7 +82,19 @@ class MatchingGraphWrapper():
 
         # return matings
 
+    def compute_cycles(self,graph=None,max_length=-1):
 
+        if graph is None:
+            graph = self.adjacency_graph
+
+        if max_length != -1:
+            raw_cycles = nx.simple_cycles(graph,length_bound=max_length)
+        else:
+            raw_cycles = nx.simple_cycles(graph)
+        
+        return raw_cycles
+        
+    
 
 def get_piece_name(node_name:str):
     # edge_name P_4_E_2

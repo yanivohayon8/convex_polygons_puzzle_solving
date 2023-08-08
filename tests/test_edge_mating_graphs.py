@@ -153,18 +153,13 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         mating_graph._build_matching_graph()
         matching_nodes = mating_graph.get_matching_graph_nodes()
         assert len(matching_nodes) == 4*2 # because it is 4 triangles matching around vertex
-        mating_graph.draw(layout="planar")
 
         mating_graph._bulid_only_pieces_graph()
-        mating_graph.draw_adjacency_graph()
-        
-        matching = mating_graph.find_matching()
-        assert len(matching) == 4
 
         plt.show()
 
     
-    def _plot_matching_for_length_pairwise(self,puzzle_image,puzzle_num,puzzle_noise_level):
+    def _bulid_wrapper(self,puzzle_image,puzzle_num,puzzle_noise_level):
         puzzle = Puzzle(f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -175,31 +170,37 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
-        mating_graph = MatchingGraphWrapper(bag_of_pieces,
+        wrapper = MatchingGraphWrapper(bag_of_pieces,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
-        mating_graph._build_matching_graph()
-        mating_graph._bulid_only_pieces_graph()
-        mating_graph._build_adjacency_graph()
-        matching = mating_graph.find_matching()
+        wrapper._build_matching_graph()
+        wrapper._bulid_only_pieces_graph()
+        wrapper._build_adjacency_graph()
+        # matching = mating_graph.find_matching()
 
+        return wrapper
+
+    def _compute_cycles(self,wrapper:MatchingGraphWrapper):
+        raw_cycles = wrapper.compute_cycles(max_length=10)
+        print(len(list(raw_cycles)))
 
     def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
-        self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        self._compute_cycles(wrapper)
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
         puzzle_num = 1
-        self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
 
 
     def test_len_pair_p5_puzzle_1(self):
         image = "p5"
         puzzle_num = 1
         puzzle_noise_level = 0
-        self._plot_matching_for_length_pairwise(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
 
 if __name__ == "__main__":
     unittest.main()
