@@ -160,32 +160,32 @@ class MatchingGraphAndSpanTree():
     #     self._draw_general_layout(self.matching_graph,layout=layout,title=title,ax=ax)
     
 
-    def draw_adjacency_with_potential_matings(self,layout="kamada_kawai",title="Adjacency Graph",ax=None):
+    # def draw_adjacency_with_potential_matings(self,layout="kamada_kawai",title="Adjacency Graph",ax=None):
         
-        if ax is None:
-            # If no existing axis is provided, create a new figure and axis
-            fig, ax = plt.subplots()
+    #     if ax is None:
+    #         # If no existing axis is provided, create a new figure and axis
+    #         fig, ax = plt.subplots()
         
-        # pos = layouts[layout](self.adjacency_graph)
+    #     # pos = layouts[layout](self.adjacency_graph)
         
-        adjacency_with_potential_graph = self.adjacency_graph.copy()
-        potential_matings = [edge for edge in self.matching_graph.edges if edge not in self.matching]
+    #     adjacency_with_potential_graph = self.adjacency_graph.copy()
+    #     potential_matings = [edge for edge in self.matching_graph.edges if edge not in self.matching]
 
-        adjacency_with_potential_graph.add_edges_from(potential_matings)
+    #     adjacency_with_potential_graph.add_edges_from(potential_matings)
 
-        pos = self._pos_by_layout(adjacency_with_potential_graph,layout)
+    #     pos = self._pos_by_layout(adjacency_with_potential_graph,layout)
      
-        edges_color = []
-        for edge in adjacency_with_potential_graph.edges:
-            if get_piece_name(edge[0]) == get_piece_name(edge[1]):
-                edges_color.append("red")
-            elif edge in self.adjacency_graph.edges:
-                edges_color.append("blue")
-            else:
-                edges_color.append("gray")
+    #     edges_color = []
+    #     for edge in adjacency_with_potential_graph.edges:
+    #         if get_piece_name(edge[0]) == get_piece_name(edge[1]):
+    #             edges_color.append("red")
+    #         elif edge in self.adjacency_graph.edges:
+    #             edges_color.append("blue")
+    #         else:
+    #             edges_color.append("gray")
         
-        nx.draw_networkx(adjacency_with_potential_graph,pos,with_labels=True,node_color="skyblue",
-                         edge_color=edges_color,font_size=10,ax=ax)
+    #     nx.draw_networkx(adjacency_with_potential_graph,pos,with_labels=True,node_color="skyblue",
+    #                      edge_color=edges_color,font_size=10,ax=ax)
         
         
         # nx.draw_networkx_edges(self.adjacency_graph,pos,potential_matings,edge_color="purple")

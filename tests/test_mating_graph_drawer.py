@@ -49,9 +49,9 @@ class TestGraphDrawer(unittest.TestCase):
         drawer = MatchingGraphDrawer(ground_truth_graph)
         
         graph = self._load_graph(puzzle_image,puzzle_num,puzzle_noise_level)
-        drawer.draw_adjacency_graph(graph)
 
-
+        ax = plt.subplot()
+        drawer.draw_adjacency_graph(graph,ax=ax)
 
         plt.show()
 

@@ -3,6 +3,8 @@ import numpy as np
 import networkx as nx
 import math
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
 
 class MatchingGraphDrawer():
 
@@ -118,17 +120,47 @@ class MatchingGraphDrawer():
         pos = self._pos_by_layout(ground_truth_adj_graph,layout=layout)
 
         adjacency_with_potential_graph = graph.adjacency_graph.copy()
+        adjacency_with_potential_graph.add_edges_from([edge for edge in ground_truth_adj_graph.edges if edge not in graph.adjacency_graph])
+
         potential_matings = [edge for edge in graph.matching_graph.edges if edge not in graph.matching]
         adjacency_with_potential_graph.add_edges_from(potential_matings)
 
         edges_color = []
+        color2edge_meaning = {
+            "intra_piece":"red",
+            "inter_piece":"blue",
+            "missed_edge":"black",
+            "potential":"orange"
+        }
+
+
         for edge in adjacency_with_potential_graph.edges:
             if get_piece_name(edge[0]) == get_piece_name(edge[1]):
-                edges_color.append("red")
+                edges_color.append(color2edge_meaning["intra_piece"])
             elif edge in graph.adjacency_graph.edges:
-                edges_color.append("blue")
+                edges_color.append(color2edge_meaning["inter_piece"])
+            elif edge in ground_truth_adj_graph.edges:
+                edges_color.append(color2edge_meaning["missed_edge"])
             else:
-                edges_color.append("gray")
+                edges_color.append(color2edge_meaning["potential"])
         
         nx.draw_networkx(adjacency_with_potential_graph,pos,with_labels=True,node_color="skyblue",
-                         edge_color=edges_color,font_size=10,ax=ax)
+                         edge_color=edges_color,font_size=10,ax=ax,width=1.5)
+        
+
+        red_patch = mpatches.Patch(color=color2edge_meaning["intra_piece"], label='Internal edge')
+        blue_patch = mpatches.Patch(color=color2edge_meaning["inter_piece"], label='Mating edge')
+        purple_patch = mpatches.Patch(color=color2edge_meaning["missed_edge"], label='Missed Ground truth edge')
+        gray_patch = mpatches.Patch(color=color2edge_meaning["potential"], label='Potential edge')
+
+        # Plot empty lists with the desired colors and labels
+        ax.plot([], [], color=color2edge_meaning["intra_piece"], label='Internal edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning["inter_piece"], label='Mating edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning["missed_edge"], label='Missed Ground truth edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning["potential"], label='Potential edge', linewidth=5)
+
+        # Create and show legend
+        ax.legend(loc='upper left')
+        handles = [red_patch, blue_patch, purple_patch,gray_patch]
+        ax.legend(handles=handles, loc='upper left')
+        ax.axis('off')
