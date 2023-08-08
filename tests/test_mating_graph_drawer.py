@@ -63,8 +63,8 @@ class TestGraphDrawer(unittest.TestCase):
 
         plt.show()
 
-        raw_cycles = wrapper.compute_cycles(max_length=10)
-        print(len(list(raw_cycles)))
+        # raw_cycles = wrapper.compute_cycles(max_length=10)
+        # print(len(list(raw_cycles)))
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         puzzle_image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"

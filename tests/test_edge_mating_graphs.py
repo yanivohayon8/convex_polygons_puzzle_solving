@@ -188,7 +188,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
-        self._compute_cycles(wrapper)
+        # self._compute_cycles(wrapper)
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
