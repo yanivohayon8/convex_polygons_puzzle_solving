@@ -46,12 +46,13 @@ class TestGraphDrawer(unittest.TestCase):
         puzzle_noise_level = 1
         
         ground_truth_graph = self._load_graph(puzzle_image,puzzle_num,0)
-        drawer = MatchingGraphDrawer(ground_truth_graph)
-        
         graph = self._load_graph(puzzle_image,puzzle_num,puzzle_noise_level)
+        
+        drawer = MatchingGraphDrawer(ground_truth_graph)
+        drawer.init()
 
-        ax = plt.subplot()
-        drawer.draw_adjacency_graph(graph,ax=ax)
+        drawer.draw_adjacency_graph(graph)
+        drawer.draw_graph_matching(graph)
 
         plt.show()
 
