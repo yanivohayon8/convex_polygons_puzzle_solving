@@ -25,24 +25,21 @@ class TestGraphDrawer(unittest.TestCase):
         graph = MatchingGraphWrapper(bag_of_pieces,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
-        graph._build_matching_graph()
-        graph._bulid_base_adjacency_graph()
-        graph.find_matching()
+        graph.build_graph()
+        # graph.find_matching()
 
         return graph
 
-    def _draw(self,graph,ground_truth_graph,ax1,ax2):
-        drawer = MatchingGraphDrawer(ground_truth_graph)
+    def _draw(self,wrapper:MatchingGraphWrapper,ground_truth_wrapper:MatchingGraphWrapper,ax1,ax2):
+        drawer = MatchingGraphDrawer(ground_truth_wrapper)
         drawer.init()
 
-        drawer.draw_adjacency_graph(graph,ax=ax1)
+        drawer.draw_adjacency_graph(wrapper,ax=ax1)
         ax1.set_title("Noised")
 
-        drawer.draw_adjacency_graph(ground_truth_graph,ax=ax2)
+        drawer.draw_adjacency_graph(ground_truth_wrapper,ax=ax2)
         ax2.set_title("Noiseless")
-        # drawer.draw_graph_matching(graph)
-
-        
+        drawer.draw_graph_matching(wrapper)
 
     def test_draw_ground_truth(self):
         puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"

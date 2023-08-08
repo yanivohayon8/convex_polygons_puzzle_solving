@@ -155,7 +155,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         assert len(matching_nodes) == 4*2 # because it is 4 triangles matching around vertex
         mating_graph.draw(layout="planar")
 
-        mating_graph._bulid_base_adjacency_graph()
+        mating_graph._bulid_only_pieces_graph()
         mating_graph.draw_adjacency_graph()
         
         matching = mating_graph.find_matching()
@@ -179,20 +179,10 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
         mating_graph._build_matching_graph()
-        mating_graph._bulid_base_adjacency_graph()
+        mating_graph._bulid_only_pieces_graph()
+        mating_graph._build_adjacency_graph()
         matching = mating_graph.find_matching()
 
-        try:
-            mating_graph.draw(layout="spring") #planar ax=axs[1]
-        except nx.exception.NetworkXException:
-            mating_graph.draw(layout="piece_clustered")
-
-        # mating_graph.draw_adjacency_graph(layout="kamada_kawai")
-
-        mating_graph.draw_adjacency_with_potential_matings(layout="kamada_kawai")
-        
-        # print(matching)
-        plt.show()
 
     def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"

@@ -136,42 +136,36 @@ class MatchingGraphDrawer():
         if ax is None:
             fig, ax = plt.subplots()
 
-        ground_truth_adj_graph = self.noiseless_ground_truth_wrapper.adjacency_graph
-
-        adjacency_with_potential_graph = graph_wrapper.adjacency_graph.copy()
-        adjacency_with_potential_graph.add_edges_from([edge for edge in ground_truth_adj_graph.edges if edge not in graph_wrapper.adjacency_graph])
-
-        potential_matings = [edge for edge in graph_wrapper.matching_graph.edges if edge not in graph_wrapper.matching]
-        adjacency_with_potential_graph.add_edges_from(potential_matings)
 
         edges_color = []
         color2edge_meaning = {
             "intra_piece":"red",
-            "inter_piece":"blue",
+            "ground_truth_edge":"blue",
             "missed_edge":"black",
             "potential":"orange"
         }
 
 
-        for edge in adjacency_with_potential_graph.edges:
+        # for edge in adjacency_with_potential_graph.edges:
+        for edge in graph_wrapper.adjacency_graph.edges:
             if get_piece_name(edge[0]) == get_piece_name(edge[1]):
                 edges_color.append(color2edge_meaning["intra_piece"])
-            elif edge in graph_wrapper.adjacency_graph.edges:
-                edges_color.append(color2edge_meaning["inter_piece"])
+            elif edge in self.noiseless_ground_truth_wrapper.potential_matings_graph.edges:
+                edges_color.append(color2edge_meaning["ground_truth_edge"])
             else:
                 edges_color.append(color2edge_meaning["potential"])
         
-        nx.draw_networkx(adjacency_with_potential_graph,self.node2position,with_labels=True,node_color="skyblue",
+        nx.draw_networkx(graph_wrapper.adjacency_graph,self.node2position,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
 
         red_patch = mpatches.Patch(color=color2edge_meaning["intra_piece"], label='Internal edge')
-        blue_patch = mpatches.Patch(color=color2edge_meaning["inter_piece"], label='Mating edge')
+        blue_patch = mpatches.Patch(color=color2edge_meaning["ground_truth_edge"], label='Ground Truth edge')
         gray_patch = mpatches.Patch(color=color2edge_meaning["potential"], label='Potential edge')
 
         # Plot empty lists with the desired colors and labels
         ax.plot([], [], color=color2edge_meaning["intra_piece"], label='Internal edge', linewidth=5)
-        ax.plot([], [], color=color2edge_meaning["inter_piece"], label='Mating edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning["ground_truth_edge"], label='Ground Truth edge', linewidth=5)
         ax.plot([], [], color=color2edge_meaning["potential"], label='Potential edge', linewidth=5)
 
         # Create and show legend
@@ -182,7 +176,7 @@ class MatchingGraphDrawer():
 
     
     def _draw_ground_truth_matching(self,layout="planar",title="Ground Truth Matching",ax=None):
-        self._draw_general_layout(self.noiseless_ground_truth_wrapper.matching_graph,layout=layout,title=title,ax=ax)
+        self._draw_general_layout(self.noiseless_ground_truth_wrapper.potential_matings_graph,layout=layout,title=title,ax=ax)
     
     def draw_graph_matching(self,graph_wrapper:MatchingGraphWrapper,layout="planar",title="Matching Graph",ax=None):
 
@@ -192,8 +186,8 @@ class MatchingGraphDrawer():
 
         # pos = self._pos_by_layout(graph.matching_graph,layout)
         my_graph = nx.Graph()
-        my_graph.add_nodes_from(self.noiseless_ground_truth_wrapper.adjacency_base_graph.nodes)
-        my_graph.add_edges_from(graph_wrapper.matching_graph.edges)
+        my_graph.add_nodes_from(self.noiseless_ground_truth_wrapper.pieces_only_graph.nodes)
+        my_graph.add_edges_from(graph_wrapper.potential_matings_graph.edges)
 
         nodes_labels = {}
 
@@ -204,7 +198,7 @@ class MatchingGraphDrawer():
         nx.draw_networkx_nodes(my_graph, self.node2position, node_size=500, node_color="skyblue", ax=ax)
         nx.draw_networkx_labels(my_graph, self.node2position, labels=nodes_labels, font_size=10, ax=ax)
 
-        edge_weights = [graph_wrapper.matching_graph[u][v]['compatibility'] for u, v in graph_wrapper.matching_graph.edges()]
+        edge_weights = [graph_wrapper.potential_matings_graph[u][v]['compatibility'] for u, v in graph_wrapper.potential_matings_graph.edges()]
         cmap = plt.cm.get_cmap('plasma')
         
         edges = nx.draw_networkx_edges(my_graph, self.node2position, edge_color=edge_weights, edge_cmap=cmap,
@@ -215,4 +209,4 @@ class MatchingGraphDrawer():
         # Set the title for the plot
         ax.set_title(title)
 
-        nx.draw_networkx_edges(my_graph, self.node2position, edge_color="gray",edgelist=self.noiseless_ground_truth_wrapper.adjacency_base_graph.edges)
+        nx.draw_networkx_edges(my_graph, self.node2position, edge_color="gray",edgelist=self.noiseless_ground_truth_wrapper.pieces_only_graph.edges)
