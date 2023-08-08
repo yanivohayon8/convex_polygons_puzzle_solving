@@ -128,8 +128,6 @@ class MatchingGraphDrawer():
 
         ground_truth_adj_graph = self.noiseless_ground_truth_graph.adjacency_graph
 
-        #pos = self.node2position #self._pos_by_layout(ground_truth_adj_graph,layout=layout)
-
         adjacency_with_potential_graph = graph.adjacency_graph.copy()
         adjacency_with_potential_graph.add_edges_from([edge for edge in ground_truth_adj_graph.edges if edge not in graph.adjacency_graph])
 
@@ -150,8 +148,6 @@ class MatchingGraphDrawer():
                 edges_color.append(color2edge_meaning["intra_piece"])
             elif edge in graph.adjacency_graph.edges:
                 edges_color.append(color2edge_meaning["inter_piece"])
-            # elif edge in ground_truth_adj_graph.edges:
-            #     edges_color.append(color2edge_meaning["missed_edge"])
             else:
                 edges_color.append(color2edge_meaning["potential"])
         
@@ -161,18 +157,15 @@ class MatchingGraphDrawer():
 
         red_patch = mpatches.Patch(color=color2edge_meaning["intra_piece"], label='Internal edge')
         blue_patch = mpatches.Patch(color=color2edge_meaning["inter_piece"], label='Mating edge')
-        # purple_patch = mpatches.Patch(color=color2edge_meaning["missed_edge"], label='Missed Ground truth edge')
         gray_patch = mpatches.Patch(color=color2edge_meaning["potential"], label='Potential edge')
 
         # Plot empty lists with the desired colors and labels
         ax.plot([], [], color=color2edge_meaning["intra_piece"], label='Internal edge', linewidth=5)
         ax.plot([], [], color=color2edge_meaning["inter_piece"], label='Mating edge', linewidth=5)
-        # ax.plot([], [], color=color2edge_meaning["missed_edge"], label='Missed Ground truth edge', linewidth=5)
         ax.plot([], [], color=color2edge_meaning["potential"], label='Potential edge', linewidth=5)
 
         # Create and show legend
         ax.legend(loc='upper left')
-        # handles = [red_patch, blue_patch, purple_patch,gray_patch]
         handles = [red_patch, blue_patch,gray_patch]
         ax.legend(handles=handles, loc='upper left')
         ax.axis('off')
