@@ -53,9 +53,12 @@ class MatchingGraphWrapper():
                 self.pieces_only_graph.add_edge(prev_node,next_node,compatibility=0)
     
     def _build_adjacency_graph(self):
-        self.adjacency_graph = self.pieces_only_graph.copy()
+        self.adjacency_graph = nx.Graph()#self.pieces_only_graph.copy()
+        self.adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes)
+        self.adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
+
         potential_matings = [edge for edge in self.potential_matings_graph.edges if not edge in self.pieces_only_graph]
-        self.adjacency_graph.add_edges_from(potential_matings)
+        self.adjacency_graph.add_edges_from(potential_matings,type="inter_piece")
 
     def build_graph(self):
         self._build_matching_graph()
@@ -94,7 +97,8 @@ class MatchingGraphWrapper():
         
         return raw_cycles
         
-    
+    def _compute_red_blue_cycle(self, end_node, curr_node):
+        pass
 
 def get_piece_name(node_name:str):
     # edge_name P_4_E_2
