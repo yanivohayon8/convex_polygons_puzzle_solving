@@ -28,7 +28,7 @@ class TestLoader(unittest.TestCase):
         puzzle = Puzzle(puzzle_directory)
         puzzle.load()
         ground_truth_solution = puzzle.get_ground_truth_puzzle()
-        print(puzzle.noise)
+        print(puzzle.matings_max_difference)
         print(ground_truth_solution)
 
 

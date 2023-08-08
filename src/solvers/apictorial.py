@@ -47,7 +47,7 @@ class FirstSolver():
 
     def pairwise(self):
         self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
-        self.edge_length_pairwiser.pairwise(self.puzzle.noise+1e-3)
+        self.edge_length_pairwiser.pairwise(self.puzzle.matings_max_difference+1e-3)
         num_pieces = len(self.bag_of_pieces)
 
         for piece_i in range(num_pieces):
@@ -188,7 +188,7 @@ class GraphMatchingSolver():
 
     def pairwise(self):
         self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
-        self.edge_length_pairwiser.pairwise(self.puzzle.noise+1e-3)
+        self.edge_length_pairwiser.pairwise(self.puzzle.matings_max_difference+1e-3)
     
     def build_mating_graph(self):
         self.mating_graph = MatchingGraphAndSpanTree(self.bag_of_pieces,

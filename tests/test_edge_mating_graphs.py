@@ -173,7 +173,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         edge_length_extractor.run()
 
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
-        edge_length_pairwiser.pairwise(puzzle.noise+1e-3)
+        edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
         mating_graph = MatchingGraphAndSpanTree(bag_of_pieces,
                                                 edge_length_pairwiser.match_edges,

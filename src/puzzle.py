@@ -23,6 +23,7 @@ class Puzzle():
         self.df_pieces = None
         self.pieces_images = {}
         self.noise = None
+        self.matings_max_difference = None
 
 
         # Because we give new edge numbers in ccw order for efficient code and debug, 
@@ -58,6 +59,7 @@ class Puzzle():
                     data = json.load(file)
                     # self.noise = float(data["xi"])
                     self.noise = float(data["epsilon"])
+                    self.matings_max_difference = self.noise * 4 # Because of the theory - the two vertices pulled to the opposite sides
         except Exception as e:
             try:
                 with open(self.puzzle_directory+"/puzzle_details.txt", "r") as file:
