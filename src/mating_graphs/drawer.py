@@ -78,7 +78,7 @@ class MatchingGraphDrawer():
         
         return pos
 
-    def _draw_general_layout(self,graph,layout="spectral",title="Graph",ax=None):
+    def _draw_general_layout(self,graph,layout="kamada_kawai",title="Graph",ax=None):
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
             fig, ax = plt.subplots()
@@ -106,19 +106,7 @@ class MatchingGraphDrawer():
         # Set the title for the plot
         ax.set_title(title)
 
-    # def _draw_adjacency_graph(self,adjacency_graph:MatchingGraphWrapper,
-    #                           layout="kamada_kawai",title="Adjacency Graph",ax=None):
-        
-    #     if ax is None:
-    #         # If no existing axis is provided, create a new figure and axis
-    #         fig, ax = plt.subplots()
-        
-    #     pos = self._pos_by_layout(adjacency_graph,layout)
-     
-    #     edges_color = ["red" if get_piece_name(edge[0]) == get_piece_name(edge[1]) else "blue"  for edge in adjacency_graph.edges]
-    #     nx.draw_networkx(adjacency_graph,pos,with_labels=True,node_color="skyblue",
-    #                      edge_color=edges_color,font_size=10,ax=ax)
-
+    
     def _draw_ground_truth_adjacency(self,layout="kamada_kawai",title="Adjacency Graph",ax=None):
         # self._draw_adjacency_graph(self.noiseless_ground_truth_wrapper.adjacency_graph)
         adjacency_graph = self.noiseless_ground_truth_wrapper.adjacency_graph
