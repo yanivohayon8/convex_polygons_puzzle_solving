@@ -184,11 +184,16 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         raw_cycles = wrapper.compute_cycles(max_length=10)
         print(len(list(raw_cycles)))
 
-    def test_len_pair_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
+    def test_red_blue_route_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
+        puzzle_noise_level = 0
         wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
         # self._compute_cycles(wrapper)
+
+        cycles = []
+        wrapper._compute_red_blue_cycles("P_7_E_1","P_9_E_0",cycles)
+        print(cycles)
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
