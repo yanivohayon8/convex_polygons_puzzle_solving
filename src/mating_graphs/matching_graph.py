@@ -107,7 +107,7 @@ class MatchingGraphWrapper():
         if visited is None:
             visited = [start_node]
 
-        if curr_node == start_node and len(visited) > 1:
+        if curr_node == start_node and len(visited) > 1:            
             computed_cycles.append(visited)
 
         curr_step_type = self.adjacency_graph[visited[-1]][curr_node]["type"]
