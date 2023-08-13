@@ -147,24 +147,37 @@ class MatchingGraphWrapper():
         if accumulated_loop_angle > 360+loop_angle_error:
             return
         
-        curr_step_type = self.adjacency_graph[visited[-1]][curr_node]["type"]
+        prev_step_type = self.adjacency_graph[visited[-1]][curr_node]["type"]
 
-        if curr_step_type == "within_piece":
+        '''
+            Because we pre-sorted the edges counterclock wise,
+            to find a 360 loop, we sum the angles in clockwise direction.
+            Remember, for an edge of a piece, it has two adjacent edges (within the piece)
+            So we select the one of the right
+        '''
+        if prev_step_type == "inter_piece":
+            curr_piece = get_piece_name(curr_node)
+            curr_edge = int(get_edge_name(curr_node))
+            neighbor = self._name_node(curr_piece,(curr_edge-1)%self.id2piece[curr_piece].get_num_coords())
+            self.compute_red_blue_360_loops(start_node, neighbor,computed_cycles,
+                                                visited + [curr_node],accumulated_loop_angle=accumulated_loop_angle)
+        elif prev_step_type == "within_piece":
             piece_name = get_piece_name(curr_node)
             edge_index_1 = int(get_edge_name(curr_node))
             edge_index_2 = int(get_edge_name(visited[-1]))
             inner_angle =  self.id2piece[piece_name].get_inner_angle(edge_index_1,edge_index_2)
             accumulated_loop_angle += inner_angle
 
-        for neighbor in self.adjacency_graph.neighbors(curr_node):
-            if neighbor in visited and neighbor != start_node:
-                continue
-            
-            next_step_type = self.adjacency_graph[curr_node][neighbor]["type"]
-            
-            if next_step_type != curr_step_type:
-                self.compute_red_blue_360_loops(start_node, neighbor,computed_cycles,
-                                                visited + [curr_node],accumulated_loop_angle=accumulated_loop_angle)
+            for neighbor in self.adjacency_graph.neighbors(curr_node):
+                
+                if neighbor in visited and neighbor != start_node:
+                    continue
+                
+                next_step_type = self.adjacency_graph[curr_node][neighbor]["type"]
+                
+                if next_step_type == "inter_piece":
+                    self.compute_red_blue_360_loops(start_node, neighbor,computed_cycles,
+                                                    visited + [curr_node],accumulated_loop_angle=accumulated_loop_angle)
 
 
 

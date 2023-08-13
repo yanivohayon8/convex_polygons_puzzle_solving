@@ -215,7 +215,29 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         wrapper.compute_red_blue_360_loops("P_7_E_2","P_9_E_0",cycles,
                                            visited=visited)
+        assert len(cycles) == 1
+
+        cycles = []
+        visited = ["P_7_E_0"]
+        visited.append("P_7_E_1")
+
+        wrapper.compute_red_blue_360_loops(visited[-2],"P_9_E_0",cycles,
+                                           visited=visited)
+        
+        
         print(cycles)
+        assert len(cycles) == 0
+        
+        cycles = []
+        visited = ["P_8_E_2"]
+        visited.append("P_8_E_1")
+
+        wrapper.compute_red_blue_360_loops(visited[-2],"P_9_E_3",cycles,
+                                           visited=visited)
+        
+        print(cycles)
+
+        
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
