@@ -213,27 +213,24 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         visited = ["P_7_E_2"]
         visited.append("P_7_E_1")
 
-        wrapper.compute_red_blue_360_loops("P_7_E_2","P_9_E_0",cycles,
-                                           visited=visited)
+        wrapper.compute_red_blue_360_loops(visited,"P_9_E_0",cycles)
         assert len(cycles) == 1
 
         cycles = []
         visited = ["P_7_E_0"]
         visited.append("P_7_E_1")
 
-        wrapper.compute_red_blue_360_loops(visited[-2],"P_9_E_0",cycles,
-                                           visited=visited)
+        wrapper.compute_red_blue_360_loops(visited,"P_9_E_0",cycles)
         
         
         print(cycles)
         assert len(cycles) == 0
-        
+
         cycles = []
         visited = ["P_8_E_2"]
         visited.append("P_8_E_1")
 
-        wrapper.compute_red_blue_360_loops(visited[-2],"P_9_E_3",cycles,
-                                           visited=visited)
+        wrapper.compute_red_blue_360_loops(visited,"P_9_E_3",cycles)
         
         print(cycles)
 
