@@ -122,7 +122,7 @@ class MatchingGraphWrapper():
             if next_step_type != curr_step_type:
                 self._compute_red_blue_cycles(start_node, neighbor,computed_cycles,visited + [curr_node])
     
-    def compute_red_blue_360_loops(self, visited, curr_node,computed_cycles:list, 
+    def _compute_red_blue_360_loops_rec(self, visited, curr_node,computed_cycles:list, 
                                    accumulated_loop_angle=0,loop_angle_error=3):
         '''
             computes zero loops around a vertex 360 degrees.
@@ -158,8 +158,9 @@ class MatchingGraphWrapper():
         if prev_step_type == "inter_piece":
             curr_piece = get_piece_name(curr_node)
             curr_edge = int(get_edge_name(curr_node))
-            neighbor = self._name_node(curr_piece,(curr_edge-1)%self.id2piece[curr_piece].get_num_coords())
-            self.compute_red_blue_360_loops(visited + [curr_node], neighbor,computed_cycles,
+            adjacent_edge = self.get_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
+            neighbor = self._name_node(curr_piece,adjacent_edge)
+            self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
                                                 accumulated_loop_angle=accumulated_loop_angle)
         elif prev_step_type == "within_piece":
             piece_name = get_piece_name(curr_node)
@@ -176,8 +177,44 @@ class MatchingGraphWrapper():
                 next_step_type = self.adjacency_graph[curr_node][neighbor]["type"]
                 
                 if next_step_type == "inter_piece":
-                    self.compute_red_blue_360_loops(visited + [curr_node], neighbor,computed_cycles,
+                    self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
                                                     accumulated_loop_angle=accumulated_loop_angle)
+
+    def compute_red_blue_360_loops(self):
+        cycles_without_duplicates = []
+        cycles_without_duplicates_sets = []
+
+        for inter_piece_link in self.potential_matings_graph.edges():
+
+            node1,node2 = inter_piece_link
+            edge1 = int(get_edge_name(node1))
+            piece_id = get_piece_name(node1)
+
+            # edge_clockwise_within_piece = self.get_clockwise_adjacent_edge(edge1,piece_id)
+            # new_cycles = []
+            # visited = []
+            # visited.append(self._name_node(piece_id,edge_clockwise_within_piece))
+            # visited.append(node1)
+            # self._compute_red_blue_360_loops_rec(visited,node2,new_cycles)
+
+            # for cycle in new_cycles:
+            #     if set(cycle) not in cycles_without_duplicates_sets:
+            #         cycles_without_duplicates.append(cycle)
+            #         cycles_without_duplicates_sets.append(set(cycle))
+
+            edge2_counter_clockwise_within_piece = self.get_counter_clockwise_adjacent_edge(edge1,piece_id)
+            new_cycles = []
+            visited = []
+            visited.append(self._name_node(piece_id,edge2_counter_clockwise_within_piece))
+            visited.append(node1)
+            self._compute_red_blue_360_loops_rec(visited,node2,new_cycles)
+            
+            for cycle in new_cycles:
+                if set(cycle) not in cycles_without_duplicates_sets:
+                    cycles_without_duplicates.append(cycle)
+                    cycles_without_duplicates_sets.append(set(cycle))
+
+        return cycles_without_duplicates
 
     
     def _link_to_mating(self,link):
@@ -206,6 +243,11 @@ class MatchingGraphWrapper():
 
         return piece2potential_matings
 
+    def get_clockwise_adjacent_edge(self,edge,piece_id):
+        return (edge-1)%self.id2piece[piece_id].get_num_coords()
+    
+    def get_counter_clockwise_adjacent_edge(self,edge,piece_id):
+        return (edge+1)%self.id2piece[piece_id].get_num_coords()
 
 
 def get_piece_name(node_name:str):

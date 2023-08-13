@@ -202,7 +202,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         wrapper._compute_red_blue_cycles("P_7_E_1","P_9_E_0",cycles)
         print(cycles)
     
-    def test_360_loops_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
+    def test_360_loops_Inv9084_rec(self,puzzle_noise_level =1 ):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 1
@@ -212,26 +212,27 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         cycles = []
         visited = ["P_7_E_2"]
         visited.append("P_7_E_1")
-
-        wrapper.compute_red_blue_360_loops(visited,"P_9_E_0",cycles)
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_9_E_0",cycles)
         assert len(cycles) == 1
 
         cycles = []
         visited = ["P_7_E_0"]
         visited.append("P_7_E_1")
-
-        wrapper.compute_red_blue_360_loops(visited,"P_9_E_0",cycles)
-        
-        
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_9_E_0",cycles)
         print(cycles)
         assert len(cycles) == 0
 
         cycles = []
         visited = ["P_8_E_2"]
         visited.append("P_8_E_1")
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_9_E_3",cycles)
+        print(cycles)
 
-        wrapper.compute_red_blue_360_loops(visited,"P_9_E_3",cycles)
-        
+        cycles = []
+        visited = ["P_0_E_2"]
+        visited.append("P_0_E_3")
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
+        assert len(cycles) == 1
         print(cycles)
 
         puzzle_num = 2
@@ -240,12 +241,12 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
-        wrapper.compute_red_blue_360_loops(visited,"P_1_E_0",cycles)
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
         assert len(cycles) == 0
         cycles = []
         visited = ["P_0_E_1"]
         visited.append("P_0_E_2")
-        wrapper.compute_red_blue_360_loops(visited,"P_1_E_0",cycles)
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
         assert len(cycles) == 0
 
         puzzle_num = 2
@@ -254,10 +255,30 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
-        wrapper.compute_red_blue_360_loops(visited,"P_1_E_0",cycles)
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
         print(cycles)
         
     
+    def test_360_loops_Inv9084(self):
+        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 1
+        puzzle_noise_level = 0
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        all_blue_red_cycles = wrapper.compute_red_blue_360_loops()
+        assert len(all_blue_red_cycles) == 5
+
+        puzzle_num = 1
+        puzzle_noise_level = 1
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        all_blue_red_cycles = wrapper.compute_red_blue_360_loops()
+        print(all_blue_red_cycles)
+
+        puzzle_num = 2
+        puzzle_noise_level = 0
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        all_blue_red_cycles = wrapper.compute_red_blue_360_loops()
+        assert len(all_blue_red_cycles) == 5
+
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
         puzzle_num = 1
