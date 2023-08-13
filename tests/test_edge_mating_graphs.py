@@ -163,14 +163,21 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         puzzle = Puzzle(f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
+        id2piece = {}
+
+        for piece in bag_of_pieces:
+            id2piece[piece.id] = piece
 
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
         edge_length_extractor.run()
 
+        angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
+        angles_extractor.run()
+
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
-        wrapper = MatchingGraphWrapper(bag_of_pieces,
+        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
         wrapper._build_matching_graph()
@@ -193,6 +200,21 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         cycles = []
         wrapper._compute_red_blue_cycles("P_7_E_1","P_9_E_0",cycles)
+        print(cycles)
+    
+    def test_360_loops_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
+        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 1
+        puzzle_noise_level = 1
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        # self._compute_cycles(wrapper)
+
+        cycles = []
+        visited = ["P_7_E_2"]
+        visited.append("P_7_E_1")
+
+        wrapper.compute_red_blue_360_loops("P_7_E_2","P_9_E_0",cycles,
+                                           visited=visited)
         print(cycles)
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):

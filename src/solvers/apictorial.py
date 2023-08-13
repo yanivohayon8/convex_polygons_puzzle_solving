@@ -186,12 +186,15 @@ class GraphMatchingSolver():
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(self.bag_of_pieces)
         edge_length_extractor.run()
 
+        angles_extractor = geo_extractor.AngleLengthExtractor(self.bag_of_pieces)
+        angles_extractor.run()
+
     def pairwise(self):
         self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
         self.edge_length_pairwiser.pairwise(self.puzzle.matings_max_difference+1e-3)
     
     def build_mating_graph(self):
-        self.mating_graph = MatchingGraphWrapper(self.bag_of_pieces,
+        self.mating_graph = MatchingGraphWrapper(self.bag_of_pieces,self.id2piece,
                                                 self.edge_length_pairwiser.match_edges,
                                                 self.edge_length_pairwiser.match_pieces_score)
         

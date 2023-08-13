@@ -20,6 +20,9 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
         edge_length_extractor.run()
 
+        angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
+        angles_extractor.run()
+
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         

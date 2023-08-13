@@ -8,6 +8,15 @@ import numpy as np
 from shapely import Polygon
 from shapely import affinity
 
+
+class TestPieceAttributes(unittest.TestCase):
+
+    def test_inner_angle(self):
+        # piece zero in puzzle Inv9084 puzzle 1
+        angles = [70.78026064882025, 87.72737855452097, 67.56571608921074, 133.92664470744808]
+        
+
+
 class TestTwoPolygonsAlign(unittest.TestCase):
     
     def _plot(self,ax,polygon1_coords,polygon2_coords):

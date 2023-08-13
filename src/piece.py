@@ -73,6 +73,14 @@ class Piece():
         return area, list(self_polygon.exterior.coords),list(other_polygon.exterior.coords)
 
 
+    def get_inner_angle(self,edge_index_1,edge_index_2):
+        if edge_index_1 == 0 and edge_index_2 == self.get_num_coords()-1 or \
+            edge_index_2 == 0 and edge_index_1 == self.get_num_coords()-1:
+            return self.features["angles"][0]
+
+        vertex_index = max(edge_index_1,edge_index_2)
+        return self.features["angles"][vertex_index]
+
 
 def overlapping_area(polygons:list):
     '''
