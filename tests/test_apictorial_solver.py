@@ -111,11 +111,6 @@ class TestMatchingGraphSolver(unittest.TestCase):
         solver.extract_features()
         solver.pairwise()
         solver.build_mating_graph()
-
-        if is_debug:
-            solver.mating_graph.draw_adjacency_graph()
-            solver.mating_graph.draw()
-            plt.show()
         
         solution = solver.global_optimize()
 

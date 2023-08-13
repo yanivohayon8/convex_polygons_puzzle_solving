@@ -234,6 +234,28 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         
         print(cycles)
 
+        puzzle_num = 2
+        puzzle_noise_level = 0
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        cycles = []
+        visited = ["P_0_E_0"]
+        visited.append("P_0_E_2")
+        wrapper.compute_red_blue_360_loops(visited,"P_1_E_0",cycles)
+        assert len(cycles) == 0
+        cycles = []
+        visited = ["P_0_E_1"]
+        visited.append("P_0_E_2")
+        wrapper.compute_red_blue_360_loops(visited,"P_1_E_0",cycles)
+        assert len(cycles) == 0
+
+        puzzle_num = 2
+        puzzle_noise_level = 1
+        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        cycles = []
+        visited = ["P_0_E_0"]
+        visited.append("P_0_E_2")
+        wrapper.compute_red_blue_360_loops(visited,"P_1_E_0",cycles)
+        print(cycles)
         
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):

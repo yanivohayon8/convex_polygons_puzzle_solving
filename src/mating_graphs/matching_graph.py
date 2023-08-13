@@ -179,6 +179,33 @@ class MatchingGraphWrapper():
                     self.compute_red_blue_360_loops(visited + [curr_node], neighbor,computed_cycles,
                                                     accumulated_loop_angle=accumulated_loop_angle)
 
+    
+    def _link_to_mating(self,link):
+        '''
+         link - an edge in potential_matings_graph e.g ("P_7_E_1","P_9_E_0")
+        '''
+        piece1 = get_piece_name(link[0])
+        edge1 = int(get_edge_name(link[0]))
+        piece2 = get_piece_name(link[1])
+        edge2 = int(get_edge_name(link[1]))
+        
+        return Mating(piece_1=piece1,edge_1=edge1,piece_2=piece2,edge_2=edge2)
+        
+    def compute_piece2potential_matings_dict(self):
+        piece2potential_matings = {}
+
+        for link in self.potential_matings_graph.edges():
+            piece1 = get_piece_name(link[0])
+            piece2potential_matings.setdefault(piece1,[])
+            piece2 = get_piece_name(link[1])
+            piece2potential_matings.setdefault(piece2,[])
+            mating = self._link_to_mating(link)
+            
+            piece2potential_matings[piece1].append(mating)
+            piece2potential_matings[piece2].append(mating)
+
+        return piece2potential_matings
+
 
 
 def get_piece_name(node_name:str):
