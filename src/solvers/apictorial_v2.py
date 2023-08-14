@@ -52,7 +52,9 @@ class ZeroLoops360Solver():
         self.mating_graph_wrapper.build_graph()
     
     def build_zero_loops(self):
-        graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops()
+        loop_angle_error= self.puzzle_noise_level * 2.5
+
+        graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
         self.cycles = []
 
         def insert_mating_to_cycle(prev_node,next_node,piece2occurence:dict,matings_chain:list):
@@ -77,7 +79,7 @@ class ZeroLoops360Solver():
 
         self.piece2potential_matings = self.mating_graph_wrapper.compute_piece2potential_matings_dict()
         zero_loops_loader = ZeroLoopAroundVertexLoader(self.id2piece,self.cycles,self.piece2potential_matings)
-        self.zero_loops = zero_loops_loader.load(3) # 3 is hardcoded - put it in variable and be correspond to self.mating_graph_wrapper.compute_red_blue_360_loops()
+        self.zero_loops = zero_loops_loader.load(loop_angle_error) 
 
         return self.zero_loops
 

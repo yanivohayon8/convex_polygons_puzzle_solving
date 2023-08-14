@@ -180,7 +180,7 @@ class MatchingGraphWrapper():
                     self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
                                                     accumulated_loop_angle=accumulated_loop_angle)
 
-    def compute_red_blue_360_loops(self):
+    def compute_red_blue_360_loops(self,loop_angle_error=3):
         cycles_without_duplicates = []
         cycles_without_duplicates_sets = []
 
@@ -195,7 +195,7 @@ class MatchingGraphWrapper():
             # visited = []
             # visited.append(self._name_node(piece_id,edge_clockwise_within_piece))
             # visited.append(node1)
-            # self._compute_red_blue_360_loops_rec(visited,node2,new_cycles)
+            # self._compute_red_blue_360_loops_rec(visited,node2,new_cycles,loop_angle_error=loop_angle_error)
 
             # for cycle in new_cycles:
             #     if set(cycle) not in cycles_without_duplicates_sets:
@@ -207,7 +207,7 @@ class MatchingGraphWrapper():
             visited = []
             visited.append(self._name_node(piece_id,edge2_counter_clockwise_within_piece))
             visited.append(node1)
-            self._compute_red_blue_360_loops_rec(visited,node2,new_cycles)
+            self._compute_red_blue_360_loops_rec(visited,node2,new_cycles,loop_angle_error=loop_angle_error)
             
             for cycle in new_cycles:
                 if set(cycle) not in cycles_without_duplicates_sets:
