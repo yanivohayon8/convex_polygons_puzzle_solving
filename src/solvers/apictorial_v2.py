@@ -4,7 +4,7 @@ from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_piece_name,get_edge_name
 from src.mating import Mating,convert_mating_to_vertex_mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
-from src.data_structures.loop_merger import BasicLoopMerger
+from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
@@ -81,7 +81,7 @@ class ZeroLoops360Solver():
 
         return self.zero_loops
 
-    def global_optimize(self):
+    def global_optimize(self,is_debug_loops=False):
         loops_scores = []
 
         for i,zero_loop in enumerate(self.zero_loops):
@@ -89,7 +89,7 @@ class ZeroLoops360Solver():
             matings = zero_loop.get_as_mating_list()
             matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
             zero_loop.set_matings_as_csv(matings_csv)
-            screenhost_name = ""#f"level_{loop_level}_loop_{i}"
+            screenhost_name = ""#f"level_{0}_loop_{i}" # ""
             response = self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
             score = self.physical_assembler.score_assembly(response)
             zero_loop.set_score(score)
@@ -99,14 +99,48 @@ class ZeroLoops360Solver():
 
         # TODO: implement wrapping mechanism here to union loops (When we will have larger puzzles)
 
-        loops_ranked = [loop for _,loop in sorted(zip(loops_scores,loops),reverse=True)]
+        loops_ranked = [loop for _,loop in sorted(zip(loops_scores,loops))]
+
+        if is_debug_loops:
+            for i,loop in enumerate(loops_ranked):
+                matings = loop.get_as_mating_list()
+                matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
+                screenhost_name = f"loop_ranked_{i+1}"#f"level_{0}_loop_{i}" # ""
+                self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
+
         merged_loop = loops_ranked[0]
+        queued_loops = []
+        queued_loops_tmp = []
 
-        for loop in loops_ranked[1:]:
+        for i,loop in enumerate(loops_ranked[1:]):
+            print(f"Try to merge loop {i+2}")
+            try:
+                queued_loops_tmp = []
+                for qued_loop in queued_loops:
+                    try:
+                        print(f"Try to Merge {loop} into {merged_loop}")
+                        self.merger.merge(merged_loop,qued_loop)
+                        print(f"Suceed")
+                    except LoopMutualPiecesMergeError as e:
+                        queued_loops_tmp.append(qued_loop)
+                    except LoopMergeError as e:
+                        print(e)
+                        pass
+                
+                queued_loops = queued_loops_tmp
+                queued_loops_tmp.clear()
 
-            merge_result = self.merger.merge(merged_loop,loop)
-            if merge_result is not None:
-                merged_loop = merge_result
+                print(f"Try to Merge {loop} into {merged_loop}")
+                merged_loop = self.merger.merge(merged_loop,loop)
+                print(f"Suceed")
+
+            except LoopMutualPiecesMergeError as e:
+                # This loop doesnot have a common pieces with other loops
+                # so, merge it for later...
+                queued_loops.append(loop)
+            except LoopMergeError as e:
+                print(e)
+                pass
 
         screenshot_name = f"Solution {self.__class__.__name__}"
         matings = merged_loop.get_as_mating_list()

@@ -5,7 +5,7 @@ from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.mating import Mating,convert_mating_to_vertex_mating
 from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
-from src.data_structures.loop_merger import BasicLoopMerger
+from src.data_structures.loop_merger import BasicLoopMerger,LoopMergeError
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
@@ -114,18 +114,21 @@ class FirstSolver():
 
                 for j in range(i+1,len(previous_loops)):
                     loop_j = previous_loops[j]
-                    new_loop = self.merger.merge(loop_i,loop_j)
+                    try:
+                        new_loop = self.merger.merge(loop_i,loop_j)
 
-                    if new_loop is not None:
-                        if new_loop not in potential_next_level_loops:
-                            matings_csv = get_loop_matings_as_csv(new_loop,self.id2piece)
-                            new_loop.set_matings_as_csv(matings_csv)
-                            screenshot_name=""#f"level_{loop_level}_loop_{i}_loop_{j}"
-                            response = self.physical_assembler.run(matings_csv,screenshot_name=screenshot_name)
-                            new_loop.set_score(self.physical_assembler.score_assembly(response))
-                            potential_next_level_loops.append(new_loop)
-                        else:
-                            debug_num_of_redundant_potential+=1
+                        if new_loop is not None:
+                            if new_loop not in potential_next_level_loops:
+                                matings_csv = get_loop_matings_as_csv(new_loop,self.id2piece)
+                                new_loop.set_matings_as_csv(matings_csv)
+                                screenshot_name=""#f"level_{loop_level}_loop_{i}_loop_{j}"
+                                response = self.physical_assembler.run(matings_csv,screenshot_name=screenshot_name)
+                                new_loop.set_score(self.physical_assembler.score_assembly(response))
+                                potential_next_level_loops.append(new_loop)
+                            else:
+                                debug_num_of_redundant_potential+=1
+                    except LoopMergeError:
+                        pass
                     
             next_level_loops = []
             debug_total_num_potential_loops = len(previous_loops) * (len(previous_loops) - 1)/2 + 1e-5

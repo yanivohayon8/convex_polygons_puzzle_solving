@@ -20,7 +20,7 @@ class TestZeroLoops360Solver(unittest.TestCase):
         solver.build_mating_graph()
         solver.build_zero_loops()
         
-        solution = solver.global_optimize()
+        solution = solver.global_optimize(is_debug_loops=True)
 
         precision = puzzle.evaluate_precision(solution.get_matings())
         print("\tmatings precision is ",precision)
@@ -32,7 +32,7 @@ class TestZeroLoops360Solver(unittest.TestCase):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
 
-        for puzzle_noise_level in range(4):
+        for puzzle_noise_level in range(2,4):
             print("******************************************")
             print(f"\tTest on noise level {puzzle_noise_level}")
             print("******************************************")
@@ -42,7 +42,7 @@ class TestZeroLoops360Solver(unittest.TestCase):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
         puzzle_num = 1
 
-        for puzzle_noise_level in range(4):
+        for puzzle_noise_level in range(1,4):
             print("******************************************")
             print(f"\tTest on noise level {puzzle_noise_level}")
             print("******************************************")

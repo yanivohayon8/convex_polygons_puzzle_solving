@@ -3,6 +3,9 @@ from src.data_structures.hierarchical_loops import Loop
 class LoopMergeError(Exception):
     pass
 
+class LoopMutualPiecesMergeError(LoopMergeError):
+    pass
+
 class BasicLoopMerger():
     
     def __init__(self) -> None:
@@ -16,10 +19,19 @@ class BasicLoopMerger():
         mutual_pieces = loop_1.get_mutual_pieces(loop_2)
         mutual_availiable_matings = loop_1.get_mutual_availiable_matings(loop_2)
         
-        if len(mutual_pieces) == 0 and len(mutual_availiable_matings) == 0:
-            mess = f"The loops {repr(loop_1)} and {repr(loop_2)} don't have mutual pieces and potential mutual availiable matings"
-            raise LoopMergeError(mess)
+
+        # if len(mutual_pieces) == 0 and len(mutual_availiable_matings) == 0:
+        #     mess = f"The loops {repr(loop_1)} and {repr(loop_2)} don't have mutual pieces and potential mutual availiable matings"
+        #     raise LoopMutualPiecesMergeError(mess) #LoopMergeError(mess)
         
+        if len(mutual_pieces) == 0:
+            mess = f"The loops {repr(loop_1)} and {repr(loop_2)} don't have mutual pieces"
+            raise LoopMutualPiecesMergeError(mess)
+        
+        if len(mutual_availiable_matings) == 0:
+            mess = f"The loops {repr(loop_1)} and {repr(loop_2)} don't have potential mutual availiable matings"
+            raise LoopMergeError(mess) #LoopMergeError(mess)
+
         conflict = loop_1._mating_conflict(loop_2)
 
         if conflict is not None:
@@ -30,40 +42,35 @@ class BasicLoopMerger():
             raise LoopMergeError(mess)
 
     def merge(self,loop_1:Loop, loop_2:Loop):
-        try:
-            self._is_merge_valid(loop_1,loop_2)
+        
+        self._is_merge_valid(loop_1,loop_2)
 
-            new_loop = Loop(piece2edge2matings={},availiable_matings=[])
-            loop_1_matings = loop_1.get_as_mating_list()
-            loop_2_matings = loop_2.get_as_mating_list()
-            total_occupied_matings = loop_1_matings+loop_2_matings
+        new_loop = Loop(piece2edge2matings={},availiable_matings=[])
+        loop_1_matings = loop_1.get_as_mating_list()
+        loop_2_matings = loop_2.get_as_mating_list()
+        total_occupied_matings = loop_1_matings+loop_2_matings
 
-            for mating in total_occupied_matings:
-                new_loop.insert_mating(mating)
+        for mating in total_occupied_matings:
+            new_loop.insert_mating(mating)
 
-            pieces_involved = []# 
-            pieces_involved_with_duplicates = list(loop_1.get_pieces_invovled()) + list(loop_2.get_pieces_invovled())
-            [pieces_involved.append(piece) for piece in pieces_involved_with_duplicates if piece not in pieces_involved]
-            mutual_availiable_matings = loop_1.get_mutual_availiable_matings(loop_2)
-            total_availiable_matings = loop_1.get_availiable_matings() +loop_2.get_availiable_matings()
+        pieces_involved = []# 
+        pieces_involved_with_duplicates = list(loop_1.get_pieces_invovled()) + list(loop_2.get_pieces_invovled())
+        [pieces_involved.append(piece) for piece in pieces_involved_with_duplicates if piece not in pieces_involved]
+        mutual_availiable_matings = loop_1.get_mutual_availiable_matings(loop_2)
+        total_availiable_matings = loop_1.get_availiable_matings() +loop_2.get_availiable_matings()
 
-            for mating in total_availiable_matings:
-                if mating in mutual_availiable_matings:
-                    if mating.piece_1 in pieces_involved and mating.piece_2 in pieces_involved:
-                        new_loop.insert_mating(mating)
-                        continue
-
-                if mating in total_occupied_matings:
+        for mating in total_availiable_matings:
+            if mating in mutual_availiable_matings:
+                if mating.piece_1 in pieces_involved and mating.piece_2 in pieces_involved:
+                    new_loop.insert_mating(mating)
                     continue
 
-                new_loop.insert_availiable_mating(mating)
-            
-            new_loop.unions_history.append((repr(loop_1),repr(loop_2)))
-            return new_loop
+            if mating in total_occupied_matings:
+                continue
 
-        except LoopMergeError as e:
-            print(e)
-            return None
+            new_loop.insert_availiable_mating(mating)
         
+        new_loop.unions_history.append((repr(loop_1),repr(loop_2)))
+        return new_loop        
         
         
