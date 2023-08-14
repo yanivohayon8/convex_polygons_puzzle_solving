@@ -3,7 +3,7 @@ from src.feature_extraction import geometric as geo_extractor
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_piece_name,get_edge_name
 from src.mating import Mating,convert_mating_to_vertex_mating
-from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
+from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
@@ -53,26 +53,10 @@ class ZeroLoops360Solver():
 
     
     def build_zero_loops(self):
-        raw_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops()
+        graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops()
         self.cycles = []
 
-        for raw_cycle in raw_cycles:
-            piece2occurence = {}
-            matings_chain = []
-            for prev_node,next_node in zip(raw_cycle[1:-1:2],raw_cycle[2::2]):
-                mating = self.mating_graph_wrapper._link_to_mating((prev_node,next_node))
-                matings_chain.append(mating)
-
-                prev_piece = get_piece_name(prev_node)
-                piece2occurence.setdefault(prev_piece,0)
-                piece2occurence[prev_piece]+=1
-                next_piece = get_piece_name(next_node)
-                piece2occurence.setdefault(next_piece,0)
-                piece2occurence[next_piece]+=1
-            
-
-            prev_node = raw_cycle[-1]
-            next_node = raw_cycle[0]
+        def insert_mating_to_cycle(prev_node,next_node,piece2occurence:dict,matings_chain:list):
             mating = self.mating_graph_wrapper._link_to_mating((prev_node,next_node))
             matings_chain.append(mating)
 
@@ -83,13 +67,19 @@ class ZeroLoops360Solver():
             piece2occurence.setdefault(next_piece,0)
             piece2occurence[next_piece]+=1
 
-            self.cycles.append(Cycle(matings_chain,piece2occurence))
+        for graph_cycle in graph_cycles:
+            piece2occurence = {}
+            matings_chain = []
+            for prev_node,next_node in zip(graph_cycle[1:-1:2],graph_cycle[2::2]):
+                insert_mating_to_cycle(prev_node,next_node,piece2occurence,matings_chain)
+            
+            insert_mating_to_cycle(graph_cycle[-1],graph_cycle[0],piece2occurence,matings_chain)
+            self.cycles.append(Cycle(matings_chain,piece2occurence,graph_cycle))
 
-        # We use ZeroLoopKeepCycleAsIs because we already made sure 360 degrees closing while computing the cycle
         self.piece2potential_matings = self.mating_graph_wrapper.compute_piece2potential_matings_dict()
-        zero_loops_loader = ZeroLoopKeepCycleAsIs(self.id2piece,self.cycles,self.piece2potential_matings)
-        self.zero_loops = zero_loops_loader.load(None)
-        
+        zero_loops_loader = ZeroLoopAroundVertexLoader(self.id2piece,self.cycles,self.piece2potential_matings)
+        self.zero_loops = zero_loops_loader.load(3) # 3 is hardcoded - put it in variable and be correspond to self.mating_graph_wrapper.compute_red_blue_360_loops()
+
         return self.zero_loops
 
 

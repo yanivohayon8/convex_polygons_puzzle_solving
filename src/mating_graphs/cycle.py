@@ -1,9 +1,13 @@
+from src.mating_graphs.matching_graph import get_piece_name,get_edge_name
+
+
 class Cycle():
 
-    def __init__(self, matings_chain:list, piece2occurence:dict) -> None:
+    def __init__(self, matings_chain:list, piece2occurence:dict,debug_graph_cycle=None) -> None:
         self.matings_chain = matings_chain
         self.piece2occurence = piece2occurence
-    
+        self.debug_graph_cycle = debug_graph_cycle
+
     def get_pieces_involved(self):
         return self.piece2occurence.keys()
 

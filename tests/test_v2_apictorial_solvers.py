@@ -30,7 +30,7 @@ class TestZeroLoops360Solver(unittest.TestCase):
     
     def test_Inv9084_puzzle_1(self):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 2
+        puzzle_num = 1
 
         for puzzle_noise_level in range(4):
             print("******************************************")
