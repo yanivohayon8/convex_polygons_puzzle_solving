@@ -107,7 +107,7 @@ class ZeroLoops360Solver():
             for i,loop in enumerate(loops_ranked):
                 matings = loop.get_as_mating_list()
                 matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
-                screenhost_name = f"loop_ranked_{i+1}"#f"level_{0}_loop_{i}" # ""
+                screenhost_name = f"rank_{i+1}_{loop}"#f"level_{0}_loop_{i}" # ""
                 self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
 
         merged_loop = loops_ranked[0]
@@ -115,7 +115,7 @@ class ZeroLoops360Solver():
         queued_loops_tmp = []
 
         for i,loop in enumerate(loops_ranked[1:]):
-            print(f"Try to merge loop {i+2}")
+            print(f"Try to merge the {i+2}-th loop")
             try:
                 queued_loops_tmp = []
                 for qued_loop in queued_loops:
