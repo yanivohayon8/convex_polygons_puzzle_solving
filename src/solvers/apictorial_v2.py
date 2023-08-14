@@ -3,7 +3,7 @@ from src.feature_extraction import geometric as geo_extractor
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_piece_name,get_edge_name
 from src.mating import Mating,convert_mating_to_vertex_mating
-from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
+from src.data_structures.zero_loops import ZeroLoopTwoEdgesPerPiece,ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
@@ -52,7 +52,7 @@ class ZeroLoops360Solver():
         self.mating_graph_wrapper.build_graph()
     
     def build_zero_loops(self):
-        loop_angle_error= self.puzzle_noise_level * 2.5
+        loop_angle_error= self.puzzle_noise_level * 1.5
 
         graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
         self.cycles = []
@@ -78,7 +78,7 @@ class ZeroLoops360Solver():
             self.cycles.append(Cycle(matings_chain,piece2occurence,graph_cycle))
 
         self.piece2potential_matings = self.mating_graph_wrapper.compute_piece2potential_matings_dict()
-        zero_loops_loader = ZeroLoopAroundVertexLoader(self.id2piece,self.cycles,self.piece2potential_matings)
+        zero_loops_loader = ZeroLoopTwoEdgesPerPiece(self.id2piece,self.cycles,self.piece2potential_matings)
         self.zero_loops = zero_loops_loader.load(loop_angle_error) 
 
         return self.zero_loops

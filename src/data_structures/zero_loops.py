@@ -72,3 +72,10 @@ class ZeroLoopKeepCycleAsIs(ZeroLoopAroundVertexLoader):
 
     def _is_valid(self, cycle, accumulated_angle_err):
         return True
+    
+class ZeroLoopTwoEdgesPerPiece(ZeroLoopAroundVertexLoader):
+
+    def _is_valid(self, cycle, accumulated_angle_err):
+        if not cycle.is_all_piece_occur(2):
+            return False
+        return True
