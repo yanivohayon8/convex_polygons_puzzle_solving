@@ -25,6 +25,7 @@ class ZeroLoops360Solver():
         self.physical_assembler = PhysicalAssembler(self.http)
         self.id2piece = {}
         self.piece2potential_matings = {}
+        self.merger = BasicLoopMerger()
     
     def load_bag_of_pieces(self):
         self.puzzle.load()
@@ -48,9 +49,7 @@ class ZeroLoops360Solver():
         self.mating_graph_wrapper = MatchingGraphWrapper(self.bag_of_pieces,self.id2piece,
                                                 self.edge_length_pairwiser.match_edges,
                                                 self.edge_length_pairwiser.match_pieces_score)
-        
         self.mating_graph_wrapper.build_graph()
-
     
     def build_zero_loops(self):
         graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops()
@@ -82,6 +81,39 @@ class ZeroLoops360Solver():
 
         return self.zero_loops
 
+    def global_optimize(self):
+        loops_scores = []
 
+        for i,zero_loop in enumerate(self.zero_loops):
+            # matings_csv = get_loop_matings_as_csv(zero_loop,self.id2piece)
+            matings = zero_loop.get_as_mating_list()
+            matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
+            zero_loop.set_matings_as_csv(matings_csv)
+            screenhost_name = ""#f"level_{loop_level}_loop_{i}"
+            response = self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
+            score = self.physical_assembler.score_assembly(response)
+            zero_loop.set_score(score)
+            loops_scores.append(score)
 
-    
+        loops = self.zero_loops 
+
+        # TODO: implement wrapping mechanism here to union loops (When we will have larger puzzles)
+
+        loops_ranked = [loop for _,loop in sorted(zip(loops_scores,loops),reverse=True)]
+        merged_loop = loops_ranked[0]
+
+        for loop in loops_ranked[1:]:
+
+            merge_result = self.merger.merge(merged_loop,loop)
+            if merge_result is not None:
+                merged_loop = merge_result
+
+        screenshot_name = f"Solution {self.__class__.__name__}"
+        matings = merged_loop.get_as_mating_list()
+        matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
+        response = self.physical_assembler.run(matings_csv,screenshot_name=screenshot_name)
+        score = self.physical_assembler.score_assembly(response)
+        print("Final merged loop scoring.....",score)
+        solution_polygons = self.physical_assembler.get_final_coordinates_as_polygons(response)
+
+        return Assembly(solution_polygons,matings)

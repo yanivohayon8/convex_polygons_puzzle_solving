@@ -19,13 +19,13 @@ class TestZeroLoops360Solver(unittest.TestCase):
         solver.pairwise()
         solver.build_mating_graph()
         solver.build_zero_loops()
+        
+        solution = solver.global_optimize()
 
-        # solution = solver.global_optimize()
-
-        # precision = puzzle.evaluate_precision(solution.get_matings())
-        # print("\tmatings precision is ",precision)
-        # recall = puzzle.evaluate_recall(solution.get_matings())
-        # print("\tmatings recall is ",recall)
+        precision = puzzle.evaluate_precision(solution.get_matings())
+        print("\tmatings precision is ",precision)
+        recall = puzzle.evaluate_recall(solution.get_matings())
+        print("\tmatings recall is ",recall)
 
     
     def test_Inv9084_puzzle_1(self):
