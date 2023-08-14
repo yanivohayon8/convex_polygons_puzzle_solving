@@ -18,7 +18,8 @@ class TestZeroLoops360Solver(unittest.TestCase):
         solver.extract_features()
         solver.pairwise()
         solver.build_mating_graph()
-        
+        solver.build_zero_loops()
+
         # solution = solver.global_optimize()
 
         # precision = puzzle.evaluate_precision(solution.get_matings())
@@ -29,7 +30,7 @@ class TestZeroLoops360Solver(unittest.TestCase):
     
     def test_Inv9084_puzzle_1(self):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
+        puzzle_num = 2
 
         for puzzle_noise_level in range(4):
             print("******************************************")

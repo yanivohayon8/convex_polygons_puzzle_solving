@@ -1,15 +1,16 @@
 from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
-from src.mating_graphs.matching_graph import MatchingGraphWrapper
+from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_piece_name,get_edge_name
 from src.mating import Mating,convert_mating_to_vertex_mating
-from src.data_structures.zero_loops import ZeroLoopAroundVertexLoader
+from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.loop_merger import BasicLoopMerger
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.assembly import Assembly
 from functools import reduce
+from src.mating_graphs.cycle import Cycle
 
 
 class ZeroLoops360Solver():
@@ -50,7 +51,47 @@ class ZeroLoops360Solver():
         
         self.mating_graph_wrapper.build_graph()
 
-        self.piece2potential_matings = self.mating_graph_wrapper.compute_piece2potential_matings_dict()
     
+    def build_zero_loops(self):
+        raw_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops()
+        self.cycles = []
+
+        for raw_cycle in raw_cycles:
+            piece2occurence = {}
+            matings_chain = []
+            for prev_node,next_node in zip(raw_cycle[1:-1:2],raw_cycle[2::2]):
+                mating = self.mating_graph_wrapper._link_to_mating((prev_node,next_node))
+                matings_chain.append(mating)
+
+                prev_piece = get_piece_name(prev_node)
+                piece2occurence.setdefault(prev_piece,0)
+                piece2occurence[prev_piece]+=1
+                next_piece = get_piece_name(next_node)
+                piece2occurence.setdefault(next_piece,0)
+                piece2occurence[next_piece]+=1
+            
+
+            prev_node = raw_cycle[-1]
+            next_node = raw_cycle[0]
+            mating = self.mating_graph_wrapper._link_to_mating((prev_node,next_node))
+            matings_chain.append(mating)
+
+            prev_piece = get_piece_name(prev_node)
+            piece2occurence.setdefault(prev_piece,0)
+            piece2occurence[prev_piece]+=1
+            next_piece = get_piece_name(next_node)
+            piece2occurence.setdefault(next_piece,0)
+            piece2occurence[next_piece]+=1
+
+            self.cycles.append(Cycle(matings_chain,piece2occurence))
+
+        # We use ZeroLoopKeepCycleAsIs because we already made sure 360 degrees closing while computing the cycle
+        self.piece2potential_matings = self.mating_graph_wrapper.compute_piece2potential_matings_dict()
+        zero_loops_loader = ZeroLoopKeepCycleAsIs(self.id2piece,self.cycles,self.piece2potential_matings)
+        self.zero_loops = zero_loops_loader.load(None)
+        
+        return self.zero_loops
+
+
 
     
