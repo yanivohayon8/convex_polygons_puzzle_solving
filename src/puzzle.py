@@ -41,7 +41,8 @@ class Puzzle():
     def _get_pieces2img_path(self,pieces):
         extentions = ["png","jpg"]
         img_paths = []  
-        [img_paths.extend(glob.glob(self.puzzle_directory+"\\*."+ext)) for ext in extentions]
+        # [img_paths.extend(glob.glob(self.puzzle_directory+"\\*."+ext)) for ext in extentions]
+        [img_paths.extend(glob.glob(self.puzzle_directory+"\\images\\*."+ext)) for ext in extentions]
 
         for piece in pieces:
             #id_str = str(piece.id)
