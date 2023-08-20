@@ -11,11 +11,16 @@ from src.piece import Piece
 
 class TestGraphDrawer(unittest.TestCase):
     
-    def _load_graph(self,puzzle_image,puzzle_num,puzzle_noise_level):
+    def _load_graph(self,db,puzzle_num,puzzle_noise_level):
         
-        puzzle = Puzzle(f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
+        puzzle = Puzzle(f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        id2piece = {}
+
+        for piece in bag_of_pieces:
+            id2piece[piece.id] = piece
 
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
         edge_length_extractor.run()
@@ -26,7 +31,7 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
-        wrapper = MatchingGraphWrapper(bag_of_pieces,
+        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score)
         wrapper.build_graph()
@@ -43,24 +48,24 @@ class TestGraphDrawer(unittest.TestCase):
 
         drawer.draw_adjacency_graph(ground_truth_wrapper,ax=ax2)
         ax2.set_title("Noiseless")
-        # drawer.draw_graph_matching(wrapper)
+        drawer.draw_graph_matching(wrapper)
 
     def test_draw_ground_truth(self):
-        puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 3
-        ground_truth_graph = self._load_graph(puzzle_image,puzzle_num,0)
+        ground_truth_graph = self._load_graph(db,puzzle_num,0)
         drawer = MatchingGraphDrawer(ground_truth_graph)
         drawer._draw_ground_truth_adjacency()
         # drawer._draw_ground_truth_matching()
         plt.show()
     
     def test_draw_Inv9084_with_noise(self):
-        puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 1
         
-        ground_truth_wrapper = self._load_graph(puzzle_image,puzzle_num,0)
-        wrapper = self._load_graph(puzzle_image,puzzle_num,puzzle_noise_level)
+        ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
+        wrapper = self._load_graph(db,puzzle_num,puzzle_noise_level)
 
         fig, axs = plt.subplots(1,2)
         self._draw(wrapper,ground_truth_wrapper,axs[0],axs[1])
@@ -73,12 +78,12 @@ class TestGraphDrawer(unittest.TestCase):
         
     
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
-        puzzle_image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
+        db = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
         puzzle_num = 2
         puzzle_noise_level = 1
         
-        ground_truth_graph = self._load_graph(puzzle_image,puzzle_num,0)
-        graph = self._load_graph(puzzle_image,puzzle_num,puzzle_noise_level)
+        ground_truth_graph = self._load_graph(db,puzzle_num,0)
+        graph = self._load_graph(db,puzzle_num,puzzle_noise_level)
         
         fig, axs = plt.subplots(1,2)
         self._draw(graph,ground_truth_graph,axs[0],axs[1])

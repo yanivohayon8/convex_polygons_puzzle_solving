@@ -12,19 +12,19 @@ class TestLoader(unittest.TestCase):
     #     loader.load()
 
     def test_ground_truth_puzzle_loading(self):
-        puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 0
-        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle_directory = f"data/ofir/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         ground_truth_solution = puzzle.get_ground_truth_puzzle()
         print(ground_truth_solution)
 
     def test_ground_truth_puzzle_loading_mutual_folder(self):
-        puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 0
-        puzzle_directory = f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle_directory = f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         puzzle.load()
         ground_truth_solution = puzzle.get_ground_truth_puzzle()

@@ -159,8 +159,8 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         plt.show()
 
     
-    def _bulid_wrapper(self,puzzle_image,puzzle_num,puzzle_noise_level):
-        puzzle = Puzzle(f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
+    def _bulid_wrapper(self,db,puzzle_num,puzzle_noise_level):
+        puzzle = Puzzle(f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
         id2piece = {}

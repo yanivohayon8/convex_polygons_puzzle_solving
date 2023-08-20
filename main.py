@@ -15,15 +15,15 @@ parser.add_argument("--is_interactive",default=True)
 args = parser.parse_args()
 
 
-def run_solver(puzzle_image,puzzle_num,puzzle_noise_level,is_interactive):
-    # puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+def run_solver(db,puzzle_num,puzzle_noise_level,is_interactive):
+    # puzzle_directory = f"data/ofir/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
     print("****************************")
-    print(f"\tSolve {puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}")
+    print(f"\tSolve {db}/Puzzle{puzzle_num}/{puzzle_noise_level}")
     print("****************************")
-    puzzle_directory = f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+    puzzle_directory = f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
 
     puzzle = Puzzle(puzzle_directory)
-    solver = GraphMatchingSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
+    solver = GraphMatchingSolver(puzzle,db,puzzle_num,puzzle_noise_level)
 
     solution = solver.run()
 

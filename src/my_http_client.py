@@ -6,14 +6,14 @@ from urllib.parse import urlencode
 
 class HTTPClient():
 
-    def __init__(self,target_puzzle_image,target_puzzle_num,target_puzzle_noise,
+    def __init__(self,target_db,target_puzzle_num,target_puzzle_noise,
                   host="localhost",port=8888):
         self.host = host
         self.port = port
         self.http = urllib3.PoolManager()
         self.target_puzzle_noise = target_puzzle_noise
         self.target_puzzle_num = target_puzzle_num
-        self.target_puzzle_image = target_puzzle_image
+        self.target_db = target_db
         self.url_prefix = "v0/ConvexDrawing"
         self.base_target = f"http://{self.host}:{self.port}/{self.url_prefix}"
 
@@ -34,7 +34,7 @@ class HTTPClient():
             "noise":self.target_puzzle_noise,
             "num":self.target_puzzle_num,
             "dataset":"ConvexDrawing",
-            "image":self.target_puzzle_image
+            "db":self.target_db
         }
 
         if screenshot_name !="":

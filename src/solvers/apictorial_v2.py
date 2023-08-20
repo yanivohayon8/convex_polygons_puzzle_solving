@@ -14,14 +14,14 @@ from src.mating_graphs.cycle import Cycle
 
 
 class ZeroLoops360Solver():
-    def __init__(self,puzzle:Puzzle,puzzle_image,puzzle_num,puzzle_noise_level) -> None:
+    def __init__(self,puzzle:Puzzle,db,puzzle_num,puzzle_noise_level) -> None:
         self.puzzle = puzzle
-        self.puzzle_image = puzzle_image
+        self.db = db
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
         self.bag_of_pieces = None
         self.mating_graph_wrapper = None
-        self.http = HTTPClient(self.puzzle_image,self.puzzle_num,self.puzzle_noise_level)
+        self.http = HTTPClient(self.db,self.puzzle_num,self.puzzle_noise_level)
         self.physical_assembler = PhysicalAssembler(self.http)
         self.id2piece = {}
         self.piece2potential_matings = {}
@@ -104,48 +104,74 @@ class ZeroLoops360Solver():
         loops_ranked = [loop for _,loop in sorted(zip(loops_scores,loops))]
 
         if is_debug_loops:
-            for i,loop in enumerate(loops_ranked):
-                matings = loop.get_as_mating_list()
+            for i,curr_loop in enumerate(loops_ranked):
+                matings = curr_loop.get_as_mating_list()
                 matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
-                screenhost_name = f"rank_{i+1}_{loop}"#f"level_{0}_loop_{i}" # ""
+                screenhost_name = f"rank_{i+1}_{curr_loop}"#f"level_{0}_loop_{i}" # ""
                 self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
 
-        merged_loop = loops_ranked[0]
-        queued_loops = []
-        queued_loops_tmp = []
+        # merged_loop = loops_ranked[0]
+        merged_loops = [loops_ranked[0]]
+        first_detected_solution = None
 
-        for i,loop in enumerate(loops_ranked[1:]):
+        for i,curr_loop in enumerate(loops_ranked[1:]):
             print(f"Try to merge the {i+2}-th loop")
-            try:
-                queued_loops_tmp = []
-                for qued_loop in queued_loops:
-                    try:
-                        print(f"Try to Merge {loop} into {merged_loop}")
-                        self.merger.merge(merged_loop,qued_loop)
-                        print(f"Suceed")
-                    except LoopMutualPiecesMergeError as e:
-                        queued_loops_tmp.append(qued_loop)
-                    except LoopMergeError as e:
-                        print(e)
-                        pass
-                
-                queued_loops = queued_loops_tmp
-                queued_loops_tmp.clear()
+            is_merged = False
+            loops_merge_with_curr_loop = []
 
-                print(f"Try to Merge {loop} into {merged_loop}")
-                merged_loop = self.merger.merge(merged_loop,loop)
-                print(f"Suceed")
+            for i,mer_lop in enumerate(merged_loops):
+                try:
+                    print(f"Try to Merge {curr_loop} into {mer_lop}")
+                    merged_res = self.merger.merge(mer_lop,curr_loop)
+                    print(f"Suceed")
+                    is_merged = True
+                    loops_merge_with_curr_loop.append(merged_res)
 
-            except LoopMutualPiecesMergeError as e:
-                # This loop doesnot have a common pieces with other loops
-                # so, merge it for later...
-                queued_loops.append(loop)
-            except LoopMergeError as e:
-                print(e)
-                pass
+                except LoopMutualPiecesMergeError as e:
+                    # This loop doesnot have a common pieces with other loops
+                    # so, merge it for later...
+                    pass
+                except LoopMergeError as e:
+                    # print(e)
+                    pass
+            
+            if is_merged:
+                merged_loops_tmp = []
+                for lop1 in loops_merge_with_curr_loop:
+                    
+                    for lop2 in merged_loops:
+                        if not lop2.is_contained(lop1):
+                            merged_loops_tmp.append(lop2)
+
+                    merged_loops_tmp.append(lop1)
+
+                merged_loops = merged_loops_tmp
+
+                merged_loops_tmp = []
+                for lop1 in merged_loops:
+                    for lop2 in merged_loops:
+                        if lop1 != lop2:
+                            try:
+                                result = self.merger.merge(lop1,lop2)
+                                merged_loops_tmp.append(result)
+                            except LoopMutualPiecesMergeError as e:
+                                if lop2 not in merged_loops_tmp:
+                                    merged_loops_tmp.append(lop2)
+                            except LoopMergeError as e:
+                                if lop2 not in merged_loops_tmp:
+                                    merged_loops_tmp.append(lop2)
+                merged_loops = merged_loops_tmp   
+            else:
+                merged_loops.append(curr_loop)
+
+            for lop in merged_loops:
+                if len(lop.get_pieces_invovled()) == len(self.bag_of_pieces):
+                    first_detected_solution = lop
+                    break
+            
 
         screenshot_name = f"Solution {self.__class__.__name__}"
-        matings = merged_loop.get_as_mating_list()
+        matings = first_detected_solution.get_as_mating_list()
         matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
         response = self.physical_assembler.run(matings_csv,screenshot_name=screenshot_name)
         score = self.physical_assembler.score_assembly(response)

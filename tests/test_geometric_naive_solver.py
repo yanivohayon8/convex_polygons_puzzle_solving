@@ -175,7 +175,7 @@ class TestProduction(unittest.TestCase):
                 fp.write("%s\n" % item)
 
     def _run(self,
-             puzzle_image,
+             db,
              puzzle_num,
              puzzle_noise,
              expected_solution_accuracy:float,expected_num_cycles=-1,
@@ -183,12 +183,12 @@ class TestProduction(unittest.TestCase):
              noise = 1,
              is_save_cycles=False):
     
-        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise}"
+        puzzle_directory = f"data/ofir/{db}/Puzzle{puzzle_num}/{puzzle_noise}"
         loader = Puzzle(puzzle_directory)
         loader.load()
         bag_of_pieces = loader.get_bag_of_pieces() #loader.get_final_puzzle()
         
-        http = HTTPClient(puzzle_image,puzzle_num,puzzle_noise)
+        http = HTTPClient(db,puzzle_num,puzzle_noise)
 
         solver = solvers.GeometricNoiselessSolver(bag_of_pieces,http)
         solver.extract_features()

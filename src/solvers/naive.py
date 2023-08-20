@@ -283,8 +283,8 @@ class GeometricNoiselessSolver(Solver):
 
 class PictorialSolver(GeometricNoiselessSolver):
 
-    def __init__(self, pieces: list):
-        super().__init__(pieces)
+    def __init__(self, pieces: list,http_client=None):
+        super().__init__(pieces,http_client)
         self.pictorial_feature_extractor = PixelEnviormnetExtractor()
 
     def extract_features(self):

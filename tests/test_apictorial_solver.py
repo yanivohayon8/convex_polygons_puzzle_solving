@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 
 class TestFirstSolver(unittest.TestCase):
     
-    def _run(self,puzzle_image,puzzle_num,puzzle_noise_level, is_load_cycles=False):
-        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+    def _run(self,db,puzzle_num,puzzle_noise_level, is_load_cycles=False):
+        puzzle_directory = f"data/ofir/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
-        solver = FirstSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
+        solver = FirstSolver(puzzle,db,puzzle_num,puzzle_noise_level)
 
         solver.load_bag_of_pieces()
         solver.extract_features()
@@ -100,12 +100,12 @@ class TestFirstSolver(unittest.TestCase):
 
 class TestMatchingGraphSolver(unittest.TestCase):
 
-    def _run_solver(self,puzzle_image,puzzle_num,puzzle_noise_level,is_debug=True):
-        # puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
-        puzzle_directory = f"../ConvexDrawingDataset/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+    def _run_solver(self,db,puzzle_num,puzzle_noise_level,is_debug=True):
+        # puzzle_directory = f"data/ofir/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle_directory = f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
 
         puzzle = Puzzle(puzzle_directory)
-        solver = GraphMatchingSolver(puzzle,puzzle_image,puzzle_num,puzzle_noise_level)
+        solver = GraphMatchingSolver(puzzle,db,puzzle_num,puzzle_noise_level)
 
         solver.load_bag_of_pieces()
         solver.extract_features()
@@ -127,14 +127,15 @@ class TestMatchingGraphSolver(unittest.TestCase):
 
     
     def test_Inv9084_puzzle_1(self):
-        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
+        #image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "1"
+        puzzle_num = 19
 
         for puzzle_noise_level in range(4):
             print("******************************************")
             print(f"\tTest on noise level {puzzle_noise_level}")
             print("******************************************")
-            self._run_solver(image,puzzle_num,puzzle_noise_level)
+            self._run_solver(db,puzzle_num,puzzle_noise_level)
     
     def test_VilladeiMisteri_puzzle_1(self):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"

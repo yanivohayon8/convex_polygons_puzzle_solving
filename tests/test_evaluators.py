@@ -54,10 +54,10 @@ class TestLeastSquareRigidBody(unittest.TestCase):
 class TestAreaOverlappingEvaluator(unittest.TestCase):
     
     def test_gt_to_gt_Inve9084_1_0(self):
-        puzzle_image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 0
-        puzzle_directory = f"data/ofir/{puzzle_image}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle_directory = f"data/ofir/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         ground_truth_polygons = puzzle.get_ground_truth_puzzle()
 

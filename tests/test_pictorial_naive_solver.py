@@ -20,7 +20,7 @@ class TestPictorialNaiveSolver(unittest.TestCase):
         solver.extract_features()
         
     def test_image_Inv9084_puzzle_1_noise_0(self):
-        direrctory = "data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
+        direrctory = "../ConvexDrawingDataset/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/"
         puzzle_directory = direrctory + "0"
         expected_num_cycles = 69
         expected_num_zero_loops = 5
