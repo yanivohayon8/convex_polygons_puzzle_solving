@@ -141,8 +141,16 @@ class MatchingGraphWrapper():
             accumulated_loop_angle =  self.id2piece[piece_name].get_inner_angle(edge_index_1,edge_index_2)
 
 
-        if curr_node == visited[0]: #and len(visited) > 2:            
-            computed_cycles.append(visited)
+        if curr_node == visited[0]: #and len(visited) > 2:
+
+            debug_is_acc_360 = abs(360-accumulated_loop_angle)<loop_angle_error
+            if debug_is_acc_360:
+                computed_cycles.append(visited)
+            else:    
+                pass
+                # print("Debug:Problematic loop")
+
+            return
 
         if accumulated_loop_angle > 360+loop_angle_error:
             return
@@ -161,7 +169,7 @@ class MatchingGraphWrapper():
             adjacent_edge = self.get_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
             neighbor = self._name_node(curr_piece,adjacent_edge)
             self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
-                                                accumulated_loop_angle=accumulated_loop_angle)
+                                                accumulated_loop_angle=accumulated_loop_angle,loop_angle_error=loop_angle_error)
         elif prev_step_type == "within_piece":
             piece_name = get_piece_name(curr_node)
             edge_index_1 = int(get_edge_name(curr_node))
@@ -178,7 +186,7 @@ class MatchingGraphWrapper():
                 
                 if next_step_type == "inter_piece":
                     self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
-                                                    accumulated_loop_angle=accumulated_loop_angle)
+                                                    accumulated_loop_angle=accumulated_loop_angle,loop_angle_error=loop_angle_error)
 
     def compute_red_blue_360_loops(self,loop_angle_error=3):
         cycles_without_duplicates = []

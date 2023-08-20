@@ -52,7 +52,7 @@ class ZeroLoops360Solver():
         self.mating_graph_wrapper.build_graph()
     
     def build_zero_loops(self):
-        loop_angle_error= self.puzzle_noise_level * 1.5
+        loop_angle_error = self.puzzle_noise_level *  1.5 #1#1.5
 
         graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
         self.cycles = []
@@ -107,7 +107,7 @@ class ZeroLoops360Solver():
             for i,curr_loop in enumerate(loops_ranked):
                 matings = curr_loop.get_as_mating_list()
                 matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,self.id2piece[mat.piece_1],self.id2piece[mat.piece_2]),matings,"")
-                screenhost_name = f"rank_{i+1}_{curr_loop}"#f"level_{0}_loop_{i}" # ""
+                screenhost_name = f"rank_{i+1}"#f"level_{0}_loop_{i}" # ""
                 self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
 
         # merged_loop = loops_ranked[0]
