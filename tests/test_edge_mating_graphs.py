@@ -10,6 +10,7 @@ from src.pairwise_matchers import geometric as geo_pairwiser
 import networkx as nx
 import matplotlib.pyplot as plt
 
+from src.mating_graphs.cycle import map_edge_to_contain_cycles
 
 
 class TestNXPloting(unittest.TestCase):
@@ -160,7 +161,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
     
     def _bulid_wrapper(self,db,puzzle_num,puzzle_noise_level):
-        puzzle = Puzzle(f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}")
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
         id2piece = {}
@@ -203,11 +204,18 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         print(cycles)
     
     def test_360_loops_Inv9084_rec(self,puzzle_noise_level =1 ):
-        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
+        # image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "1"
+        puzzle_num = 19
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
         # self._compute_cycles(wrapper)
+
+        cycles = []
+        visited = ["P_1_E_1"]
+        visited.append("P_1_E_0")
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_0_E_3",cycles)
+        assert len(cycles) >0
 
         cycles = []
         visited = ["P_7_E_2"]
@@ -237,7 +245,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         puzzle_num = 2
         puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
@@ -251,7 +259,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         puzzle_num = 2
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
@@ -260,17 +268,32 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         
     
     def test_360_loops_Inv9084(self):
-        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
+        db="1"
+        puzzle_num = 19
         puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
-        all_blue_red_cycles = wrapper.compute_red_blue_360_loops()
-        assert len(all_blue_red_cycles) == 5
+        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
+        cycles_noise_0 = wrapper.compute_red_blue_360_loops()
+        assert len(cycles_noise_0) == 5
 
-        puzzle_num = 1
+        puzzle_num = 19
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
-        all_blue_red_cycles = wrapper.compute_red_blue_360_loops()
+        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
+        cycles_noise_1 = wrapper.compute_red_blue_360_loops()
+        cycles_noise_1_sets = [set(cycle) for cycle in cycles_noise_1]
+
+        for cycle in cycles_noise_0:
+            assert set(cycle) in cycles_noise_1_sets
+
+        debug_edge2cycles = map_edge_to_contain_cycles(cycles_noise_1)
+        P_1_e_1_cycles = sorted(
+            list(
+                map(lambda cycle: sorted(list(cycle.get_pieces_involved())),
+                    debug_edge2cycles["P_1_e_1"])
+            )
+        )
+
+        assert [0,1,2,5] in P_1_e_1_cycles
+
         print(all_blue_red_cycles)
 
         puzzle_num = 2

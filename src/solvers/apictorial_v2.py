@@ -79,7 +79,7 @@ class ZeroLoops360Solver():
 
         self.piece2potential_matings = self.mating_graph_wrapper.compute_piece2potential_matings_dict()
         zero_loops_loader = ZeroLoopTwoEdgesPerPiece(self.id2piece,self.cycles,self.piece2potential_matings)
-        self.zero_loops = zero_loops_loader.load(loop_angle_error) 
+        self.zero_loops = zero_loops_loader.load(None)# 
 
         return self.zero_loops
 
