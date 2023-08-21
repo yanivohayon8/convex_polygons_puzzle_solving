@@ -39,3 +39,33 @@ class Cycle():
             acc = acc + delimiter + repr(mate)
         
         return acc[len(delimiter):]
+    
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value,Cycle):
+            return False
+        
+        for self_mating in self.matings_chain:
+            if not self_mating in __value.matings_chain:
+                return False
+
+        return len(self.matings_chain) == len(__value.matings_chain)
+
+def map_edge_to_contain_cycles(cycles:list)->dict:
+    edge2cycles = {}
+
+    for cycle in cycles:
+        for mating in cycle.matings_chain:
+            edge_1 = f"P_{mating.piece_1}_e_{mating.edge_1}"
+            edge2cycles.setdefault(edge_1,[])
+            edge2cycles[edge_1].append(cycle)
+
+            edge_2 = f"P_{mating.piece_2}_e_{mating.edge_2}"
+            edge2cycles.setdefault(edge_2,[])
+            edge2cycles[edge_2].append(cycle)
+    
+    sorted_edge2cycles = {}
+
+    for key in sorted(edge2cycles.keys()):
+        sorted_edge2cycles[key] = edge2cycles[key]
+        
+    return sorted_edge2cycles
