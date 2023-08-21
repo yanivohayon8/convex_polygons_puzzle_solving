@@ -55,27 +55,7 @@ class ZeroLoops360Solver():
         loop_angle_error = self.puzzle_noise_level *  1.5 #1#1.5
 
         graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
-        self.cycles = []
-
-        def insert_mating_to_cycle(prev_node,next_node,piece2occurence:dict,matings_chain:list):
-            mating = self.mating_graph_wrapper._link_to_mating((prev_node,next_node))
-            matings_chain.append(mating)
-
-            prev_piece = get_piece_name(prev_node)
-            piece2occurence.setdefault(prev_piece,0)
-            piece2occurence[prev_piece]+=1
-            next_piece = get_piece_name(next_node)
-            piece2occurence.setdefault(next_piece,0)
-            piece2occurence[next_piece]+=1
-
-        for graph_cycle in graph_cycles:
-            piece2occurence = {}
-            matings_chain = []
-            for prev_node,next_node in zip(graph_cycle[1:-1:2],graph_cycle[2::2]):
-                insert_mating_to_cycle(prev_node,next_node,piece2occurence,matings_chain)
-            
-            insert_mating_to_cycle(graph_cycle[-1],graph_cycle[0],piece2occurence,matings_chain)
-            self.cycles.append(Cycle(matings_chain,piece2occurence,graph_cycle))
+        self.cycles = [Cycle(debug_graph_cycle=graph_cycle) for graph_cycle in graph_cycles]
 
         self.piece2potential_matings = self.mating_graph_wrapper.compute_piece2potential_matings_dict()
         zero_loops_loader = ZeroLoopTwoEdgesPerPiece(self.id2piece,self.cycles,self.piece2potential_matings)

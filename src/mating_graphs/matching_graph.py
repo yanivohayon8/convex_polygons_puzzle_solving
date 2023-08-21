@@ -192,49 +192,44 @@ class MatchingGraphWrapper():
         cycles_without_duplicates = []
         cycles_without_duplicates_sets = []
 
+        def _compute_from_edge(visited,curr_node): #,cycles_without_duplicates:list,cycles_without_duplicates_sets:list
+            new_cycles = []
+            self._compute_red_blue_360_loops_rec(visited,curr_node,new_cycles,loop_angle_error=loop_angle_error)
+
+            for cycle in new_cycles:
+                cycle_set = set(cycle) 
+
+                if  cycle_set not in cycles_without_duplicates_sets:
+                    cycles_without_duplicates.append(cycle)
+                    cycles_without_duplicates_sets.append(cycle_set)
+
         for inter_piece_link in self.potential_matings_graph.edges():
 
             node1,node2 = inter_piece_link
             edge1 = int(get_edge_name(node1))
-            piece_id = get_piece_name(node1)
+            node_1_piece_id = get_piece_name(node1)
 
-            # edge_clockwise_within_piece = self.get_clockwise_adjacent_edge(edge1,piece_id)
-            # new_cycles = []
-            # visited = []
-            # visited.append(self._name_node(piece_id,edge_clockwise_within_piece))
-            # visited.append(node1)
-            # self._compute_red_blue_360_loops_rec(visited,node2,new_cycles,loop_angle_error=loop_angle_error)
+            edge1_adj = self.get_counter_clockwise_adjacent_edge(edge1,node_1_piece_id)
+            visited = [
+                self._name_node(node_1_piece_id,edge1_adj),
+                node1
+            ]
 
-            # for cycle in new_cycles:
-            #     if set(cycle) not in cycles_without_duplicates_sets:
-            #         cycles_without_duplicates.append(cycle)
-            #         cycles_without_duplicates_sets.append(set(cycle))
+            _compute_from_edge(visited,node2) 
 
-            edge2_counter_clockwise_within_piece = self.get_counter_clockwise_adjacent_edge(edge1,piece_id)
-            new_cycles = []
-            visited = []
-            visited.append(self._name_node(piece_id,edge2_counter_clockwise_within_piece))
-            visited.append(node1)
-            self._compute_red_blue_360_loops_rec(visited,node2,new_cycles,loop_angle_error=loop_angle_error)
-            
-            for cycle in new_cycles:
-                if set(cycle) not in cycles_without_duplicates_sets:
-                    cycles_without_duplicates.append(cycle)
-                    cycles_without_duplicates_sets.append(set(cycle))
+            edge2 = int(get_edge_name(node2))
+            node_2_piece_id = get_piece_name(node2)
+            edge2_adj = self.get_counter_clockwise_adjacent_edge(edge2,node_2_piece_id)
+
+            visited = [
+                self._name_node(node_2_piece_id,edge2_adj),
+                node2
+            ]
+            _compute_from_edge(visited,node1) 
 
         return cycles_without_duplicates
 
     
-    def _link_to_mating(self,link):
-        '''
-         link - an edge in potential_matings_graph e.g ("P_7_E_1","P_9_E_0")
-        '''
-        piece1 = get_piece_name(link[0])
-        edge1 = int(get_edge_name(link[0]))
-        piece2 = get_piece_name(link[1])
-        edge2 = int(get_edge_name(link[1]))
-        
-        return Mating(piece_1=piece1,edge_1=edge1,piece_2=piece2,edge_2=edge2)
         
     def compute_piece2potential_matings_dict(self):
         piece2potential_matings = {}
@@ -244,7 +239,7 @@ class MatchingGraphWrapper():
             piece2potential_matings.setdefault(piece1,[])
             piece2 = get_piece_name(link[1])
             piece2potential_matings.setdefault(piece2,[])
-            mating = self._link_to_mating(link)
+            mating = _link_to_mating(link)
             
             piece2potential_matings[piece1].append(mating)
             piece2potential_matings[piece2].append(mating)
@@ -258,6 +253,7 @@ class MatchingGraphWrapper():
         return (edge+1)%self.id2piece[piece_id].get_num_coords()
 
 
+
 def get_piece_name(node_name:str):
     # edge_name P_4_E_2
     return node_name.split("_")[1]
@@ -265,3 +261,14 @@ def get_piece_name(node_name:str):
 def get_edge_name(node_name:str):
     # edge_name P_4_E_2
     return node_name.split("_")[-1]
+
+def _link_to_mating(link):
+    '''
+        link - an edge in potential_matings_graph e.g ("P_7_E_1","P_9_E_0")
+    '''
+    piece1 = get_piece_name(link[0])
+    edge1 = int(get_edge_name(link[0]))
+    piece2 = get_piece_name(link[1])
+    edge2 = int(get_edge_name(link[1]))
+    
+    return Mating(piece_1=piece1,edge_1=edge1,piece_2=piece2,edge_2=edge2)

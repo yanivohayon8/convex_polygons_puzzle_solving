@@ -1,12 +1,34 @@
-from src.mating_graphs.matching_graph import get_piece_name,get_edge_name
+from src.mating_graphs.matching_graph import get_piece_name,get_edge_name,_link_to_mating
 
 
 class Cycle():
 
-    def __init__(self, matings_chain:list, piece2occurence:dict,debug_graph_cycle=None) -> None:
-        self.matings_chain = matings_chain
-        self.piece2occurence = piece2occurence
+    def __init__(self, matings_chain:list=None, piece2occurence:dict=None,debug_graph_cycle=None) -> None:
         self.debug_graph_cycle = debug_graph_cycle
+
+        if matings_chain is not None and piece2occurence is not None:
+            self.matings_chain = matings_chain
+            self.piece2occurence = piece2occurence
+        elif debug_graph_cycle is not None:
+            self.matings_chain = []
+            self.piece2occurence = {}
+
+            def insert_mating_to_cycle(prev_node,next_node):
+                mating = _link_to_mating((prev_node,next_node))
+                self.matings_chain.append(mating)
+
+                prev_piece = get_piece_name(prev_node)
+                self.piece2occurence.setdefault(prev_piece,0)
+                self.piece2occurence[prev_piece]+=1
+
+                next_piece = get_piece_name(next_node)
+                self.piece2occurence.setdefault(next_piece,0)
+                self.piece2occurence[next_piece]+=1
+
+            for prev_node,next_node in zip(self.debug_graph_cycle[1:-1:2],self.debug_graph_cycle[2::2]):
+                insert_mating_to_cycle(prev_node,next_node)
+            
+            insert_mating_to_cycle(self.debug_graph_cycle[-1],self.debug_graph_cycle[0])
 
     def get_pieces_involved(self):
         return self.piece2occurence.keys()
