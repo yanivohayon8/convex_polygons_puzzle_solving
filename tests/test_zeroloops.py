@@ -3,7 +3,7 @@ from src.solvers.apictorial import FirstSolver
 from src.puzzle import Puzzle
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
-
+from src.feature_extraction import geometric as geo_extractor 
 
 class TestZeroLoopKeepCycleAsIs(unittest.TestCase):
     
@@ -30,6 +30,37 @@ class TestZeroLoopKeepCycleAsIs(unittest.TestCase):
             matings_csv = get_loop_matings_as_csv(zero_loop,solver.id2piece)
             # zero_loop.set_matings_as_csv(matings_csv)
             response = solver.physical_assembler.run(matings_csv,screenshot_name=f"cycle_{i}")
+        
+class TestAngleSum(unittest.TestCase):
+
+    def test_Inv9084_noise_1zero_loops(self):
+
+        
+        db = "1"
+        puzzle_num = 19
+
+        for puzzle_noise_level in range(4):
+            print(f"Running on noise {puzzle_noise_level}")
+            puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+            puzzle.load()
+            bag_of_pieces = puzzle.get_bag_of_pieces()
+            angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
+            angles_extractor.run()
+            piece_edge_loop = [(3,1), (3,0), (2,2), (2,1), (5,3), (5,2)]
+
+            accumulated_loop_angle = 0
+
+            for edge1,edge2 in zip(piece_edge_loop[:-1:2],piece_edge_loop[1::2]):
+                piece = bag_of_pieces[edge1[0]]
+                inner_angle =  piece.get_inner_angle(edge1[1],edge2[1])
+                print("\tinner_angle",inner_angle)
+                accumulated_loop_angle += inner_angle
+
+            print("\taccumulated_loop_angle",accumulated_loop_angle)
+            print("\t360 - accumulated_loop_angle",360 - accumulated_loop_angle)
+
+
+
         
 
 

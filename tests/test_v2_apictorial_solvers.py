@@ -3,7 +3,7 @@ from src.solvers.apictorial_v2 import ZeroLoops360Solver
 from src.puzzle import Puzzle
 from src.evaluator import AreaOverlappingEvaluator
 import matplotlib.pyplot as plt
-
+from src.mating_graphs.cycle import map_edge_to_contain_cycles
 
 class TestZeroLoops360Solver(unittest.TestCase):
 
@@ -19,8 +19,7 @@ class TestZeroLoops360Solver(unittest.TestCase):
         solver.pairwise()
         solver.build_mating_graph()
         solver.build_zero_loops()
-        
-        solution = solver.global_optimize(is_debug_loops=False)
+        solution = solver.global_optimize(is_debug_loops=True)
 
         precision = puzzle.evaluate_precision(solution.get_matings())
         print("\tmatings precision is ",precision)
@@ -33,51 +32,51 @@ class TestZeroLoops360Solver(unittest.TestCase):
         db = "1"
         puzzle_num = 19
 
-        for puzzle_noise_level in range(4):
+        for puzzle_noise_level in range(1,4):
             print("******************************************")
             print(f"\tTest on noise level {puzzle_noise_level}")
             print("******************************************")
             self._run_solver(db,puzzle_num,puzzle_noise_level)
     
-    def test_VilladeiMisteri_puzzle_1(self):
-        image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
-        puzzle_num = 1
+    # def test_VilladeiMisteri_puzzle_1(self):
+    #     image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
+    #     puzzle_num = 1
 
-        for puzzle_noise_level in range(1,4):
-            print("******************************************")
-            print(f"\tTest on noise level {puzzle_noise_level}")
-            print("******************************************")
-            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    #     for puzzle_noise_level in range(1,4):
+    #         print("******************************************")
+    #         print(f"\tTest on noise level {puzzle_noise_level}")
+    #         print("******************************************")
+    #         self._run_solver(image,puzzle_num,puzzle_noise_level)
     
-    def test_Terentius_puzzle_1(self):
-        image = "SCALED-3_Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01"
-        puzzle_num = 1
+    # def test_Terentius_puzzle_1(self):
+    #     image = "SCALED-3_Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01"
+    #     puzzle_num = 1
 
-        for puzzle_noise_level in range(1):
-            print("******************************************")
-            print(f"\tTest on noise level {puzzle_noise_level}")
-            print("******************************************")
-            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    #     for puzzle_noise_level in range(1):
+    #         print("******************************************")
+    #         print(f"\tTest on noise level {puzzle_noise_level}")
+    #         print("******************************************")
+    #         self._run_solver(image,puzzle_num,puzzle_noise_level)
     
-    def test_Terentius_puzzle_2(self):
-        image = "SCALED-3_Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01"
-        puzzle_num = 2
+    # def test_Terentius_puzzle_2(self):
+    #     image = "SCALED-3_Terentius_Neo_and_wife_MAN_Napoli_Inv9058_n01"
+    #     puzzle_num = 2
 
-        for puzzle_noise_level in range(1):
-            print("******************************************")
-            print(f"\tTest on noise level {puzzle_noise_level}")
-            print("******************************************")
-            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    #     for puzzle_noise_level in range(1):
+    #         print("******************************************")
+    #         print(f"\tTest on noise level {puzzle_noise_level}")
+    #         print("******************************************")
+    #         self._run_solver(image,puzzle_num,puzzle_noise_level)
     
-    def test_pizza_1(self):
-        image = "SCALED-3_pizza"
-        puzzle_num = 1
+    # def test_pizza_1(self):
+    #     image = "SCALED-3_pizza"
+    #     puzzle_num = 1
 
-        for puzzle_noise_level in range(1):
-            print("******************************************")
-            print(f"\tTest on noise level {puzzle_noise_level}")
-            print("******************************************")
-            self._run_solver(image,puzzle_num,puzzle_noise_level)
+    #     for puzzle_noise_level in range(1):
+    #         print("******************************************")
+    #         print(f"\tTest on noise level {puzzle_noise_level}")
+    #         print("******************************************")
+    #         self._run_solver(image,puzzle_num,puzzle_noise_level)
 
 
 

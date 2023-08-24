@@ -79,11 +79,16 @@ def map_edge_to_contain_cycles(cycles:list)->dict:
         for mating in cycle.matings_chain:
             edge_1 = f"P_{mating.piece_1}_e_{mating.edge_1}"
             edge2cycles.setdefault(edge_1,[])
-            edge2cycles[edge_1].append(cycle)
+            
+            if not cycle in edge2cycles[edge_1]:
+                edge2cycles[edge_1].append(cycle)
 
             edge_2 = f"P_{mating.piece_2}_e_{mating.edge_2}"
             edge2cycles.setdefault(edge_2,[])
-            edge2cycles[edge_2].append(cycle)
+
+            if not cycle in edge2cycles[edge_2]:
+                edge2cycles[edge_2].append(cycle)
+            
     
     sorted_edge2cycles = {}
 

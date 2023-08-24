@@ -13,7 +13,7 @@ class TestGraphDrawer(unittest.TestCase):
     
     def _load_graph(self,db,puzzle_num,puzzle_noise_level):
         
-        puzzle = Puzzle(f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}")
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
@@ -60,8 +60,8 @@ class TestGraphDrawer(unittest.TestCase):
         plt.show()
     
     def test_draw_Inv9084_with_noise(self):
-        db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
+        db = "1" #"Pseudo-Sappho_MAN_Napoli_Inv9084"
+        puzzle_num = 19
         puzzle_noise_level = 1
         
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0)

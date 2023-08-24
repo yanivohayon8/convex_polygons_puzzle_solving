@@ -188,7 +188,7 @@ class MatchingGraphWrapper():
                     self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
                                                     accumulated_loop_angle=accumulated_loop_angle,loop_angle_error=loop_angle_error)
 
-    def compute_red_blue_360_loops(self,loop_angle_error=3):
+    def compute_red_blue_360_loops(self,loop_angle_error=6):
         cycles_without_duplicates = []
         cycles_without_duplicates_sets = []
 
@@ -205,27 +205,25 @@ class MatchingGraphWrapper():
 
         for inter_piece_link in self.potential_matings_graph.edges():
 
-            node1,node2 = inter_piece_link
-            edge1 = int(get_edge_name(node1))
-            node_1_piece_id = get_piece_name(node1)
+            graph_node1,graph_node2 = inter_piece_link
+            piece_edge1 = int(get_edge_name(graph_node1))
+            node_1_piece_id = get_piece_name(graph_node1)
 
-            edge1_adj = self.get_counter_clockwise_adjacent_edge(edge1,node_1_piece_id)
+            piece_edge1_adj = self.get_counter_clockwise_adjacent_edge(piece_edge1,node_1_piece_id)
             visited = [
-                self._name_node(node_1_piece_id,edge1_adj),
-                node1
+                self._name_node(node_1_piece_id,piece_edge1_adj),
+                graph_node1
             ]
+            _compute_from_edge(visited,graph_node2) 
 
-            _compute_from_edge(visited,node2) 
-
-            edge2 = int(get_edge_name(node2))
-            node_2_piece_id = get_piece_name(node2)
-            edge2_adj = self.get_counter_clockwise_adjacent_edge(edge2,node_2_piece_id)
-
+            piece_edge2 = int(get_edge_name(graph_node2))
+            node_2_piece_id = get_piece_name(graph_node2)
+            piece_edge2_adj = self.get_counter_clockwise_adjacent_edge(piece_edge2,node_2_piece_id)
             visited = [
-                self._name_node(node_2_piece_id,edge2_adj),
-                node2
+                self._name_node(node_2_piece_id,piece_edge2_adj),
+                graph_node2
             ]
-            _compute_from_edge(visited,node1) 
+            _compute_from_edge(visited,graph_node1) 
 
         return cycles_without_duplicates
 

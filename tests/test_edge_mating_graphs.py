@@ -10,7 +10,7 @@ from src.pairwise_matchers import geometric as geo_pairwiser
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from src.mating_graphs.cycle import map_edge_to_contain_cycles
+from src.mating_graphs.cycle import map_edge_to_contain_cycles,Cycle
 
 
 class TestNXPloting(unittest.TestCase):
@@ -214,8 +214,20 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         cycles = []
         visited = ["P_1_E_1"]
         visited.append("P_1_E_0")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_0_E_3",cycles)
-        assert len(cycles) >0
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_0_E_3",cycles,loop_angle_error=6)
+        cycle_0_1_2_5 = [
+            "P_1_E_1","P_1_E_0",
+            "P_0_E_3","P_0_E_2",
+            "P_5_E_0","P_5_E_3",
+            "P_2_E_1","P_2_E_0"]
+
+        assert cycle_0_1_2_5 in cycles
+
+        cycles = []
+        visited = ["P_2_E_1"]
+        visited.append("P_2_E_0")
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_1",cycles)
+        print(len(cycles))
 
         cycles = []
         visited = ["P_7_E_2"]
@@ -272,18 +284,22 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         puzzle_num = 19
         puzzle_noise_level = 0
         wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
-        cycles_noise_0 = wrapper.compute_red_blue_360_loops()
-        assert len(cycles_noise_0) == 5
+        graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops()
+        assert len(graph_cycles_noise_0) == 5
 
-        puzzle_num = 19
         puzzle_noise_level = 1
         wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
-        cycles_noise_1 = wrapper.compute_red_blue_360_loops()
-        cycles_noise_1_sets = [set(cycle) for cycle in cycles_noise_1]
+        graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
+        graph_cycles_noise_1_sets = [set(cycle) for cycle in graph_cycles_noise_1]
 
-        for cycle in cycles_noise_0:
-            assert set(cycle) in cycles_noise_1_sets
+        # Verifying no duplicates
+        graph_cycles_noise_1_sets_no_dup = []
+        [graph_cycles_noise_1_sets_no_dup.append(cycle_set) for cycle_set in graph_cycles_noise_1_sets if cycle_set not in graph_cycles_noise_1_sets_no_dup]
+        assert len(graph_cycles_noise_1_sets_no_dup) == len(graph_cycles_noise_1_sets)
 
+        # sampling a cycle in the noise 0 puzzle assemly 
+        # making sure it is in the found cycles noised puzzles 
+        cycles_noise_1 = [Cycle(debug_graph_cycle=cycle) for cycle in graph_cycles_noise_1]
         debug_edge2cycles = map_edge_to_contain_cycles(cycles_noise_1)
         P_1_e_1_cycles = sorted(
             list(
@@ -291,16 +307,12 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
                     debug_edge2cycles["P_1_e_1"])
             )
         )
+        assert ["0","1","2","5"] in P_1_e_1_cycles
 
-        assert [0,1,2,5] in P_1_e_1_cycles
-
-        print(all_blue_red_cycles)
-
-        puzzle_num = 2
-        puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
-        all_blue_red_cycles = wrapper.compute_red_blue_360_loops()
-        assert len(all_blue_red_cycles) == 5
+        # making sure all the cycles found in the noise 0 puzzle
+        # are found also in the noised puzzle
+        for cycle in graph_cycles_noise_0:
+            assert set(cycle) in graph_cycles_noise_1_sets
 
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
