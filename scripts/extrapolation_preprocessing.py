@@ -47,6 +47,8 @@ for piece in bag_of_pieces:
         shutil.copy(output_mask_path,wsl_directory)
         print(f"Piece {piece.id}: copied to extrapolation model successfully.")
 
+        with open(f"{output_directory}/params.txt") as f:
+            f.write(f"line_width {args.line_width}")
 
     except Exception as e:
         print("error:",e)
