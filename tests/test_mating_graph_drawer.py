@@ -7,7 +7,8 @@ from src.mating_graphs.drawer import MatchingGraphDrawer
 import matplotlib.pyplot as plt
 import numpy as np
 from src.piece import Piece
-
+from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
+from src.pairwise_matchers.pictorial import ExtrapolatorMatcher
 
 class TestGraphDrawer(unittest.TestCase):
     
@@ -21,6 +22,7 @@ class TestGraphDrawer(unittest.TestCase):
 
         for piece in bag_of_pieces:
             id2piece[piece.id] = piece
+            piece.load_extrapolated_image()
 
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
         edge_length_extractor.run()
@@ -28,12 +30,19 @@ class TestGraphDrawer(unittest.TestCase):
         angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
         angles_extractor.run()
 
+        lama_extractor = LamaEdgeExtrapolator(bag_of_pieces)
+        lama_extractor.run()
+
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
-        
+
+        pictorial_matcher = ExtrapolatorMatcher(bag_of_pieces)
+        pictorial_matcher.pairwise()
+
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
                                                 edge_length_pairwiser.match_edges,
-                                                edge_length_pairwiser.match_pieces_score)
+                                                edge_length_pairwiser.match_pieces_score,
+                                                pictorial_matcher=pictorial_matcher)
         wrapper.build_graph()
         # wrapper.find_matching()
 
