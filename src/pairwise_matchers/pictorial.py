@@ -24,7 +24,7 @@ class ExtrapolatorMatcher():
 
             self.total_num_edges+= num_coords
 
-        self.matching_edges_scores = np.zeros((self.total_num_edges,self.total_num_edges))
+        self.matching_edges_scores = np.nan * np.ones((self.total_num_edges,self.total_num_edges))
     
     def _score_pair(self,edge1_content:np.array,edge2_content:np.array):
         assert edge1_content.shape[1] == 3

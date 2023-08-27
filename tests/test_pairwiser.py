@@ -34,6 +34,12 @@ class TestlamaMatcher(unittest.TestCase):
 
         score = matcher.get_score("3","0","4","2")
         print(score)
+        assert np.isnan(matcher.get_score("3","0","3","2"))
+        assert np.isnan(matcher.get_score("3","0","3","1"))
+        assert np.isnan(matcher.get_score("3","0","3","0"))
+        assert np.isnan(matcher.get_score("4","0","4","2"))
+        assert np.isnan(matcher.get_score("4","0","4","1"))
+        assert np.isnan(matcher.get_score("4","0","4","0"))
 
 
 
