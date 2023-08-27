@@ -22,6 +22,9 @@ output_directory = f"{directory}/for_extrapolation"
 if not os.path.exists(output_directory):
     os.makedirs(output_directory)
 
+with open(f"{output_directory}/params.txt","w") as f:
+    f.write(f"line_width {args.line_width}")
+
 puzzle = Puzzle(directory)
 puzzle.load()
 bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -47,8 +50,7 @@ for piece in bag_of_pieces:
         shutil.copy(output_mask_path,wsl_directory)
         print(f"Piece {piece.id}: copied to extrapolation model successfully.")
 
-        with open(f"{output_directory}/params.txt") as f:
-            f.write(f"line_width {args.line_width}")
+       
 
     except Exception as e:
         print("error:",e)
