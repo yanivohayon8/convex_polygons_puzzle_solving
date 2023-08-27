@@ -12,6 +12,8 @@ from src.assembly import Assembly
 from functools import reduce
 from src.mating_graphs.cycle import Cycle
 
+from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
+
 
 class ZeroLoops360Solver():
     def __init__(self,puzzle:Puzzle,db,puzzle_num,puzzle_noise_level) -> None:
@@ -33,6 +35,7 @@ class ZeroLoops360Solver():
 
         for piece in self.bag_of_pieces:
             self.id2piece[piece.id] = piece
+            piece.load_extrapolated_image()
 
     def extract_features(self):
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(self.bag_of_pieces)
@@ -40,6 +43,9 @@ class ZeroLoops360Solver():
 
         angles_extractor = geo_extractor.AngleLengthExtractor(self.bag_of_pieces)
         angles_extractor.run()
+
+        lama_extractor = LamaEdgeExtrapolator(self.bag_of_pieces)
+        lama_extractor.run()
 
     def pairwise(self):
         self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
