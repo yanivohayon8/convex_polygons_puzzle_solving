@@ -48,7 +48,7 @@ class ExtrapolatorMatcher():
 
         # A temporary score I found to avoid as possible
         # from numerical instabiility
-        return np.linalg.norm(big-small_padded)
+        return -np.linalg.norm(big-small_padded)
 
     def pairwise(self):
         for edge1_i in range(self.total_num_edges):
