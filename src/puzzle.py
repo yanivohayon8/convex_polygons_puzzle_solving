@@ -52,6 +52,23 @@ class Puzzle():
                 if file_name == id_str:
                     piece.img_path = path
                     continue
+    
+    def _get_pieces2extrapolated_img_path(self,pieces):
+        extentions = ["png","jpg"]
+        img_paths = []  
+        # [img_paths.extend(glob.glob(self.puzzle_directory+"\\*."+ext)) for ext in extentions]
+        [img_paths.extend(glob.glob(self.puzzle_directory+"\\extrapolated\\*."+ext)) for ext in extentions]
+
+        for piece in pieces:
+            #id_str = str(piece.id)
+            id_str = str(int(float(piece.id))) # The id is int written as double in Ofir ground truth, but the image name is in int...
+            for path in img_paths:
+                file_name = path.split("\\")[-1].split(".")[0]
+                tmp = file_name.split("-")[-1]
+                file_piece_id = tmp.split("_")[0]
+                if file_piece_id == id_str:
+                    piece.extrapolated_img_path = path
+                    continue
         
     
     def _get_noise_on_puzzle(self):
@@ -81,6 +98,7 @@ class Puzzle():
         pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
         self._preprocess(pieces)
         self._get_pieces2img_path(pieces)
+        self._get_pieces2extrapolated_img_path(pieces)
         return pieces
 
     def get_ground_truth_puzzle(self,csv_conv="Ofir"):

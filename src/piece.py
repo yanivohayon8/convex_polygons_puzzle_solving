@@ -16,6 +16,7 @@ class Piece():
         self.img = None
         self.features = {}
         self.ccw_edge2origin_edge = {}
+        self.extrapolated_img_path = ""
 
     def load_image(self):
         self.img = cv2.imread(self.img_path)

@@ -21,15 +21,19 @@ class TestLoader(unittest.TestCase):
         print(ground_truth_solution)
 
     def test_ground_truth_puzzle_loading_mutual_folder(self):
-        db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
+        db = "1"
+        puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_directory = f"../ConvexDrawingDataset/{db}/Puzzle{puzzle_num}/{puzzle_noise_level}"
+        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         puzzle.load()
         ground_truth_solution = puzzle.get_ground_truth_puzzle()
         print(puzzle.matings_max_difference)
         print(ground_truth_solution)
+
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        assert "0_mask" in bag_of_pieces[0].extrapolated_img_path
 
 
 
