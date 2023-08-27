@@ -59,7 +59,8 @@ class ZeroLoops360Solver():
     def build_mating_graph(self):
         self.mating_graph_wrapper = MatchingGraphWrapper(self.bag_of_pieces,self.id2piece,
                                                 self.edge_length_pairwiser.match_edges,
-                                                self.edge_length_pairwiser.match_pieces_score)
+                                                self.edge_length_pairwiser.match_pieces_score,
+                                                pictorial_matcher=self.pictorial_matcher)
         self.mating_graph_wrapper.build_graph()
     
     def build_zero_loops(self):

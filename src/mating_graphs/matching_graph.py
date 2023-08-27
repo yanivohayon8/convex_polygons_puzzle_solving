@@ -5,14 +5,17 @@ import matplotlib.collections as mpc
 from  matplotlib.cm import ScalarMappable
 import numpy as np
 import math
+from src.pairwise_matchers.pictorial import ExtrapolatorMatcher
 
 class MatchingGraphWrapper():
 
-    def __init__(self,pieces,id2piece:dict,match_edges=None,match_pieces_score=None) -> None:
+    def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
+                 geometric_match_pieces_score=None,pictorial_matcher:ExtrapolatorMatcher=None) -> None:
         self.pieces = pieces
         self.id2piece = id2piece
-        self.match_edges = match_edges
-        self.match_pieces_score = match_pieces_score
+        self.geometric_match_edges = geometric_match_edges
+        self.geometric_match_pieces_score = geometric_match_pieces_score # deprecated
+        self.pictorial_matcher = pictorial_matcher
         self.potential_matings_graph = None#nx.Graph()
         self.pieces_only_graph = None#nx.Graph()
         self.adjacency_graph = None
@@ -28,16 +31,16 @@ class MatchingGraphWrapper():
             piece_i_id = self.pieces[piece_i].id
             for piece_j in range(piece_i+1,num_pieces):
                 piece_j_id = self.pieces[piece_j].id
-                mating_edges = self.match_edges[piece_i,piece_j]
+                mating_edges = self.geometric_match_edges[piece_i,piece_j]
                 if len(mating_edges)>0:
-                    mating_edges_scores = self.match_pieces_score[piece_i,piece_j]
+                    # mating_edges_scores = self.geometric_match_pieces_score[piece_i,piece_j]
                     for k,mat_edge in enumerate(mating_edges):
                         new_links = []
 
                         for mating in mat_edge:
                             first_node = self._name_node(piece_i_id,mating[0])
                             second_node = self._name_node(piece_j_id,mating[1])
-                            compatibility = mating_edges_scores[k]
+                            compatibility = self.pictorial_matcher.get_score(piece_i_id,mating[0],piece_j_id,mating[1]) #mating_edges_scores[k]
                             new_links.append((first_node,second_node,{"compatibility":compatibility}))
                         
                         self.potential_matings_graph.add_edges_from(new_links)
