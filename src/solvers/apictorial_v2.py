@@ -52,7 +52,7 @@ class ZeroLoops360Solver():
         self.mating_graph_wrapper.build_graph()
     
     def build_zero_loops(self):
-        loop_angle_error = self.puzzle_noise_level *  1.5 #1#1.5
+        loop_angle_error = self.puzzle_noise_level *  1.5 #1#1.5 # this is not a good heuristic
 
         graph_cycles = self.mating_graph_wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
         self.cycles = [Cycle(debug_graph_cycle=graph_cycle) for graph_cycle in graph_cycles]
