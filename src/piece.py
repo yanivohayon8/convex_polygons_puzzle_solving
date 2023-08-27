@@ -7,7 +7,7 @@ from functools import reduce
 
 class Piece():
 
-    def __init__(self,id:str,coordinates:list,img_path=None) -> None:
+    def __init__(self,id:str,coordinates:list,img_path=None,extrapolated_img_path=None) -> None:
         self.id = id
         self.polygon = Polygon(coordinates)
         self.coordinates = coordinates
@@ -16,7 +16,7 @@ class Piece():
         self.img = None
         self.features = {}
         self.ccw_edge2origin_edge = {}
-        self.extrapolated_img_path = ""
+        self.extrapolated_img_path = extrapolated_img_path
         self.extrapolated_img = None
 
     def load_image(self):
