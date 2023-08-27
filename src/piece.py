@@ -17,10 +17,16 @@ class Piece():
         self.features = {}
         self.ccw_edge2origin_edge = {}
         self.extrapolated_img_path = ""
+        self.extrapolated_img = None
 
     def load_image(self):
         self.img = cv2.imread(self.img_path)
         self.img = self.img[...,::-1] # BGR to RGB
+
+    def load_extrapolated_image(self):
+        self.extrapolated_img = cv2.imread(self.extrapolated_img_path)
+        self.extrapolated_img = cv2.cvtColor(self.extrapolated_img,cv2.COLOR_BGR2RGB)
+        
 
     def get_coords(self):
         '''
