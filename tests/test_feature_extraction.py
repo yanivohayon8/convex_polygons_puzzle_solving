@@ -5,6 +5,30 @@ import matplotlib.pyplot as plt
 from src.feature_extraction.pictorial import slice_image,rotate_and_crop,trans_image
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
+from src.puzzle import Puzzle
+from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
+
+class TestLamaExtrapolation(unittest.TestCase):
+
+    def test_toy_example(self):
+        pieces = [
+            Piece("0",
+                  [
+                      (279.26156414925936,0.0),
+                        (0.0,400.418000125509),
+                        (325.5645334835908,1962.0680983081097),
+                        (1260.6015084925616,1329.154326230219)
+                      ])
+        ]
+
+        
+
+        pieces[0].extrapolated_img_path = '../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-0_mask.png'
+        pieces[0].load_extrapolated_image()
+
+        feature_extractor = LamaEdgeExtrapolator(pieces)
+        feature_extractor.run()
+        assert len(pieces[0].features["edges_extrapolated_lama"]) == 4
 
 
 class TestPictorial(unittest.TestCase):
