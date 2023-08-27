@@ -11,8 +11,9 @@ from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.assembly import Assembly
 from functools import reduce
 from src.mating_graphs.cycle import Cycle
-
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
+from src.pairwise_matchers.pictorial import ExtrapolatorMatcher
+
 
 
 class ZeroLoops360Solver():
@@ -22,6 +23,7 @@ class ZeroLoops360Solver():
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
         self.bag_of_pieces = None
+        self.pictorial_matcher = None
         self.mating_graph_wrapper = None
         self.http = HTTPClient(self.db,self.puzzle_num,self.puzzle_noise_level)
         self.physical_assembler = PhysicalAssembler(self.http)
@@ -50,6 +52,9 @@ class ZeroLoops360Solver():
     def pairwise(self):
         self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
         self.edge_length_pairwiser.pairwise(self.puzzle.matings_max_difference+1e-3)
+
+        self.pictorial_matcher = ExtrapolatorMatcher(self.bag_of_pieces)
+        self.pictorial_matcher.pairwise()
     
     def build_mating_graph(self):
         self.mating_graph_wrapper = MatchingGraphWrapper(self.bag_of_pieces,self.id2piece,
