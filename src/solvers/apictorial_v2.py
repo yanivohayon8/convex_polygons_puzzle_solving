@@ -12,7 +12,7 @@ from src.assembly import Assembly
 from functools import reduce
 from src.mating_graphs.cycle import Cycle
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.pairwise_matchers.pictorial import ExtrapolatorMatcher
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
 
 
 
@@ -53,7 +53,7 @@ class ZeroLoops360Solver():
         self.edge_length_pairwiser = geo_pairwiser.EdgeMatcher(self.bag_of_pieces)
         self.edge_length_pairwiser.pairwise(self.puzzle.matings_max_difference+1e-3)
 
-        self.pictorial_matcher = ExtrapolatorMatcher(self.bag_of_pieces)
+        self.pictorial_matcher = NaiveExtrapolatorMatcher(self.bag_of_pieces)
         self.pictorial_matcher.pairwise()
     
     def build_mating_graph(self):

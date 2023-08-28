@@ -5,12 +5,12 @@ import matplotlib.collections as mpc
 from  matplotlib.cm import ScalarMappable
 import numpy as np
 import math
-from src.pairwise_matchers.pictorial import ExtrapolatorMatcher
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
 
 class MatchingGraphWrapper():
 
     def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
-                 geometric_match_pieces_score=None,pictorial_matcher:ExtrapolatorMatcher=None) -> None:
+                 geometric_match_pieces_score=None,pictorial_matcher:NaiveExtrapolatorMatcher=None) -> None:
         self.pieces = pieces
         self.id2piece = id2piece
         self.geometric_match_edges = geometric_match_edges

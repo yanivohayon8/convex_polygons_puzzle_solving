@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class ExtrapolatorMatcher():
+class NaiveExtrapolatorMatcher():
     
     def __init__(self,pieces) -> None:
         self.pieces = pieces
@@ -48,7 +48,7 @@ class ExtrapolatorMatcher():
 
         # A temporary score I found to avoid as possible
         # from numerical instabiility
-        return -np.linalg.norm(big-small_padded)
+        return -np.power(np.square(-np.linalg.norm(big-small_padded,ord=2)),1/3)
 
     def pairwise(self):
         for edge1_i in range(self.total_num_edges):
