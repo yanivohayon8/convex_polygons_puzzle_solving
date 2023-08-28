@@ -5,6 +5,7 @@ from PIL import ImageDraw
 from shapely import Polygon,Point
 import matplotlib.pyplot as plt
 import cv2
+import numpy as np
 
 class TestPOC(unittest.TestCase):
     
@@ -60,23 +61,52 @@ class TestPOC(unittest.TestCase):
         width = 10
         debug_masked_images = []
         edges_content = []
-        
+
         for prev_coord,next_coord in zip(piece4_coords_[:-1],piece4_coords_[1:]):
             masked_image,line_pixels = mask_line(image,prev_coord,next_coord,width)
             debug_masked_images.append(masked_image)
-        
-        fig, axs_masked_images = plt.subplots(2,2)
+            edges_content.append(line_pixels)
 
-        axs_masked_images[0,0].imshow(debug_masked_images[0])
-        axs_masked_images[0,0].axis("off")
-        axs_masked_images[0,1].imshow(debug_masked_images[1])
-        axs_masked_images[0,1].axis("off")
-        axs_masked_images[1,0].imshow(debug_masked_images[2])
-        axs_masked_images[1,0].axis("off")
-        axs_masked_images[1,1].imshow(debug_masked_images[3])
-        axs_masked_images[1,1].axis("off")
-        
-        plt.show()
+        width_extrapolation = 10
+        is_show_all_edges = False#True
+
+        if is_show_all_edges:
+
+            fig, axs_masked_images = plt.subplots(2,2)
+
+            axs_masked_images[0,0].imshow(debug_masked_images[0])
+            axs_masked_images[0,0].axis("off")
+            axs_masked_images[0,1].imshow(debug_masked_images[1])
+            axs_masked_images[0,1].axis("off")
+            axs_masked_images[1,0].imshow(debug_masked_images[2])
+            axs_masked_images[1,0].axis("off")
+            axs_masked_images[1,1].imshow(debug_masked_images[3])
+            axs_masked_images[1,1].axis("off")
+            
+            plt.show()
+
+            fig2, axs_line_pixels = plt.subplots(2,2)
+            axs_flatten = axs_line_pixels.flatten()
+
+            for i,content in enumerate(edges_content):
+                num_pad = width_extrapolation - content.shape[0]%width_extrapolation
+                edge_padded = np.pad(content,((0,num_pad),(0,0)),constant_values=0)
+                # edge_img = edge_padded.reshape(width_extrapolation,-1,3)
+                edge_img = edge_padded.reshape(-1,width_extrapolation,3)
+                axs_flatten[i].imshow(edge_img)
+            
+            plt.show()
+        else:
+            fig3, axs_zoomed = plt.subplots(1,2)
+            jj = 3
+            axs_zoomed[0].imshow(debug_masked_images[jj])
+            num_pad = width_extrapolation - edges_content[jj].shape[0]%width_extrapolation
+            edge_padded = np.pad(edges_content[jj],((0,num_pad),(0,0)),constant_values=0)
+            # edge_img = edge_padded.reshape(width_extrapolation,-1,3)
+            edge_img = edge_padded.reshape(-1,width_extrapolation,3)
+            axs_zoomed[1].imshow(edge_img)
+            plt.show()
+
 
 
 

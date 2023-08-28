@@ -21,14 +21,23 @@ class TestLamaExtrapolation(unittest.TestCase):
                       ])
         ]
 
-        
-
         pieces[0].extrapolated_img_path = '../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-0_mask.png'
         pieces[0].load_extrapolated_image()
 
         feature_extractor = LamaEdgeExtrapolator(pieces)
         feature_extractor.run()
         assert len(pieces[0].features["edges_extrapolated_lama"]) == 4
+
+        axs_zoomed = plt.subplot()
+        jj = 2
+        width_extrapolation = 10
+        edge_content = pieces[0].features["edges_extrapolated_lama"][jj]
+
+        num_pad = width_extrapolation - edge_content.shape[0]%width_extrapolation
+        edge_padded = np.pad(edge_content,((0,num_pad),(0,0)),constant_values=0)
+        edge_img = edge_padded.reshape(-1,width_extrapolation,3)
+        axs_zoomed.imshow(edge_img)
+        plt.show()
 
 
 class TestPictorial(unittest.TestCase):
