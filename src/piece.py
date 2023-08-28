@@ -25,7 +25,8 @@ class Piece():
 
     def load_extrapolated_image(self):
         self.extrapolated_img = cv2.imread(self.extrapolated_img_path)
-        self.extrapolated_img = cv2.cvtColor(self.extrapolated_img,cv2.COLOR_BGR2LAB)
+        # self.extrapolated_img = cv2.cvtColor(self.extrapolated_img,cv2.COLOR_BGR2LAB)
+        # self.extrapolated_img = cv2.cvtColor(self.extrapolated_img,cv2.COLOR_BGR2HSV)
 
     def get_coords(self):
         '''
