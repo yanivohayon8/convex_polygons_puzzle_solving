@@ -1,5 +1,5 @@
 import unittest 
-from src.feature_extraction.extrapolator.lama_masking import convert_rgba_to_rgb,get_line_pixels,mask_line
+from src.feature_extraction.extrapolator.lama_masking import mask_line
 from PIL import Image
 from PIL import ImageDraw
 from shapely import Polygon,Point

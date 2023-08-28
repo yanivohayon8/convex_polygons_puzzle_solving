@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.pairwise_matchers.pictorial import ExtrapolatorMatcher
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
 
 class TestGraphDrawer(unittest.TestCase):
     
@@ -36,7 +36,7 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
 
-        pictorial_matcher = ExtrapolatorMatcher(bag_of_pieces)
+        pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
         pictorial_matcher.pairwise()
 
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
@@ -89,7 +89,7 @@ class TestGraphDrawer(unittest.TestCase):
     def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
         db = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
         puzzle_num = 2
-        puzzle_noise_level = 1
+        puzzle_noise_level = 0
         
         ground_truth_graph = self._load_graph(db,puzzle_num,0)
         graph = self._load_graph(db,puzzle_num,puzzle_noise_level)

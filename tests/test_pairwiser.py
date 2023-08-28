@@ -6,7 +6,7 @@ from src.feature_extraction.geometric import EdgeLengthExtractor
 from src.pairwise_matchers.geometric import EdgeMatcher
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.pairwise_matchers.pictorial import ExtrapolatorMatcher
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
 
 class TestlamaMatcher(unittest.TestCase):
 
@@ -29,7 +29,7 @@ class TestlamaMatcher(unittest.TestCase):
         feature_extractor = LamaEdgeExtrapolator(bag_of_pieces)
         feature_extractor.run()
 
-        matcher = ExtrapolatorMatcher(bag_of_pieces)
+        matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
         matcher.pairwise()
 
         score = matcher.get_score("3","0","4","2")

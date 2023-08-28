@@ -32,7 +32,7 @@ class TestZeroLoops360Solver(unittest.TestCase):
         db = "1"
         puzzle_num = 19
 
-        for puzzle_noise_level in range(1,4):
+        for puzzle_noise_level in range(0,4):
             print("******************************************")
             print(f"\tTest on noise level {puzzle_noise_level}")
             print("******************************************")
