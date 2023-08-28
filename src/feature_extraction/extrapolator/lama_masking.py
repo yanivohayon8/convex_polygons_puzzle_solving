@@ -48,13 +48,7 @@ class OriginalImgExtractor(Extractor):
 def mask_line(image:np.array, start_point, end_point, width):
     mask = np.zeros_like(image)
     cv2.line(mask,start_point,end_point,(1,1,1),width)
-
-    # masked_image = cv2.bitwise_and(image,mask)
     masked_image = image.copy() * mask
-    # masked_image[mask==0] = 0
-    # masked_image[np.all(mask==0,axis=1)] = 0
-
-    # line_pixels = np.argwhere(masked_image!=0)
     line_pixels = masked_image[np.any(masked_image!=0,axis=2)]
 
     return masked_image,line_pixels

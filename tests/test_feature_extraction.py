@@ -10,6 +10,7 @@ from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolato
 
 class TestLamaExtrapolation(unittest.TestCase):
 
+
     def test_toy_example(self):
         pieces = [
             Piece("0",
@@ -39,6 +40,43 @@ class TestLamaExtrapolation(unittest.TestCase):
         axs_zoomed.imshow(edge_img)
         plt.show()
 
+
+    def _make_line_pixel_imagble(self,edge_content:np.ndarray,width_extrapolation:int):
+        num_pad = width_extrapolation - edge_content.shape[0]%width_extrapolation
+        edge_padded = np.pad(edge_content,((0,num_pad),(0,0)),constant_values=0)
+        return edge_padded.reshape(-1,width_extrapolation,3)
+
+    def test_edge_vs_edge_display(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+        piece_ii = 0
+        edge_ii = 3
+        piece_jj = 1
+        edge_jj = 1
+        pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+
+        for piece in pieces:
+            piece.load_extrapolated_image()
+
+        feature_extractor = LamaEdgeExtrapolator(pieces)
+        feature_extractor.run()
+
+        fig,axs = plt.subplots(1,2)
+        width_extrapolation = 10 # as preproceessed beforehand
+        edges_indices = [edge_ii,edge_jj]
+        pieces_indecies = [piece_ii,piece_jj]
+
+        for k in range(2):
+            edge_content = pieces[k].features["edges_extrapolated_lama"][edges_indices[k]]
+            edge_img = self._make_line_pixel_imagble(edge_content,width_extrapolation)
+            axs[k].imshow(edge_img)
+            axs[k].set_title(f"P_{pieces_indecies[k]}_E_{edges_indices[k]}")
+
+        plt.show()
 
 class TestPictorial(unittest.TestCase):
     
