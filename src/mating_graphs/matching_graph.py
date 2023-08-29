@@ -72,7 +72,7 @@ class MatchingGraphWrapper():
             self.filtered_potential_matings_graph.add_node(node, **attributes)
 
         compatibilities = [edge_attributes[2]["compatibility"] for edge_attributes in self.potential_matings_graph.edges(data=True)]
-        sorted_edges = [x for _, x in sorted(zip(compatibilities, self.potential_matings_graph.edges))] #sorted(compatibilities, key=lambda edge: compatibilities[edge], reverse=True)
+        sorted_edges = [x for _, x in sorted(zip(compatibilities, self.potential_matings_graph.edges),reverse=True)] #sorted(compatibilities, key=lambda edge: compatibilities[edge], reverse=True)
         num_edges = len(sorted_edges)
         quartile_threshold  = int(0.75 * num_edges)
         top_quartile_edges = sorted_edges[:quartile_threshold]
