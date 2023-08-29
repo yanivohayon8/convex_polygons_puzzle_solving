@@ -90,6 +90,7 @@ class ConvolutionV1Matcher(NaiveExtrapolatorMatcher):
             feature_map = img2
             kernel = img1
         
+        # TODO: implement steps
         start_row = 0
         end_row = kernel.shape[0]
         end_col = self.extrapolation_width # both images have the same width
