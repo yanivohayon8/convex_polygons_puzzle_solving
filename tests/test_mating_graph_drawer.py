@@ -8,11 +8,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,ConvolutionV1Matcher
 
 class TestGraphDrawer(unittest.TestCase):
     
-    def _load_graph(self,db,puzzle_num,puzzle_noise_level):
+    def _load_graph(self,db,puzzle_num,puzzle_noise_level,
+                    pictorial_matcher="naive"):
         
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
@@ -36,8 +37,12 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
 
-        pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
-        pictorial_matcher.pairwise()
+        if pictorial_matcher == "naive":
+            pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
+            pictorial_matcher.pairwise()
+        elif pictorial_matcher == "convV1":
+            pictorial_matcher = ConvolutionV1Matcher(bag_of_pieces,self.extrapolation_width)
+            pictorial_matcher.pairwise()
 
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
                                                 edge_length_pairwiser.match_edges,
@@ -69,34 +74,23 @@ class TestGraphDrawer(unittest.TestCase):
         plt.show()
     
     def test_draw_Inv9084_with_noise(self):
-        db = "1" #"Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 13 #19
-        puzzle_noise_level = 0
-        
-        ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
-        wrapper = self._load_graph(db,puzzle_num,puzzle_noise_level)
+        db = "1" 
+        puzzle_num = 19 #13 #19
+        puzzle_noise_level = 1
+        pictorial_matcher = "convV1"
+        self.extrapolation_width = 10
+
+        ground_truth_wrapper = self._load_graph(db,puzzle_num,0,
+                                                pictorial_matcher=pictorial_matcher)
+        wrapper = self._load_graph(db,puzzle_num,puzzle_noise_level,
+                                   pictorial_matcher=pictorial_matcher)
 
         fig, axs = plt.subplots(1,2)
         self._draw(wrapper,ground_truth_wrapper,axs[0],axs[1])
 
         plt.show()
-
-        # raw_cycles = wrapper.compute_cycles(max_length=10)
-        # print(len(list(raw_cycles)))
-
         
     
-    def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
-        db = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
-        puzzle_num = 2
-        puzzle_noise_level = 0
-        
-        ground_truth_graph = self._load_graph(db,puzzle_num,0)
-        graph = self._load_graph(db,puzzle_num,puzzle_noise_level)
-        
-        fig, axs = plt.subplots(1,2)
-        self._draw(graph,ground_truth_graph,axs[0],axs[1])
-        plt.show()
 
         
         

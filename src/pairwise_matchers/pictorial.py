@@ -80,4 +80,23 @@ class ConvolutionV1Matcher(NaiveExtrapolatorMatcher):
         self.extrapolation_width = extrapolation_width
 
     def _score_pair(self,edge1_pixels:np.array,edge2_pixels:np.array):
-        img1 = reshape_line_to_image(edge)
+        img1 = reshape_line_to_image(edge1_pixels,self.extrapolation_width)
+        img2 = reshape_line_to_image(edge2_pixels,self.extrapolation_width)
+
+        feature_map = img1
+        kernel = img2
+
+        if kernel.shape[0] > feature_map.shape[0]:
+            feature_map = img2
+            kernel = img1
+        
+        start_row = 0
+        end_row = kernel.shape[0]
+        end_col = self.extrapolation_width # both images have the same width
+        receptive_field = feature_map[start_row:end_row,:end_col]
+        norm1 = np.linalg.norm(receptive_field)
+        norm2 = np.linalg.norm(kernel)
+
+        return np.sum(kernel*receptive_field)/norm1/norm2
+
+

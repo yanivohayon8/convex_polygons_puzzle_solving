@@ -54,7 +54,7 @@ def mask_line(image:np.array, start_point, end_point, extrapolation_width):
     return masked_image,edge_pixels
 
 
-def reshape_line_to_image(line_pixels:np.ndarray,width_extrapolation:int):
+def reshape_line_to_image(line_pixels:np.ndarray,width_extrapolation:int)->np.ndarray:
     '''
         line_pixels = Nx3 (RGB)
     '''
