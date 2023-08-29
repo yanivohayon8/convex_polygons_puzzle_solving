@@ -45,10 +45,10 @@ class TestLamaExtrapolation(unittest.TestCase):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
-        piece_ii = 6
-        edge_ii = 2
-        piece_jj = 4
-        edge_jj = 1
+        piece_ii = 8
+        edge_ii = 0
+        piece_jj = 7
+        edge_jj = 2
         pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
 
         for piece in pieces:

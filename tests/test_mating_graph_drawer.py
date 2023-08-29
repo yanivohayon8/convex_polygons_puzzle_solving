@@ -77,7 +77,7 @@ class TestGraphDrawer(unittest.TestCase):
     def test_draw_Inv9084_with_noise(self):
         db = "1" 
         puzzle_num = 19 #13 #19
-        puzzle_noise_level = 1
+        puzzle_noise_level = 0
         pictorial_matcher = "convV1" #"convV1"
         self.extrapolation_width = 10
 

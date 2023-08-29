@@ -75,7 +75,7 @@ class NaiveExtrapolatorMatcher():
 
 class ConvolutionV1Matcher(NaiveExtrapolatorMatcher):
 
-    def __init__(self, pieces,extrapolation_width,step_size=20) -> None:
+    def __init__(self, pieces,extrapolation_width,step_size=100) -> None:
         super().__init__(pieces)
         self.extrapolation_width = extrapolation_width
         self.step_size = step_size
