@@ -79,7 +79,7 @@ class TestGraphDrawer(unittest.TestCase):
         db = "1" 
         puzzle_num = 19 #13 #19
         puzzle_noise_level = 1
-        pictorial_matcher = "convV1"
+        pictorial_matcher = "convV1" #"convV1"
         self.extrapolation_width = 10
 
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0,
