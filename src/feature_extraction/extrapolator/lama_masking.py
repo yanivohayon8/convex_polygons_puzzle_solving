@@ -14,36 +14,26 @@ class LamaEdgeExtrapolator(Extractor):
     def extract_for_piece(self,piece:Piece):
         piece.features["edges_extrapolated_lama"] = []
         coords = [(int(coord[0]),int(coord[1])) for coord in piece.coordinates + [piece.coordinates[0]]]
-        # debug_masked_images = []
 
         for prev_coord,next_coord in zip(coords[:-1],coords[1:]):
             masked_image,line_pixels = mask_line(piece.extrapolated_img,prev_coord,next_coord,self.sampling_width)
             piece.features["edges_extrapolated_lama"].append(line_pixels)
-            # debug_masked_images.append(masked_image)
         
-        # return debug_masked_images
-
 class OriginalImgExtractor(Extractor):
 
     def __init__(self, pieces,extrapolator_samling_width=10):
         super().__init__(pieces)
-        self.sampling_width = extrapolator_samling_width*2 # becuse part of the masking line overlapped with the background
+        self.sampling_width = extrapolator_samling_width#*2 # becuse part of the masking line overlapped with the background
 
     def extract_for_piece(self,piece:Piece): 
         piece.features["edges_pictorial_content"] = []
         coords = [(int(coord[0]),int(coord[1])) for coord in piece.coordinates + [piece.coordinates[0]]]
-        debug_masked_images = []
+        img_rgb = cv2.cvtColor(piece.img,cv2.COLOR_RGBA2RGB)
 
         for prev_coord,next_coord in zip(coords[:-1],coords[1:]):
-            img_rgb = cv2.cvtColor(piece.img,cv2.COLOR_RGBA2RGB)
-            masked_image,line_pixels_with_background = mask_line(img_rgb,prev_coord,next_coord,self.sampling_width)
-
-            line_pixels = line_pixels_with_background[line_pixels_with_background>0]
-
+            masked_image,line_pixels = mask_line(img_rgb,prev_coord,next_coord,self.sampling_width)
             piece.features["edges_pictorial_content"].append(line_pixels)
-            debug_masked_images.append(masked_image)
         
-        return debug_masked_images
 
 def mask_line(image:np.array, start_point, end_point, extrapolation_width):
     mask = np.zeros_like(image)
