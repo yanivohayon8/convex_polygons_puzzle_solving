@@ -57,11 +57,10 @@ class TestGraphDrawer(unittest.TestCase):
         drawer = MatchingGraphDrawer(ground_truth_wrapper)
         drawer.init()
 
-        drawer.draw_adjacency_graph(wrapper,ax=ax1)
-        ax1.set_title("Noised")
-
-        drawer.draw_adjacency_graph(ground_truth_wrapper,ax=ax2)
-        ax2.set_title("Noiseless")
+        # drawer.draw_adjacency_graph(wrapper,ax=ax1)
+        # ax1.set_title("Noised")
+        # drawer.draw_adjacency_graph(ground_truth_wrapper,ax=ax2)
+        # ax2.set_title("Noiseless")
 
         drawer.draw_graph_matching(wrapper)
         drawer.draw_graph_filtered_matching(wrapper)

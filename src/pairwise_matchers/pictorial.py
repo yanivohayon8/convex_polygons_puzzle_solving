@@ -75,9 +75,10 @@ class NaiveExtrapolatorMatcher():
 
 class ConvolutionV1Matcher(NaiveExtrapolatorMatcher):
 
-    def __init__(self, pieces,extrapolation_width) -> None:
+    def __init__(self, pieces,extrapolation_width,step_size=20) -> None:
         super().__init__(pieces)
         self.extrapolation_width = extrapolation_width
+        self.step_size = step_size
 
     def _score_pair(self,edge1_pixels:np.array,edge2_pixels:np.array):
         img1 = reshape_line_to_image(edge1_pixels,self.extrapolation_width)
@@ -90,14 +91,20 @@ class ConvolutionV1Matcher(NaiveExtrapolatorMatcher):
             feature_map = img2
             kernel = img1
         
-        # TODO: implement steps
+        products = [-999]
         start_row = 0
-        end_row = kernel.shape[0]
+        end_row = start_row + kernel.shape[0]
         end_col = self.extrapolation_width # both images have the same width
-        receptive_field = feature_map[start_row:end_row,:end_col]
-        norm1 = np.linalg.norm(receptive_field)
-        norm2 = np.linalg.norm(kernel)
+        kernel_norm = np.linalg.norm(kernel)
 
-        return np.sum(kernel*receptive_field)/norm1/norm2
+        while end_row < feature_map.shape[0]:
+            receptive_field = feature_map[start_row:end_row,:end_col]
+            receptive_field_norm = np.linalg.norm(receptive_field)
+            prod = np.sum(kernel*receptive_field)/receptive_field_norm/kernel_norm
+            products.append(prod)
+            start_row += self.step_size
+            end_row = start_row + kernel.shape[0]
+
+        return max(products)
 
 
