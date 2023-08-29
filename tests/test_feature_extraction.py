@@ -6,7 +6,7 @@ from src.feature_extraction.pictorial import slice_image,rotate_and_crop,trans_i
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
 from src.puzzle import Puzzle
-from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
+from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator,reshape_line_to_image
 
 class TestLamaExtrapolation(unittest.TestCase):
 
@@ -34,17 +34,13 @@ class TestLamaExtrapolation(unittest.TestCase):
         width_extrapolation = 10
         edge_content = pieces[0].features["edges_extrapolated_lama"][jj]
 
-        num_pad = width_extrapolation - edge_content.shape[0]%width_extrapolation
-        edge_padded = np.pad(edge_content,((0,num_pad),(0,0)),constant_values=0)
-        edge_img = edge_padded.reshape(-1,width_extrapolation,3)
+        # num_pad = width_extrapolation - edge_content.shape[0]%width_extrapolation
+        # edge_padded = np.pad(edge_content,((0,num_pad),(0,0)),constant_values=0)
+        # edge_img = edge_padded.reshape(-1,width_extrapolation,3)
+        edge_img = reshape_line_to_image(edge_content,width_extrapolation)
         axs_zoomed.imshow(edge_img)
         plt.show()
 
-
-    def _make_line_pixel_imagble(self,edge_content:np.ndarray,width_extrapolation:int):
-        num_pad = width_extrapolation - edge_content.shape[0]%width_extrapolation
-        edge_padded = np.pad(edge_content,((0,num_pad),(0,0)),constant_values=0)
-        return edge_padded.reshape(-1,width_extrapolation,3)
 
     def test_edge_vs_edge_display(self):
         db = 1
@@ -53,9 +49,9 @@ class TestLamaExtrapolation(unittest.TestCase):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
-        piece_ii = 0
-        edge_ii = 3
-        piece_jj = 1
+        piece_ii = 6
+        edge_ii = 2
+        piece_jj = 4
         edge_jj = 1
         pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
 
@@ -69,14 +65,18 @@ class TestLamaExtrapolation(unittest.TestCase):
         width_extrapolation = 10 # as preproceessed beforehand
         edges_indices = [edge_ii,edge_jj]
         pieces_indecies = [piece_ii,piece_jj]
+        edges_names = [f"P_{pieces_indecies[0]}_E_{edges_indices[0]}",f"P_{pieces_indecies[1]}_E_{edges_indices[1]}"]
 
         for k in range(2):
             edge_content = pieces[k].features["edges_extrapolated_lama"][edges_indices[k]]
-            edge_img = self._make_line_pixel_imagble(edge_content,width_extrapolation)
+            edge_img = reshape_line_to_image(edge_content,width_extrapolation) #self._make_line_pixel_imagble(edge_content,width_extrapolation)
             axs[k].imshow(edge_img)
-            axs[k].set_title(f"P_{pieces_indecies[k]}_E_{edges_indices[k]}")
+            axs[k].set_title(edges_names[k])
 
         plt.show()
+        edge_ii_length = pieces[0].features["edges_extrapolated_lama"][edges_indices[0]].shape[0]
+        edge_jj_length = pieces[1].features["edges_extrapolated_lama"][edges_indices[1]].shape[0]
+        assert abs(edge_ii_length -  edge_jj_length) < width_extrapolation, f"{edges_names[0]} length is {edge_ii_length} and {edges_names[1]} length is {edge_jj_length}. The diffrence is too big "
 
 class TestPictorial(unittest.TestCase):
     

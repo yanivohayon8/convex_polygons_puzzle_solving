@@ -56,7 +56,7 @@ class TestPOC(unittest.TestCase):
         piece4_coords = [(0.0,0.0),(627.1196899414062,606.4771728515625),(832.7311401367188,665.748779296875),(1624.2766723632812,758.9954223632812)]
         piece4_coords_ = [(int(coord[0]),int(coord[1])) for coord in piece4_coords+[piece4_coords[0]]]
 
-        image = cv2.imread(f"{directory}/extrapolated/{piece_name}_mask.png")
+        image = cv2.imread(f"{directory}/extrapolated/DB-{db}-puzzle-{puzzle_num}-noise-{puzzle_noise_level}-{piece_name}_mask.png")
         image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
         width = 10
         debug_masked_images = []
@@ -98,7 +98,7 @@ class TestPOC(unittest.TestCase):
             plt.show()
         else:
             fig3, axs_zoomed = plt.subplots(1,2)
-            jj = 3
+            jj = 1 
             axs_zoomed[0].imshow(debug_masked_images[jj])
             num_pad = width_extrapolation - edges_content[jj].shape[0]%width_extrapolation
             edge_padded = np.pad(edges_content[jj],((0,num_pad),(0,0)),constant_values=0)
