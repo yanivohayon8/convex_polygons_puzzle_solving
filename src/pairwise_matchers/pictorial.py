@@ -1,5 +1,5 @@
 import numpy as np
-
+from src.feature_extraction.extrapolator.lama_masking import reshape_line_to_image
 
 class NaiveExtrapolatorMatcher():
     
@@ -26,16 +26,16 @@ class NaiveExtrapolatorMatcher():
 
         self.matching_edges_scores = np.nan * np.ones((self.total_num_edges,self.total_num_edges))
     
-    def _score_pair(self,edge1_content:np.array,edge2_content:np.array):
-        assert edge1_content.shape[1] == 3
-        assert edge2_content.shape[1] == 3
+    def _score_pair(self,edge1_pixels:np.array,edge2_pixels:np.array):
+        assert edge1_pixels.shape[1] == 3
+        assert edge2_pixels.shape[1] == 3
 
-        small = edge2_content
-        big = edge1_content
+        small = edge2_pixels
+        big = edge1_pixels
 
-        if edge1_content.shape[0] < edge2_content.shape[0]:
-            small = edge1_content
-            big = edge2_content
+        if edge1_pixels.shape[0] < edge2_pixels.shape[0]:
+            small = edge1_pixels
+            big = edge2_pixels
         
         length_diff = big.shape[0]-small.shape[0]
         right_padd_size = length_diff//2
@@ -59,13 +59,13 @@ class NaiveExtrapolatorMatcher():
 
                 piece1_i = self.edge2piece_index[edge1_i]
                 edge1_local_i = self.global_index2local_index[edge1_i]
-                edge1_content = self.pieces[piece1_i].features["edges_extrapolated_lama"][edge1_local_i]
+                edge1_pixels = self.pieces[piece1_i].features["edges_extrapolated_lama"][edge1_local_i]
 
                 piece2_j = self.edge2piece_index[edge2_j]
                 edge2_local_j = self.global_index2local_index[edge2_j]
-                edge2_content = self.pieces[piece2_j].features["edges_extrapolated_lama"][edge2_local_j]
+                edge2_pixels = self.pieces[piece2_j].features["edges_extrapolated_lama"][edge2_local_j]
                 
-                self.matching_edges_scores[edge1_i,edge2_j] = self._score_pair(edge1_content,edge2_content)
+                self.matching_edges_scores[edge1_i,edge2_j] = self._score_pair(edge1_pixels,edge2_pixels)
 
     def get_score(self,piece1,edge1,piece2,edge2):
         global_index1 = self.local_index2global_index[f"{piece1}-{edge1}"]
@@ -73,4 +73,11 @@ class NaiveExtrapolatorMatcher():
         return self.matching_edges_scores[global_index1,global_index2] 
 
 
+class ConvolutionV1Matcher(NaiveExtrapolatorMatcher):
 
+    def __init__(self, pieces,extrapolation_width) -> None:
+        super().__init__(pieces)
+        self.extrapolation_width = extrapolation_width
+
+    def _score_pair(self,edge1_pixels:np.array,edge2_pixels:np.array):
+        img1 = reshape_line_to_image(edge)

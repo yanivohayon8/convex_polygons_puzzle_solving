@@ -49,9 +49,9 @@ def mask_line(image:np.array, start_point, end_point, extrapolation_width):
     mask = np.zeros_like(image)
     cv2.line(mask,start_point,end_point,(1,1,1),extrapolation_width)
     masked_image = image.copy() * mask
-    line_pixels = masked_image[np.any(mask!=0,axis=2)]
+    edge_pixels = masked_image[np.any(mask!=0,axis=2)]
 
-    return masked_image,line_pixels
+    return masked_image,edge_pixels
 
 
 def reshape_line_to_image(line_pixels:np.ndarray,width_extrapolation:int):

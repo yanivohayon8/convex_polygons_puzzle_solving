@@ -32,12 +32,8 @@ class TestLamaExtrapolation(unittest.TestCase):
         axs_zoomed = plt.subplot()
         jj = 2
         width_extrapolation = 10
-        edge_content = pieces[0].features["edges_extrapolated_lama"][jj]
-
-        # num_pad = width_extrapolation - edge_content.shape[0]%width_extrapolation
-        # edge_padded = np.pad(edge_content,((0,num_pad),(0,0)),constant_values=0)
-        # edge_img = edge_padded.reshape(-1,width_extrapolation,3)
-        edge_img = reshape_line_to_image(edge_content,width_extrapolation)
+        edge_pixels = pieces[0].features["edges_extrapolated_lama"][jj]
+        edge_img = reshape_line_to_image(edge_pixels,width_extrapolation)
         axs_zoomed.imshow(edge_img)
         plt.show()
 
@@ -68,8 +64,8 @@ class TestLamaExtrapolation(unittest.TestCase):
         edges_names = [f"P_{pieces_indecies[0]}_E_{edges_indices[0]}",f"P_{pieces_indecies[1]}_E_{edges_indices[1]}"]
 
         for k in range(2):
-            edge_content = pieces[k].features["edges_extrapolated_lama"][edges_indices[k]]
-            edge_img = reshape_line_to_image(edge_content,width_extrapolation) #self._make_line_pixel_imagble(edge_content,width_extrapolation)
+            edge_pixels = pieces[k].features["edges_extrapolated_lama"][edges_indices[k]]
+            edge_img = reshape_line_to_image(edge_pixels,width_extrapolation) 
             axs[k].imshow(edge_img)
             axs[k].set_title(edges_names[k])
 

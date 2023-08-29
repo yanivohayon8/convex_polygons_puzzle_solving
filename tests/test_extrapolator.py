@@ -50,9 +50,6 @@ class TestPOC(unittest.TestCase):
         directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
         piece_name = "4"
 
-        # mask_image = Image.open(f"{directory}/rgb/{piece_name}_mask.png")
-        # mask_pixels = mask_image.load()
-
         piece4_coords = [(0.0,0.0),(627.1196899414062,606.4771728515625),(832.7311401367188,665.748779296875),(1624.2766723632812,758.9954223632812)]
         piece4_coords_ = [(int(coord[0]),int(coord[1])) for coord in piece4_coords+[piece4_coords[0]]]
 
@@ -60,12 +57,12 @@ class TestPOC(unittest.TestCase):
         image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
         width = 10
         debug_masked_images = []
-        edges_content = []
+        edges_pixels = []
 
         for prev_coord,next_coord in zip(piece4_coords_[:-1],piece4_coords_[1:]):
-            masked_image,line_pixels = mask_line(image,prev_coord,next_coord,width)
+            masked_image,edge_pixels = mask_line(image,prev_coord,next_coord,width)
             debug_masked_images.append(masked_image)
-            edges_content.append(line_pixels)
+            edges_pixels.append(edge_pixels)
 
         width_extrapolation = 10
         is_show_all_edges = False#True
@@ -88,9 +85,9 @@ class TestPOC(unittest.TestCase):
             fig2, axs_line_pixels = plt.subplots(2,2)
             axs_flatten = axs_line_pixels.flatten()
 
-            for i,content in enumerate(edges_content):
-                num_pad = width_extrapolation - content.shape[0]%width_extrapolation
-                edge_padded = np.pad(content,((0,num_pad),(0,0)),constant_values=0)
+            for i,edge_pixels_ in enumerate(edges_pixels):
+                num_pad = width_extrapolation - edge_pixels_.shape[0]%width_extrapolation
+                edge_padded = np.pad(edge_pixels_,((0,num_pad),(0,0)),constant_values=0)
                 # edge_img = edge_padded.reshape(width_extrapolation,-1,3)
                 edge_img = edge_padded.reshape(-1,width_extrapolation,3)
                 axs_flatten[i].imshow(edge_img)
@@ -100,9 +97,8 @@ class TestPOC(unittest.TestCase):
             fig3, axs_zoomed = plt.subplots(1,2)
             jj = 1 
             axs_zoomed[0].imshow(debug_masked_images[jj])
-            num_pad = width_extrapolation - edges_content[jj].shape[0]%width_extrapolation
-            edge_padded = np.pad(edges_content[jj],((0,num_pad),(0,0)),constant_values=0)
-            # edge_img = edge_padded.reshape(width_extrapolation,-1,3)
+            num_pad = width_extrapolation - edges_pixels[jj].shape[0]%width_extrapolation
+            edge_padded = np.pad(edges_pixels[jj],((0,num_pad),(0,0)),constant_values=0)
             edge_img = edge_padded.reshape(-1,width_extrapolation,3)
             axs_zoomed[1].imshow(edge_img)
             plt.show()
