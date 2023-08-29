@@ -17,6 +17,7 @@ class MatchingGraphWrapper():
         self.geometric_match_pieces_score = geometric_match_pieces_score # deprecated
         self.pictorial_matcher = pictorial_matcher
         self.potential_matings_graph = None#nx.Graph()
+        self.filtered_potential_matings_graph = None
         self.pieces_only_graph = None#nx.Graph()
         self.adjacency_graph = None
 
@@ -64,10 +65,28 @@ class MatchingGraphWrapper():
         potential_matings = [edge for edge in self.potential_matings_graph.edges if not edge in self.pieces_only_graph]
         self.adjacency_graph.add_edges_from(potential_matings,type="inter_piece")
 
+    def _build_filtered_matching_graph(self):
+        self.filtered_potential_matings_graph = nx.Graph()
+        
+        for node, attributes in self.potential_matings_graph.nodes(data=True):
+            self.filtered_potential_matings_graph.add_node(node, **attributes)
+
+        compatibilities = [edge_attributes[2]["compatibility"] for edge_attributes in self.potential_matings_graph.edges(data=True)]
+        sorted_edges = [x for _, x in sorted(zip(compatibilities, self.potential_matings_graph.edges))] #sorted(compatibilities, key=lambda edge: compatibilities[edge], reverse=True)
+        num_edges = len(sorted_edges)
+        quartile_threshold  = int(0.75 * num_edges)
+        top_quartile_edges = sorted_edges[:quartile_threshold]
+
+        for source, target in top_quartile_edges:
+            attributes = self.potential_matings_graph[source][target]
+            self.filtered_potential_matings_graph.add_edge(source, target, **attributes)
+
+
     def build_graph(self):
         self._build_matching_graph()
         self._bulid_only_pieces_graph()
         self._build_adjacency_graph()
+        self._build_filtered_matching_graph()
     
     def get_matching_graph_nodes(self):
         return list(self.potential_matings_graph.nodes)
