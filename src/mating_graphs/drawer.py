@@ -166,7 +166,7 @@ class MatchingGraphDrawer():
     def _draw_ground_truth_matching(self,layout="planar",title="Ground Truth Matching",ax=None):
         self._draw_general_layout(self.noiseless_ground_truth_wrapper.potential_matings_graph,layout=layout,title=title,ax=ax)
     
-    def draw_graph_matching(self,graph_wrapper:MatchingGraphWrapper,layout="planar",title="Matching Graph",ax=None):
+    def _draw_graph_matching(self,matings_graph:nx.Graph,layout="planar",title="Matching Graph",ax=None):
 
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
@@ -175,7 +175,7 @@ class MatchingGraphDrawer():
         # pos = self._pos_by_layout(graph.matching_graph,layout)
         my_graph = nx.Graph()
         my_graph.add_nodes_from(self.noiseless_ground_truth_wrapper.pieces_only_graph.nodes)
-        my_graph.add_edges_from(graph_wrapper.potential_matings_graph.edges)
+        my_graph.add_edges_from(matings_graph.edges)
 
         nodes_labels = {}
 
@@ -186,7 +186,7 @@ class MatchingGraphDrawer():
         nx.draw_networkx_nodes(my_graph, self.node2position, node_size=500, node_color="skyblue", ax=ax)
         nx.draw_networkx_labels(my_graph, self.node2position, labels=nodes_labels, font_size=10, ax=ax)
 
-        edge_weights = [graph_wrapper.potential_matings_graph[u][v]['compatibility'] for u, v in graph_wrapper.potential_matings_graph.edges()]
+        edge_weights = [matings_graph[u][v]['compatibility'] for u, v in matings_graph.edges()]
         cmap = plt.cm.get_cmap('plasma')
         
         edges = nx.draw_networkx_edges(my_graph, self.node2position, edge_color=edge_weights, edge_cmap=cmap,
@@ -198,3 +198,9 @@ class MatchingGraphDrawer():
         ax.set_title(title)
 
         nx.draw_networkx_edges(my_graph, self.node2position, edge_color="gray",edgelist=self.noiseless_ground_truth_wrapper.pieces_only_graph.edges)
+
+    def draw_graph_matching(self,graph_wrapper:MatchingGraphWrapper,layout="planar",title="Matching Graph",ax=None):
+        self._draw_graph_matching(graph_wrapper.potential_matings_graph,layout=layout,title=title,ax=ax)
+    
+    def draw_graph_filtered_matching(self,graph_wrapper:MatchingGraphWrapper,layout="planar",title="Filtered Matching Graph",ax=None):
+        self._draw_graph_matching(graph_wrapper.filtered_potential_matings_graph,layout=layout,title=title,ax=ax)

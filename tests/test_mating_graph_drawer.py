@@ -62,7 +62,9 @@ class TestGraphDrawer(unittest.TestCase):
 
         drawer.draw_adjacency_graph(ground_truth_wrapper,ax=ax2)
         ax2.set_title("Noiseless")
+
         drawer.draw_graph_matching(wrapper)
+        drawer.draw_graph_filtered_matching(wrapper)
 
     def test_draw_ground_truth(self):
         db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
