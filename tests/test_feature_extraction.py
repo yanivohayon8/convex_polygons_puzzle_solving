@@ -7,7 +7,7 @@ import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
 from src.puzzle import Puzzle
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator,reshape_line_to_image,OriginalImgExtractor
-
+from PIL import Image
 
 class TestLamaExtrapolation(unittest.TestCase):
 
@@ -79,7 +79,7 @@ class TestLamaExtrapolation(unittest.TestCase):
 
 class TestOriginalImageExtractor(unittest.TestCase):
 
-    def test_single_edge(self):
+    def test_poc(self):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -87,19 +87,59 @@ class TestOriginalImageExtractor(unittest.TestCase):
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
-        piece_index = 2
+        piece_index = 0
         edge_index = 1
-        bag_of_pieces[piece_index].load_image()
-        pieces_container = [bag_of_pieces[piece_index]]
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_image()
         width_extrapolation = 50#10
 
-        feature_extractor = OriginalImgExtractor(pieces_container,extrapolator_samling_width=width_extrapolation)
-        feature_extractor.run()
+        curr_coord = chosen_piece.coordinates[edge_index]
+        start_point = (int(curr_coord[0]),int(curr_coord[1]))
+        next_coord = chosen_piece.coordinates[(edge_index+1)%chosen_piece.get_num_coords()]
+        end_point = (int(next_coord[0]),int(next_coord[1]))
+        
+        img_rgb = cv2.cvtColor(chosen_piece.img,cv2.COLOR_RGBA2RGB)
+        mask = np.zeros_like(img_rgb)
+        cv2.line(mask,start_point,end_point,(1,1,1),width_extrapolation)
+        masked_image = img_rgb.copy() * mask
+        edge_pixels = masked_image[np.any(mask!=0,axis=2)]
+        # edge_pixels_indices = np.argwhere(np.any(mask!=0,axis=2))
+        edge_pixels_indices = np.argwhere(np.any(masked_image!=0,axis=2))
 
-        axs_zoomed = plt.subplot()
-        edge_pixels = pieces_container[0].features["edges_pictorial_content"][edge_index]
-        edge_img = reshape_line_to_image(edge_pixels,width_extrapolation)
-        axs_zoomed.imshow(edge_img)
+        min_row,min_col = np.min(edge_pixels_indices,axis=0)
+        max_row,max_col = np.max(edge_pixels_indices,axis=0)
+        cropped_img = masked_image[min_row:max_row,min_col:max_col,:]
+        
+        axs = plt.subplot()
+        axs.imshow(cropped_img)
+
+        cropped_indices = np.argwhere(np.any(cropped_img!=0,axis=2))
+        # index_center_x,index_center_y = np.mean(cropped_indices,axis=0)
+        # centered_cropped_indices = cropped_indices - np.array([index_center_x,index_center_y],dtype=np.int)
+        # min_x, min_y = np.min(centered_cropped_indices,axis=0)
+        
+
+        min_row_cropped,min_col_cropped = np.min(cropped_indices,axis=0)
+        max_row_cropped,max_col_cropped = np.max(cropped_indices,axis=0)
+
+       
+
+        # fig,axs_zoomed = plt.subplots(1,2)
+        # edge_img = reshape_line_to_image(edge_pixels,width_extrapolation)
+        # axs_zoomed[0].imshow(np.transpose(edge_img,axes=(1,0,2)))
+        
+        # fig,axs = plt.subplots(1,2)
+        # axs[0].imshow(cropped_img)
+        
+
+        # angles_extractor = geo_extractor.AngleLengthExtractor([chosen_piece])
+        # angles_extractor.run()
+        # prev_edge_index = (edge_index-1)%chosen_piece.get_num_coords()
+        # inner_angle = chosen_piece.get_inner_angle(prev_edge_index,edge_index)
+        # inner_angle/=2
+        # img = Image.fromarray(masked_image).rotate(-inner_angle,center=end_point)
+        # axs[1].imshow(img)
+
         plt.show()
 
     def test_plot_two_edges(self):
@@ -142,7 +182,7 @@ class TestOriginalImageExtractor(unittest.TestCase):
 class TestPictorial(unittest.TestCase):
     
     def test_slice_image_func(self):
-        puzzleDirectory = "../ConvexDrawingDataset/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+        puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
         piece_id = "0"
         img_path = puzzleDirectory+f"/images/{piece_id}.png"
         coordinates = [
@@ -170,8 +210,8 @@ class TestPictorial(unittest.TestCase):
         plt.show()
 
 
-    def test_sample_edge(self):
-        puzzleDirectory = "../ConvexDrawingDataset/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+    def test_sample_edge_deprecated(self):
+        puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
         piece_id = "0"
         img_path = puzzleDirectory+f"/images/{piece_id}.png"
         coordinates = [
@@ -229,22 +269,29 @@ class TestPictorial(unittest.TestCase):
         plt.show()
         pass
 
-    def test_sample_edge_v2(self):
-        puzzleDirectory = "../ConvexDrawingDataset/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+    def test_sample_edge_quick_dirty(self):
+        puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
         piece_id = "0"
         img_path = puzzleDirectory+f"/images/{piece_id}.png"
+        # coordinates = [
+        #     (0,1144),
+        #     (433,1369),
+        #     (1939,845),
+        #     (1191,0)
+        # ]
+
         coordinates = [
-            (0,1144),
-            (433,1369),
-            (1939,845),
-            (1191,0)
+            (279,0),
+            (0,400),
+            (325,1962),
+            (1260,1329)
         ]
 
         piece = Piece(piece_id,coordinates,img_path)
         piece.load_image()
 
-        curr_index = 1
-        next_index = 2
+        curr_index = 3
+        next_index = 0
 
         curr_row = coordinates[curr_index][1]
         curr_col = coordinates[curr_index][0]
@@ -288,8 +335,62 @@ class TestPictorial(unittest.TestCase):
         plt.show()
         pass
     
+    def test_sample_edge_v2_organize(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        # PARAMS
+        piece_index = 0
+        edge_index = 1
+        width_extrapolation = 100 #10 # for visualization I used 100. note that the extrapolation have width 10
+
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_image()
+        chosen_piece.load_extrapolated_image()
+        next_edge_index = (edge_index+1)%chosen_piece.get_num_coords()
+
+        edge_row = chosen_piece.coordinates[edge_index][1]
+        edge_col = chosen_piece.coordinates[edge_index][0]
+        next_edge_row = chosen_piece.coordinates[next_edge_index][1]
+        next_edge_col = chosen_piece.coordinates[next_edge_index][0]
+        angle = np.arctan((next_edge_row-edge_row)/(next_edge_col-edge_col))*180/np.pi
+
+        if next_edge_col-edge_col < 0:
+            angle +=180
+        
+        edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
+        img = chosen_piece.img.copy()
+        img = np.pad(img,((0,img.shape[0]-edge_width),(0,edge_width),(0,0)),constant_values=0)
+
+        # this should result as the image is hidding right above the top left corner
+        img_translated = trans_image(img,edge_col,edge_row,angle,edge_row,edge_col) 
+        img_translated_shift_down = trans_image(img,edge_col,edge_row,angle,edge_row-width_extrapolation,edge_col)
+        result = img_translated_shift_down[:width_extrapolation,:edge_width]
+
+        fig, axs = plt.subplots(2,2)
+        axs[0,0].set_title("piece")
+        axs[0,0].imshow(img)
+        axs[0,1].set_title("rotated and translate")
+        axs[0,1].imshow(img_translated)
+        axs[1,0].set_title("rotated,translate, shift down")
+        axs[1,0].imshow(img_translated_shift_down)
+        axs[1,1].set_title("result")
+        axs[1,1].imshow(result)
+
+        plt.show()
+
+
+
+    def test_sample_extrapolated_edge(self):
+        pass
+
+
     def test_crop_then_rotate(self):
-        puzzleDirectory = "../ConvexDrawingDataset/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0"
+        puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
         piece_id = "0"
         img_path = puzzleDirectory+f"/images/{piece_id}.png"
         # image = cv2.imread(img_path,cv2.COLOR_BGR2RGB)
