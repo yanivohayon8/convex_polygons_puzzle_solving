@@ -6,7 +6,7 @@ from src.feature_extraction.pictorial import trans_image,image_edge,EdgePictoria
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
 from src.puzzle import Puzzle
-from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator,reshape_line_to_image,OriginalImgExtractor
+from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator,reshape_line_to_image#,OriginalImgExtractor
 from PIL import Image
 
 class TestLamaExtrapolation(unittest.TestCase):
@@ -77,103 +77,103 @@ class TestLamaExtrapolation(unittest.TestCase):
 
 
 
-class TestOriginalImageExtractor(unittest.TestCase):
+# class TestOriginalImageExtractor(unittest.TestCase):
 
-    def test_poc(self):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+#     def test_poc(self):
+#         db = 1
+#         puzzle_num = 19
+#         puzzle_noise_level = 0
+#         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+#         puzzle.load()
+#         bag_of_pieces = puzzle.get_bag_of_pieces()
 
-        piece_index = 0
-        edge_index = 1
-        chosen_piece = bag_of_pieces[piece_index]
-        chosen_piece.load_image()
-        width_extrapolation = 50#10
+#         piece_index = 0
+#         edge_index = 1
+#         chosen_piece = bag_of_pieces[piece_index]
+#         chosen_piece.load_image()
+#         width_extrapolation = 50#10
 
-        curr_coord = chosen_piece.coordinates[edge_index]
-        start_point = (int(curr_coord[0]),int(curr_coord[1]))
-        next_coord = chosen_piece.coordinates[(edge_index+1)%chosen_piece.get_num_coords()]
-        end_point = (int(next_coord[0]),int(next_coord[1]))
+#         curr_coord = chosen_piece.coordinates[edge_index]
+#         start_point = (int(curr_coord[0]),int(curr_coord[1]))
+#         next_coord = chosen_piece.coordinates[(edge_index+1)%chosen_piece.get_num_coords()]
+#         end_point = (int(next_coord[0]),int(next_coord[1]))
         
-        img_rgb = cv2.cvtColor(chosen_piece.img,cv2.COLOR_RGBA2RGB)
-        mask = np.zeros_like(img_rgb)
-        cv2.line(mask,start_point,end_point,(1,1,1),width_extrapolation)
-        masked_image = img_rgb.copy() * mask
-        edge_pixels = masked_image[np.any(mask!=0,axis=2)]
-        # edge_pixels_indices = np.argwhere(np.any(mask!=0,axis=2))
-        edge_pixels_indices = np.argwhere(np.any(masked_image!=0,axis=2))
+#         img_rgb = cv2.cvtColor(chosen_piece.img,cv2.COLOR_RGBA2RGB)
+#         mask = np.zeros_like(img_rgb)
+#         cv2.line(mask,start_point,end_point,(1,1,1),width_extrapolation)
+#         masked_image = img_rgb.copy() * mask
+#         edge_pixels = masked_image[np.any(mask!=0,axis=2)]
+#         # edge_pixels_indices = np.argwhere(np.any(mask!=0,axis=2))
+#         edge_pixels_indices = np.argwhere(np.any(masked_image!=0,axis=2))
 
-        min_row,min_col = np.min(edge_pixels_indices,axis=0)
-        max_row,max_col = np.max(edge_pixels_indices,axis=0)
-        cropped_img = masked_image[min_row:max_row,min_col:max_col,:]
+#         min_row,min_col = np.min(edge_pixels_indices,axis=0)
+#         max_row,max_col = np.max(edge_pixels_indices,axis=0)
+#         cropped_img = masked_image[min_row:max_row,min_col:max_col,:]
         
-        axs = plt.subplot()
-        axs.imshow(cropped_img)
+#         axs = plt.subplot()
+#         axs.imshow(cropped_img)
 
-        cropped_indices = np.argwhere(np.any(cropped_img!=0,axis=2))
-        # index_center_x,index_center_y = np.mean(cropped_indices,axis=0)
-        # centered_cropped_indices = cropped_indices - np.array([index_center_x,index_center_y],dtype=np.int)
-        # min_x, min_y = np.min(centered_cropped_indices,axis=0)
+#         cropped_indices = np.argwhere(np.any(cropped_img!=0,axis=2))
+#         # index_center_x,index_center_y = np.mean(cropped_indices,axis=0)
+#         # centered_cropped_indices = cropped_indices - np.array([index_center_x,index_center_y],dtype=np.int)
+#         # min_x, min_y = np.min(centered_cropped_indices,axis=0)
         
 
-        min_row_cropped,min_col_cropped = np.min(cropped_indices,axis=0)
-        max_row_cropped,max_col_cropped = np.max(cropped_indices,axis=0)
+#         min_row_cropped,min_col_cropped = np.min(cropped_indices,axis=0)
+#         max_row_cropped,max_col_cropped = np.max(cropped_indices,axis=0)
 
        
 
-        # fig,axs_zoomed = plt.subplots(1,2)
-        # edge_img = reshape_line_to_image(edge_pixels,width_extrapolation)
-        # axs_zoomed[0].imshow(np.transpose(edge_img,axes=(1,0,2)))
+#         # fig,axs_zoomed = plt.subplots(1,2)
+#         # edge_img = reshape_line_to_image(edge_pixels,width_extrapolation)
+#         # axs_zoomed[0].imshow(np.transpose(edge_img,axes=(1,0,2)))
         
-        # fig,axs = plt.subplots(1,2)
-        # axs[0].imshow(cropped_img)
+#         # fig,axs = plt.subplots(1,2)
+#         # axs[0].imshow(cropped_img)
         
 
-        # angles_extractor = geo_extractor.AngleLengthExtractor([chosen_piece])
-        # angles_extractor.run()
-        # prev_edge_index = (edge_index-1)%chosen_piece.get_num_coords()
-        # inner_angle = chosen_piece.get_inner_angle(prev_edge_index,edge_index)
-        # inner_angle/=2
-        # img = Image.fromarray(masked_image).rotate(-inner_angle,center=end_point)
-        # axs[1].imshow(img)
+#         # angles_extractor = geo_extractor.AngleLengthExtractor([chosen_piece])
+#         # angles_extractor.run()
+#         # prev_edge_index = (edge_index-1)%chosen_piece.get_num_coords()
+#         # inner_angle = chosen_piece.get_inner_angle(prev_edge_index,edge_index)
+#         # inner_angle/=2
+#         # img = Image.fromarray(masked_image).rotate(-inner_angle,center=end_point)
+#         # axs[1].imshow(img)
 
-        plt.show()
+#         plt.show()
 
-    def test_plot_two_edges(self):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-        piece_ii = 8
-        edge_ii = 0
-        piece_jj = 7
-        edge_jj = 2
-        pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+#     def test_plot_two_edges(self):
+#         db = 1
+#         puzzle_num = 19
+#         puzzle_noise_level = 0
+#         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+#         puzzle.load()
+#         bag_of_pieces = puzzle.get_bag_of_pieces()
+#         piece_ii = 8
+#         edge_ii = 0
+#         piece_jj = 7
+#         edge_jj = 2
+#         pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
 
-        for piece in pieces:
-            piece.load_image()
+#         for piece in pieces:
+#             piece.load_image()
 
-        feature_extractor = OriginalImgExtractor(pieces)
-        feature_extractor.run()
+#         feature_extractor = OriginalImgExtractor(pieces)
+#         feature_extractor.run()
 
-        fig,axs = plt.subplots(1,2)
-        width_extrapolation = 10 # as preproceessed beforehand
-        edges_indices = [edge_ii,edge_jj]
-        pieces_indecies = [piece_ii,piece_jj]
-        edges_names = [f"P_{pieces_indecies[0]}_E_{edges_indices[0]}",f"P_{pieces_indecies[1]}_E_{edges_indices[1]}"]
+#         fig,axs = plt.subplots(1,2)
+#         width_extrapolation = 10 # as preproceessed beforehand
+#         edges_indices = [edge_ii,edge_jj]
+#         pieces_indecies = [piece_ii,piece_jj]
+#         edges_names = [f"P_{pieces_indecies[0]}_E_{edges_indices[0]}",f"P_{pieces_indecies[1]}_E_{edges_indices[1]}"]
 
-        for k in range(2):
-            edge_pixels = pieces[k].features["edges_pictorial_content"][edges_indices[k]]
-            edge_img = reshape_line_to_image(edge_pixels,width_extrapolation) 
-            axs[k].imshow(edge_img)
-            axs[k].set_title(edges_names[k])
+#         for k in range(2):
+#             edge_pixels = pieces[k].features["edges_pictorial_content"][edges_indices[k]]
+#             edge_img = reshape_line_to_image(edge_pixels,width_extrapolation) 
+#             axs[k].imshow(edge_img)
+#             axs[k].set_title(edges_names[k])
 
-        plt.show()
+#         plt.show()
 
 
 
@@ -212,7 +212,7 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         # PARAMS
         sampling_height = 100
         piece_ii = 5
-        edge_ii = 3
+        edge_ii = 0
         piece_jj = 2
         edge_jj = 1
 
@@ -301,7 +301,7 @@ class TestPocPictorial(unittest.TestCase):
         plt.show()
         pass
     
-    def test_sample_edge_organize(self):
+    def test_sample_edge_quick_dirty(self):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -310,8 +310,8 @@ class TestPocPictorial(unittest.TestCase):
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
         # PARAMS
-        piece_index = 0
-        edge_index = 0
+        piece_index = 2
+        edge_index = 1
         width_extrapolation = 100 #10 # for visualization I used 100. note that the extrapolation have width 10
 
         chosen_piece = bag_of_pieces[piece_index]
@@ -346,15 +346,15 @@ class TestPocPictorial(unittest.TestCase):
         img = np.pad(img,((0,num_row_padded),(0,num_col_padded),(0,0)),constant_values=0)
 
         # this should result as the image is hidding right above the top left corner
-        img_translated = trans_image(img,edge_col,edge_row,angle,edge_row,edge_col) 
+        img_rotated = trans_image(img,edge_col,edge_row,angle,0,0) 
         img_translated_shift_down = trans_image(img,edge_col,edge_row,angle,edge_row-width_extrapolation,edge_col)
         result = img_translated_shift_down[:width_extrapolation,:edge_width]
 
         fig, axs = plt.subplots(2,2)
         axs[0,0].set_title("piece")
         axs[0,0].imshow(img)
-        axs[0,1].set_title("rotated and translate")
-        axs[0,1].imshow(img_translated)
+        axs[0,1].set_title("rotated")
+        axs[0,1].imshow(img_rotated)
         axs[1,0].set_title("rotated,translate, shift down")
         axs[1,0].imshow(img_translated_shift_down)
         axs[1,1].set_title("result")
