@@ -14,8 +14,13 @@ class EdgePictorialExtractor(Extractor):
         piece.features["original_edges_image"] = []
         
         for edge_index in range(piece.get_num_coords()):
-            piece.features["original_edges_image"].append(image_edge(piece.img,piece.coordinates,
-                                                                     edge_index,self.sampling_height))
+            img = image_edge(piece.img,piece.coordinates,edge_index,self.sampling_height)
+            piece.features["original_edges_image"].append(
+                {
+                    "original":img,
+                    "flipped":np.flip(img,axis=(0,1))
+                }
+            )
 
 
 def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_height:int):

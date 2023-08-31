@@ -6,7 +6,8 @@ from src.feature_extraction.geometric import EdgeLengthExtractor
 from src.pairwise_matchers.geometric import EdgeMatcher
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
+from src.feature_extraction.pictorial import EdgePictorialExtractor
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 
 class TestlamaMatcher(unittest.TestCase):
 
@@ -34,19 +35,53 @@ class TestlamaMatcher(unittest.TestCase):
 
         score = matcher.get_score("3","0","4","2")
         print(score)
-        assert np.isnan(matcher.get_score("3","0","3","2"))
-        assert np.isnan(matcher.get_score("3","0","3","1"))
-        assert np.isnan(matcher.get_score("3","0","3","0"))
-        assert np.isnan(matcher.get_score("4","0","4","2"))
-        assert np.isnan(matcher.get_score("4","0","4","1"))
-        assert np.isnan(matcher.get_score("4","0","4","0"))
+        assert np.isneginf(matcher.get_score("3","0","3","2"))
+        assert np.isneginf(matcher.get_score("3","0","3","1"))
+        assert np.isneginf(matcher.get_score("3","0","3","0"))
+        assert np.isneginf(matcher.get_score("4","0","4","2"))
+        assert np.isneginf(matcher.get_score("4","0","4","1"))
+        assert np.isneginf(matcher.get_score("4","0","4","0"))
 
 
 
+class TestDotProductNoisslessMatcher(unittest.TestCase):
+
+    def test_toy_example(self):
         
+        images_dir = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\for_extrapolation"
+
+        bag_of_pieces = [
+            Piece("3",
+                  [(359.6934234692053,0.0),(0.0,1182.1466364589978),(552.5547553983743,664.8981548785887)],
+                  img_path=f'{images_dir}\\DB-1-puzzle-19-noise-0-3.png'),
+            Piece("4",
+                  [(892.8888169403926,2033.45176941104),(0.0,0.0),(211.833995449535,1002.4259449236998)],
+                  img_path=f'{images_dir}\\DB-1-puzzle-19-noise-0-4.png'),
+            Piece("5",
+                  [(0.0,1595.1806656860645),(160.30040305844886,1601.4394492589781),(474.0201114068477,912.6414795354285),(11.914194622491777,0.0)],
+                  img_path=f'{images_dir}\\DB-1-puzzle-19-noise-0-5.png'),
+            Piece("6",
+                  [(1022.2569034805347,0.0),(0.0,68.71924696099452),(321.1597911884128,744.9290577022039)],
+                  img_path=f'{images_dir}\\DB-1-puzzle-19-noise-0-6.png')
+        ]
+
+        for piece in bag_of_pieces:
+            piece.load_image()
         
-        
-        
+        feature_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=5)
+        feature_extractor.run()
+
+        matcher = DotProductNoisslessMatcher(bag_of_pieces)
+        matcher.pairwise()
+
+        score = matcher.get_score("3","0","4","2")
+        print(score)
+        assert np.isneginf(matcher.get_score("3","0","3","2"))
+        assert np.isneginf(matcher.get_score("3","0","3","1"))
+        assert np.isneginf(matcher.get_score("3","0","3","0"))
+        assert np.isneginf(matcher.get_score("4","0","4","2"))
+        assert np.isneginf(matcher.get_score("4","0","4","1"))
+        assert np.isneginf(matcher.get_score("4","0","4","0"))
 
 
 class TestEdgeMatcher(unittest.TestCase):
