@@ -1,38 +1,58 @@
 import numpy as np
 import cv2 
+from src.feature_extraction.geometric import Extractor
+from src.piece import Piece
 
 
-class PixelEnviormnetExtractor():
 
-    def __init__(self) -> None:
-        pass
 
-    def pad_img(self,img, width):
-        return np.pad(img,width)
+class EdgePictorialExtractor(Extractor):
+    def __init__(self, pieces,sampling_width=10):
+        super().__init__(pieces)
+        self.sampling_width = sampling_width
 
-    # def get_pixel_env(self,img, center_x:int,center_y:int,width:int,height,is_repad_img = False):
-    #     '''
-    #         center - the pixel around to compute the enviorment
-    #         radius - how far going from the center...
-    #     '''
-    #     # padded_img = img
+    def extract_for_piece(self,piece:Piece): 
+        piece.features["edges_image"] = []
+        coords = [(int(coord[0]),int(coord[1])) for coord in piece.coordinates + [piece.coordinates[0]]]
+        img_rgb = cv2.cvtColor(piece.img,cv2.COLOR_RGBA2RGB)
+        debug_masked_images = []
 
-    #     # if is_repad_img or self.padded_img is None:
-    #     #      padded_img = self.pad_img(img,radius)
+        for prev_coord,next_coord in zip(coords[:-1],coords[1:]):
+            masked_image,line_pixels = mask_line(img_rgb,prev_coord,next_coord,self.sampling_width)
+            piece.features["edges_pictorial_content"].append(line_pixels)
+            debug_masked_images.append(masked_image)
         
+        return debug_masked_images
 
-    #     return img[center_x-radius:center_x+radius,center_y-radius:radius+center_y]
 
-def slice_image(img,center_x,center_y,degrees,width,height,scale=1):
-    shape = ( img.shape[1], img.shape[0] ) # cv2.warpAffine expects shape in (length, height)
 
-    matrix = cv2.getRotationMatrix2D(center=(center_x,center_y), angle=degrees, scale=scale )
-    image = cv2.warpAffine( src=img, M=matrix, dsize=shape )
+def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_height:int):
+    next_edge_index = (edge_index+1)%len(piece_coordinates)
+    edge_row = piece_coordinates[edge_index][1]
+    edge_col = piece_coordinates[edge_index][0]
+    next_edge_row = piece_coordinates[next_edge_index][1]
+    next_edge_col = piece_coordinates[next_edge_index][0]
+    edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
+    angle = np.arctan((next_edge_row-edge_row)/(next_edge_col-edge_col))*180/np.pi
 
-    x = int( center_x - width/2  ) # switching because warpAffine?
-    y = int( center_y - height/2 )
+    if next_edge_col-edge_col < 0:
+        angle +=180
+    
+    num_row_padded = 0
+        
+    if edge_width>img.shape[0]:
+        num_row_padded = edge_width - img.shape[0]
+    
+    num_col_padded = 0
+    
+    if edge_width>img.shape[1]:
+        num_col_padded = edge_width - img.shape[1]
 
-    return image[ y:y+height, x:x+width ]
+    img_padded = np.pad(img,((0,num_row_padded),(0,num_col_padded),(0,0)),constant_values=0)
+    img_translated_shift_down = trans_image(img_padded,edge_col,edge_row,angle,edge_row-sampling_height,edge_col)
+    return img_translated_shift_down[:sampling_height,:edge_width]
+
+
 
 def trans_image(img,center_x,center_y,degrees,t_row,t_col,scale=1):
     shape = ( img.shape[1], img.shape[0] ) # cv2.warpAffine expects shape in (length, height)
@@ -44,20 +64,3 @@ def trans_image(img,center_x,center_y,degrees,t_row,t_col,scale=1):
 
     return image
 
-    
-def rotate_and_crop(image, rectangle, angle):
-    # Unpack the rectangle coordinates
-    x1, y1, x2, y2 = rectangle
-    
-    cropped_image = image[y1:y2, x1:x2] # image coordinages are from top left
-        
-    # Get the center of the cropped image
-    center = (int((x2 - x1) / 2), int((y2 - y1) / 2)) # 
-    
-    # Prepare the rotation matrix
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
-    
-    # Perform the rotation
-    rotated = cv2.warpAffine(cropped_image, M, (x2 - x1, y2 - y1))#  x and y "opposite according to the documentation"
-    
-    return rotated,cropped_image

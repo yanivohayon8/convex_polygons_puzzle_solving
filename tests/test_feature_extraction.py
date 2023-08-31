@@ -2,7 +2,7 @@ import unittest
 import cv2
 from src.piece import Piece
 import matplotlib.pyplot as plt
-from src.feature_extraction.pictorial import slice_image,rotate_and_crop,trans_image
+from src.feature_extraction.pictorial import trans_image,image_edge
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
 from src.puzzle import Puzzle
@@ -179,36 +179,8 @@ class TestOriginalImageExtractor(unittest.TestCase):
 
 
 
-class TestPictorial(unittest.TestCase):
+class TestPocPictorial(unittest.TestCase):
     
-    def test_slice_image_func(self):
-        puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
-        piece_id = "0"
-        img_path = puzzleDirectory+f"/images/{piece_id}.png"
-        coordinates = [
-            (0.0,1144.617911756789),
-            (433.1002195373303,1369.8862015073328),
-            (1939.6970145840846,845.5681099625981),
-            (1191.439977412138,0.0)
-        ]
-
-        piece = Piece(piece_id,None,img_path)
-        piece.load_image()
-
-        #plt.imshow(piece.img)
-        center_col = piece.img.shape[1]/2 #216
-        center_row = piece.img.shape[0]/2
-        angle = 0
-        width = piece.img.shape[1]#300
-        height = piece.img.shape[0]
-        scale = 1
-
-        fig, axs = plt.subplots(1,2)
-        pictorial_content = slice_image(piece.img,center_col,center_row,angle,width,height,scale=scale)
-        axs[0].imshow(pictorial_content)
-        axs[1].imshow(piece.img)
-        plt.show()
-
 
     def test_sample_edge_deprecated(self):
         puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
@@ -345,7 +317,7 @@ class TestPictorial(unittest.TestCase):
 
         # PARAMS
         piece_index = 0
-        edge_index = 1
+        edge_index = 0
         width_extrapolation = 100 #10 # for visualization I used 100. note that the extrapolation have width 10
 
         chosen_piece = bag_of_pieces[piece_index]
@@ -364,7 +336,20 @@ class TestPictorial(unittest.TestCase):
         
         edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
         img = chosen_piece.img.copy()
-        img = np.pad(img,((0,img.shape[0]-edge_width),(0,edge_width),(0,0)),constant_values=0)
+        # img = chosen_piece.extrapolated_img.copy()
+        # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+
+        num_row_padded = 0
+        
+        if edge_width>img.shape[0]:
+            num_row_padded = edge_width - img.shape[0]
+        
+        num_col_padded = 0
+        
+        if edge_width>img.shape[1]:
+            num_col_padded = edge_width - img.shape[1]
+
+        img = np.pad(img,((0,num_row_padded),(0,num_col_padded),(0,0)),constant_values=0)
 
         # this should result as the image is hidding right above the top left corner
         img_translated = trans_image(img,edge_col,edge_row,angle,edge_row,edge_col) 
@@ -381,55 +366,29 @@ class TestPictorial(unittest.TestCase):
         axs[1,1].set_title("result")
         axs[1,1].imshow(result)
 
+        # ax = plt.subplot()
+        # ax.imshow(result)
+        
         plt.show()
 
+    def test_image_edge(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
 
+        # PARAMS
+        piece_index = 0
+        edge_index = 1
+        sampling_height = 100
 
-    def test_sample_extrapolated_edge(self):
-        pass
-
-
-    def test_crop_then_rotate(self):
-        puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
-        piece_id = "0"
-        img_path = puzzleDirectory+f"/images/{piece_id}.png"
-        # image = cv2.imread(img_path,cv2.COLOR_BGR2RGB)
-        image = cv2.imread(img_path)
-
-
-        coordinates = [
-            (0,1144),
-            (433,1369),
-            (1939,845),
-            (1191,0)
-        ]
-
-        # row1 = 0
-        # col1 = 0
-        # row2 = image.shape[0]
-        # col2 = image.shape[1]
-        # angle = 0 #45  # In degrees
-        # rotated,cropped_image = rotate_and_crop(image,(row1,col1,col2,row2),angle)
-
-        # # # switch from cartesian to image coordinates
-        row1 = 1144
-        col1 = 0
-        row2 = 1369
-        col2 = 433
-
-        #angle = 0 #45  # In degrees
-        angle = np.arctan(col2-col1/row2-row1)*180/np.pi
-        rotated,cropped_image = rotate_and_crop(image,(col1,row1,col2,row2),angle)
-
-        fig, axs = plt.subplots(2,2)
-        axs[0,0].set_title("cropped_image")
-        axs[0,0].imshow(cropped_image)
-        axs[0,1].set_title("rotated")
-        axs[0,1].imshow(rotated)
-        axs[1,0].set_title("Original Image")
-        axs[1,0].imshow(image)
+        bag_of_pieces[piece_index].load_image()
+        img = bag_of_pieces[piece_index].img#.copy()
+        result = image_edge(img,bag_of_pieces[piece_index].coordinates,edge_index,sampling_height)
+        plt.imshow(result)
         plt.show()
-
 
 class TestGeometric(unittest.TestCase):
 
