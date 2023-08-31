@@ -2,7 +2,7 @@ import unittest
 import cv2
 from src.piece import Piece
 import matplotlib.pyplot as plt
-from src.feature_extraction.pictorial import trans_image,image_edge
+from src.feature_extraction.pictorial import trans_image,image_edge,EdgePictorialExtractor
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
 from src.puzzle import Puzzle
@@ -177,71 +177,65 @@ class TestOriginalImageExtractor(unittest.TestCase):
 
 
 
+class TestEdgePictorialExtractor(unittest.TestCase):
+    
+    def test_single_edge(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        # PARAMS
+        piece_index = 0
+        edge_index = 1
+        sampling_height = 100
+
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_image()
+        feature_extractor = EdgePictorialExtractor([chosen_piece],sampling_height=sampling_height)
+        feature_extractor.run()
+
+        edge_image_ = chosen_piece.features["original_edges_image"][edge_index]
+        plt.imshow(edge_image_)
+        plt.show()
+
+    def test_side_by_side(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        # PARAMS
+        sampling_height = 100
+        piece_ii = 5
+        edge_ii = 3
+        piece_jj = 2
+        edge_jj = 1
+
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+        [piece.load_image() for piece in chosen_pieces]
+        feature_extractor = EdgePictorialExtractor(chosen_pieces,sampling_height=sampling_height)
+        feature_extractor.run()
+
+        edge_image_ii = chosen_pieces[0].features["original_edges_image"][edge_ii]
+        edge_image_jj = chosen_pieces[1].features["original_edges_image"][edge_jj]
+        
+        fig, axs = plt.subplots(1,2)
+        axs[0].imshow(edge_image_ii)
+        axs[1].imshow(edge_image_jj)
+
+        plt.show()
+
+
 
 
 class TestPocPictorial(unittest.TestCase):
     
-
-    def test_sample_edge_deprecated(self):
-        puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
-        piece_id = "0"
-        img_path = puzzleDirectory+f"/images/{piece_id}.png"
-        coordinates = [
-            (0,1144),
-            (433,1369),
-            (1939,845),
-            (1191,0)
-        ]
-
-        piece = Piece(piece_id,coordinates,img_path)
-        piece.load_image()
-
-        curr_index = 3
-        next_index = 0
-
-        curr_row = coordinates[curr_index][1]
-        curr_col = coordinates[curr_index][0]
-        next_row = coordinates[next_index][1]
-        next_col = coordinates[next_index][0]
-
-        #plt.imshow(piece.img)
-        center_x = int((curr_col+next_col)/2)#piece.img.shape[0]/2 #216
-        center_y = int((curr_row+next_row)/2)
-        width = int(np.sqrt((curr_col-next_col)**2 + (curr_row-next_row)**2)) #abs(curr_col-next_col)
-        #height = abs(next_row-curr_row)
-        height_sampling = 500
-        
-        angle = np.arctan((next_row-curr_row)/(next_col-curr_col))*180/np.pi
-
-        if next_col-curr_col < 0:
-            angle +=180
-
-        img_only_rotate_from_center = trans_image(piece.img,center_x,center_y,angle,0,0) # 
-        img_only_rotate = trans_image(piece.img,curr_col,curr_row,angle,0,0) # center_x,center_y
-
-        img_rot_and_trans = trans_image(piece.img,curr_col,curr_row,angle,curr_row,curr_col) # this should result as the image is hidding right above the top left corner
-        img_height_as_param = trans_image(piece.img,curr_col,curr_row,angle,curr_row-height_sampling,curr_col)
-        
-        content = img_height_as_param[:height_sampling,:width]
-
-        fig, axs = plt.subplots(2,3)
-        axs[0,0].set_title("piece.img")
-        axs[0,0].imshow(piece.img)
-        axs[0,1].set_title("results")
-        axs[0,1].imshow(content)
-        axs[0,2].set_title("img_only_rotate_from_center")
-        axs[0,2].imshow(img_only_rotate_from_center)
-        axs[1,0].set_title("img_only_rotate_from_vertex")
-        axs[1,0].imshow(img_only_rotate)
-        axs[1,1].set_title("img_rot_and_trans")
-        axs[1,1].imshow(img_rot_and_trans)
-        axs[1,2].set_title("img_height_as_param")
-        axs[1,2].imshow(img_height_as_param)
-        
-        plt.show()
-        pass
-
-    def test_sample_edge_quick_dirty(self):
+    def test_sample_edge_quick_dirty_piece_0(self):
         puzzleDirectory = "../ConvexDrawingDataset/DB1/Puzzle19/noise_0"
         piece_id = "0"
         img_path = puzzleDirectory+f"/images/{piece_id}.png"
@@ -307,7 +301,7 @@ class TestPocPictorial(unittest.TestCase):
         plt.show()
         pass
     
-    def test_sample_edge_v2_organize(self):
+    def test_sample_edge_organize(self):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0

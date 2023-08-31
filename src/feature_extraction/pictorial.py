@@ -5,25 +5,17 @@ from src.piece import Piece
 
 
 
-
 class EdgePictorialExtractor(Extractor):
-    def __init__(self, pieces,sampling_width=10):
+    def __init__(self, pieces,sampling_height=10):
         super().__init__(pieces)
-        self.sampling_width = sampling_width
+        self.sampling_height = sampling_height
 
     def extract_for_piece(self,piece:Piece): 
-        piece.features["edges_image"] = []
-        coords = [(int(coord[0]),int(coord[1])) for coord in piece.coordinates + [piece.coordinates[0]]]
-        img_rgb = cv2.cvtColor(piece.img,cv2.COLOR_RGBA2RGB)
-        debug_masked_images = []
-
-        for prev_coord,next_coord in zip(coords[:-1],coords[1:]):
-            masked_image,line_pixels = mask_line(img_rgb,prev_coord,next_coord,self.sampling_width)
-            piece.features["edges_pictorial_content"].append(line_pixels)
-            debug_masked_images.append(masked_image)
+        piece.features["original_edges_image"] = []
         
-        return debug_masked_images
-
+        for edge_index in range(piece.get_num_coords()):
+            piece.features["original_edges_image"].append(image_edge(piece.img,piece.coordinates,
+                                                                     edge_index,self.sampling_height))
 
 
 def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_height:int):
