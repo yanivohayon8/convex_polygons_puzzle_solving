@@ -13,14 +13,22 @@ class EdgePictorialExtractor(Extractor):
     def extract_for_piece(self,piece:Piece): 
         piece.features[self.__class__.__name__] = []
         
+        images_not_ordered = []
+
         for edge_index in range(piece.get_num_coords()):
             img = image_edge(piece.img,piece.coordinates,edge_index,self.sampling_height)
-            piece.features[self.__class__.__name__].append(
+            images_not_ordered.append(
                 {
                     "original":img,
                     "flipped":np.flip(img,axis=(1))#np.flip(img,axis=(0,1))
                 }
             )
+        
+        '''Tfira because of _preprocess in puzzle.py
+        make the edge_length feature correspond in the indices to the images'''
+        ordering_indexes = [piece.get_origin_index(i) for i in range(piece.get_num_coords())]
+        piece.features[self.__class__.__name__] = [x for _,x in zip(ordering_indexes,images_not_ordered)]
+
 
 
 def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_height:int):

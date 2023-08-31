@@ -76,107 +76,6 @@ class TestLamaExtrapolation(unittest.TestCase):
         assert abs(edge_ii_length -  edge_jj_length) < width_extrapolation, f"{edges_names[0]} length is {edge_ii_length} and {edges_names[1]} length is {edge_jj_length}. The diffrence is too big "
 
 
-
-# class TestOriginalImageExtractor(unittest.TestCase):
-
-#     def test_poc(self):
-#         db = 1
-#         puzzle_num = 19
-#         puzzle_noise_level = 0
-#         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-#         puzzle.load()
-#         bag_of_pieces = puzzle.get_bag_of_pieces()
-
-#         piece_index = 0
-#         edge_index = 1
-#         chosen_piece = bag_of_pieces[piece_index]
-#         chosen_piece.load_image()
-#         width_extrapolation = 50#10
-
-#         curr_coord = chosen_piece.coordinates[edge_index]
-#         start_point = (int(curr_coord[0]),int(curr_coord[1]))
-#         next_coord = chosen_piece.coordinates[(edge_index+1)%chosen_piece.get_num_coords()]
-#         end_point = (int(next_coord[0]),int(next_coord[1]))
-        
-#         img_rgb = cv2.cvtColor(chosen_piece.img,cv2.COLOR_RGBA2RGB)
-#         mask = np.zeros_like(img_rgb)
-#         cv2.line(mask,start_point,end_point,(1,1,1),width_extrapolation)
-#         masked_image = img_rgb.copy() * mask
-#         edge_pixels = masked_image[np.any(mask!=0,axis=2)]
-#         # edge_pixels_indices = np.argwhere(np.any(mask!=0,axis=2))
-#         edge_pixels_indices = np.argwhere(np.any(masked_image!=0,axis=2))
-
-#         min_row,min_col = np.min(edge_pixels_indices,axis=0)
-#         max_row,max_col = np.max(edge_pixels_indices,axis=0)
-#         cropped_img = masked_image[min_row:max_row,min_col:max_col,:]
-        
-#         axs = plt.subplot()
-#         axs.imshow(cropped_img)
-
-#         cropped_indices = np.argwhere(np.any(cropped_img!=0,axis=2))
-#         # index_center_x,index_center_y = np.mean(cropped_indices,axis=0)
-#         # centered_cropped_indices = cropped_indices - np.array([index_center_x,index_center_y],dtype=np.int)
-#         # min_x, min_y = np.min(centered_cropped_indices,axis=0)
-        
-
-#         min_row_cropped,min_col_cropped = np.min(cropped_indices,axis=0)
-#         max_row_cropped,max_col_cropped = np.max(cropped_indices,axis=0)
-
-       
-
-#         # fig,axs_zoomed = plt.subplots(1,2)
-#         # edge_img = reshape_line_to_image(edge_pixels,width_extrapolation)
-#         # axs_zoomed[0].imshow(np.transpose(edge_img,axes=(1,0,2)))
-        
-#         # fig,axs = plt.subplots(1,2)
-#         # axs[0].imshow(cropped_img)
-        
-
-#         # angles_extractor = geo_extractor.AngleLengthExtractor([chosen_piece])
-#         # angles_extractor.run()
-#         # prev_edge_index = (edge_index-1)%chosen_piece.get_num_coords()
-#         # inner_angle = chosen_piece.get_inner_angle(prev_edge_index,edge_index)
-#         # inner_angle/=2
-#         # img = Image.fromarray(masked_image).rotate(-inner_angle,center=end_point)
-#         # axs[1].imshow(img)
-
-#         plt.show()
-
-#     def test_plot_two_edges(self):
-#         db = 1
-#         puzzle_num = 19
-#         puzzle_noise_level = 0
-#         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-#         puzzle.load()
-#         bag_of_pieces = puzzle.get_bag_of_pieces()
-#         piece_ii = 8
-#         edge_ii = 0
-#         piece_jj = 7
-#         edge_jj = 2
-#         pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
-
-#         for piece in pieces:
-#             piece.load_image()
-
-#         feature_extractor = OriginalImgExtractor(pieces)
-#         feature_extractor.run()
-
-#         fig,axs = plt.subplots(1,2)
-#         width_extrapolation = 10 # as preproceessed beforehand
-#         edges_indices = [edge_ii,edge_jj]
-#         pieces_indecies = [piece_ii,piece_jj]
-#         edges_names = [f"P_{pieces_indecies[0]}_E_{edges_indices[0]}",f"P_{pieces_indecies[1]}_E_{edges_indices[1]}"]
-
-#         for k in range(2):
-#             edge_pixels = pieces[k].features["edges_pictorial_content"][edges_indices[k]]
-#             edge_img = reshape_line_to_image(edge_pixels,width_extrapolation) 
-#             axs[k].imshow(edge_img)
-#             axs[k].set_title(edges_names[k])
-
-#         plt.show()
-
-
-
 class TestEdgePictorialExtractor(unittest.TestCase):
     
     def test_single_edge(self):
@@ -188,8 +87,8 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
         # PARAMS
-        piece_index = 0
-        edge_index = 1
+        piece_index = 9
+        edge_index = 0
         sampling_height = 100
 
         chosen_piece = bag_of_pieces[piece_index]
@@ -200,6 +99,13 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         edge_image_ = chosen_piece.features["EdgePictorialExtractor"][edge_index]["original"]
         plt.imshow(edge_image_)
         plt.show()
+
+        edge_length_extractor = geo_extractor.EdgeLengthExtractor([chosen_piece])
+        edge_length_extractor.run()
+
+        small_number = 5
+        edge_length = chosen_piece.features["edges_length"][chosen_piece.ccw_edge2origin_edge[edge_index]]
+        assert abs(edge_length-edge_image_.shape[1]) < small_number
 
     def test_side_by_side(self):
         db = 1
@@ -212,9 +118,9 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         # PARAMS
         sampling_height = 100
         piece_ii = 9
-        edge_ii = 2
+        edge_ii = 3
         piece_jj = 7
-        edge_jj = 2
+        edge_jj = 1
         
         chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
         chosen_edges = [edge_ii,edge_jj]
@@ -250,7 +156,15 @@ class TestEdgePictorialExtractor(unittest.TestCase):
 
         plt.show()
 
-        assert abs(edge_image_ii.shape[1]-edge_image_jj.shape[1]) < 10, "Note: the edge length are not correct (as is it should be almost identical for noiseless puzzles)"
+        edge_length_extractor = geo_extractor.EdgeLengthExtractor(chosen_pieces)
+        edge_length_extractor.run()
+
+        edge_ii_length_feature = chosen_pieces[0].features["edges_length"][chosen_edges[0]]
+        edge_jj_length_feature = chosen_pieces[1].features["edges_length"][chosen_edges[1]]
+        small_number = 5
+        assert abs(edge_ii_length_feature-edge_jj_length_feature) < small_number
+
+        assert abs(edge_image_ii.shape[1]-edge_image_jj.shape[1]) < small_number, "Note: the edge length are not correct (as is it should be almost identical for noiseless puzzles)"
 
 
 
@@ -320,8 +234,13 @@ class TestPocPictorial(unittest.TestCase):
         axs[1,2].imshow(img_height_as_param)
         
         plt.show()
-        pass
-    
+        
+        # edge_length_extractor = geo_extractor.EdgeLengthExtractor([piece])
+        # edge_length_extractor.run()
+
+        # small_number = 5
+        # assert abs(piece.features["edges_length"][curr_index] - content.shape[1]) < small_number
+
     def test_sample_edge_quick_dirty(self):
         db = 1
         puzzle_num = 19
@@ -331,8 +250,8 @@ class TestPocPictorial(unittest.TestCase):
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
         # PARAMS
-        piece_index = 2
-        edge_index = 1
+        piece_index =9 #7
+        edge_index =3 #1
         width_extrapolation = 100 #10 # for visualization I used 100. note that the extrapolation have width 10
 
         chosen_piece = bag_of_pieces[piece_index]
