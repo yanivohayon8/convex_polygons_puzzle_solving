@@ -211,9 +211,9 @@ class TestEdgePictorialExtractor(unittest.TestCase):
 
         # PARAMS
         sampling_height = 100
-        piece_ii = 3
-        edge_ii = 0
-        piece_jj = 4
+        piece_ii = 9
+        edge_ii = 2
+        piece_jj = 7
         edge_jj = 2
         
         chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
@@ -250,6 +250,7 @@ class TestEdgePictorialExtractor(unittest.TestCase):
 
         plt.show()
 
+        assert abs(edge_image_ii.shape[1]-edge_image_jj.shape[1]) < 10, "Note: the edge length are not correct (as is it should be almost identical for noiseless puzzles)"
 
 
 

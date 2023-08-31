@@ -8,6 +8,8 @@ from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
 from src.feature_extraction.pictorial import EdgePictorialExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
+from src.puzzle import Puzzle
+
 
 class TestlamaMatcher(unittest.TestCase):
 
@@ -82,6 +84,35 @@ class TestDotProductNoisslessMatcher(unittest.TestCase):
         assert np.isneginf(matcher.get_score("4","0","4","2"))
         assert np.isneginf(matcher.get_score("4","0","4","1"))
         assert np.isneginf(matcher.get_score("4","0","4","0"))
+
+
+    def test_two_pieces(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        piece_ii = 9
+        edge_ii = 2
+        piece_jj = 7
+        edge_jj = 2
+        
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+        
+        for piece in chosen_pieces:
+            piece.load_image()
+
+        pic_extractor = EdgePictorialExtractor(chosen_pieces,sampling_height=100)
+        pic_extractor.run()
+
+        pictorial_matcher = DotProductNoisslessMatcher(chosen_pieces)
+        pictorial_matcher.pairwise()
+
+        score = pictorial_matcher.get_score(str(piece_ii),str(edge_ii),str(piece_jj),str(edge_jj))
+        print(score)
+
 
 
 class TestEdgeMatcher(unittest.TestCase):

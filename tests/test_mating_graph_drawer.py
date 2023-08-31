@@ -42,12 +42,12 @@ class TestGraphDrawer(unittest.TestCase):
             angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
             angles_extractor.run()
 
-        if "EdgePictorialExtractor" in pictorial_feature_extractor:
-            pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=5)
-            pic_extractor.run()
-
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
+
+        if "EdgePictorialExtractor" in pictorial_feature_extractor:
+            pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=100)
+            pic_extractor.run()
 
         if pictorial_matcher == "naive":
             pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
@@ -93,10 +93,9 @@ class TestGraphDrawer(unittest.TestCase):
     def test_draw_noisless(self):
         db = "1" 
         puzzle_num = 19 #13 #19
-        self.extrapolation_width = 10#10 #1
 
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
-        wrapper = self._load_graph(db,puzzle_num,0)
+        wrapper = self._load_graph(db,puzzle_num,1)
 
         fig, axs = plt.subplots(1,2)
         self._draw(wrapper,ground_truth_wrapper,axs[0],axs[1])

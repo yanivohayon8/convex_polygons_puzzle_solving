@@ -18,7 +18,7 @@ class EdgePictorialExtractor(Extractor):
             piece.features[self.__class__.__name__].append(
                 {
                     "original":img,
-                    "flipped":np.flip(img,axis=(0,1))
+                    "flipped":np.flip(img,axis=(1))#np.flip(img,axis=(0,1))
                 }
             )
 
