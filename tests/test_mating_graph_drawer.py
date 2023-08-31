@@ -8,12 +8,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,ConvolutionV1Matcher
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,ConvolutionV1MatcherToDELETE
+from src.feature_extraction.pictorial import EdgePictorialExtractor
+from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 
 class TestGraphDrawer(unittest.TestCase):
     
     def _load_graph(self,db,puzzle_num,puzzle_noise_level,
-                    pictorial_matcher="naive"):
+                    img_type="original",
+                    geo_feature_extractors=["angle","length"],
+                    pictorial_feature_extractor=["EdgePictorialExtractor"],
+                    pictorial_matcher="DotProductNoisslessMatcher"):
         
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
@@ -23,16 +28,23 @@ class TestGraphDrawer(unittest.TestCase):
 
         for piece in bag_of_pieces:
             id2piece[piece.id] = piece
-            piece.load_extrapolated_image()
 
-        edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
-        edge_length_extractor.run()
+            if img_type == "original":
+                piece.load_image()
+            elif img_type == "extrapolated":
+                piece.load_extrapolated_image()
 
-        angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
-        angles_extractor.run()
+        if "length" in  geo_feature_extractors:
+            edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
+            edge_length_extractor.run()
 
-        lama_extractor = LamaEdgeExtrapolator(bag_of_pieces)
-        lama_extractor.run()
+        if "angle" in geo_feature_extractors:
+            angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
+            angles_extractor.run()
+
+        if "EdgePictorialExtractor" in pictorial_feature_extractor:
+            pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=5)
+            pic_extractor.run()
 
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
@@ -41,7 +53,10 @@ class TestGraphDrawer(unittest.TestCase):
             pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
             pictorial_matcher.pairwise()
         elif pictorial_matcher == "convV1":
-            pictorial_matcher = ConvolutionV1Matcher(bag_of_pieces,self.extrapolation_width)
+            pictorial_matcher = ConvolutionV1MatcherToDELETE(bag_of_pieces,self.extrapolation_width)
+            pictorial_matcher.pairwise()
+        elif pictorial_matcher == "DotProductNoisslessMatcher":
+            pictorial_matcher = DotProductNoisslessMatcher(bag_of_pieces)
             pictorial_matcher.pairwise()
 
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
@@ -74,12 +89,26 @@ class TestGraphDrawer(unittest.TestCase):
         # drawer._draw_ground_truth_matching()
         plt.show()
     
+
+    def test_draw_noisless(self):
+        db = "1" 
+        puzzle_num = 19 #13 #19
+        self.extrapolation_width = 10#10 #1
+
+        ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
+        wrapper = self._load_graph(db,puzzle_num,0)
+
+        fig, axs = plt.subplots(1,2)
+        self._draw(wrapper,ground_truth_wrapper,axs[0],axs[1])
+
+        plt.show()
+
     def test_draw_Inv9084_with_noise(self):
         db = "1" 
         puzzle_num = 19 #13 #19
-        puzzle_noise_level = 0
-        pictorial_matcher = "convV1" #"convV1"
-        self.extrapolation_width = 10
+        puzzle_noise_level = 1
+        pictorial_matcher = "naive" #"convV1"
+        self.extrapolation_width = 10#10 #1
 
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0,
                                                 pictorial_matcher=pictorial_matcher)
