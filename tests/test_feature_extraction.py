@@ -215,18 +215,38 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         edge_ii = 0
         piece_jj = 2
         edge_jj = 1
-
+        
         chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
-        [piece.load_image() for piece in chosen_pieces]
+        chosen_edges = [edge_ii,edge_jj]
+        
+        for edge,piece in zip(chosen_edges,chosen_pieces):
+            piece.load_image()
+
+            #marking the edge
+            coord1 = piece.coordinates[edge]
+            vertex1 = (int(coord1[0]),int(coord1[1]))
+            coord2 = piece.coordinates[(edge+1)%piece.get_num_coords()]
+            vertex2 = (int(coord2[0]),int(coord2[1]))
+            piece.img = piece.img.astype(np.uint8) # THIS COULD HAVE SIDE EFFECTS
+            cv2.line(piece.img,vertex1,vertex2,(0,255,0),1)
+
         feature_extractor = EdgePictorialExtractor(chosen_pieces,sampling_height=sampling_height)
         feature_extractor.run()
 
         edge_image_ii = chosen_pieces[0].features["original_edges_image"][edge_ii]
         edge_image_jj = chosen_pieces[1].features["original_edges_image"][edge_jj]
         
-        fig, axs = plt.subplots(1,2)
-        axs[0].imshow(edge_image_ii)
-        axs[1].imshow(edge_image_jj)
+        fig, axs = plt.subplots(2,2)
+        axs[0,0].imshow(edge_image_ii)
+        axs[0,0].set_title(f"P_{piece_ii}_E_{edge_ii}")
+        axs[1,0].imshow(edge_image_jj)
+        axs[1,0].set_title(f"P_{piece_jj}_E_{edge_jj}")
+        flipped_edge_image_jj = np.flip(edge_image_jj,axis=(0,1))
+        axs[1,1].imshow(flipped_edge_image_jj)
+        axs[1,1].set_title(f"P_{piece_jj}_E_{edge_jj} (FLIPPED)")
+        axs[0,1].imshow(edge_image_ii)
+        axs[0,1].set_title(f"P_{piece_ii}_E_{edge_ii} (SAME)")
+
 
         plt.show()
 
