@@ -120,7 +120,7 @@ class ConvolutionV1MatcherToDELETE(NaiveExtrapolatorMatcher):
 class DotProductNoisslessMatcher(PictorialMatcher):
 
     def __init__(self, pieces,step_size=50) -> None:
-        super().__init__(pieces, "original_edges_image")
+        super().__init__(pieces, "EdgePictorialExtractor")
         self.step_size = step_size # The images width should be almost same in case of noiseless puzzle. so it in this case, it is meaningless
 
     def _score_pair(self, edge1_img: dict, edge2_img: dict):

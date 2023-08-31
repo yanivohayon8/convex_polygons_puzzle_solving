@@ -197,7 +197,7 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         feature_extractor = EdgePictorialExtractor([chosen_piece],sampling_height=sampling_height)
         feature_extractor.run()
 
-        edge_image_ = chosen_piece.features["original_edges_image"][edge_index]["original"]
+        edge_image_ = chosen_piece.features["EdgePictorialExtractor"][edge_index]["original"]
         plt.imshow(edge_image_)
         plt.show()
 
@@ -233,9 +233,9 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         feature_extractor = EdgePictorialExtractor(chosen_pieces,sampling_height=sampling_height)
         feature_extractor.run()
 
-        edge_image_ii = chosen_pieces[0].features["original_edges_image"][edge_ii]["original"]
-        edge_image_jj = chosen_pieces[1].features["original_edges_image"][edge_jj]["original"]
-        flipped_edge_image_jj = chosen_pieces[1].features["original_edges_image"][edge_jj]["flipped"]
+        edge_image_ii = chosen_pieces[0].features["EdgePictorialExtractor"][edge_ii]["original"]
+        edge_image_jj = chosen_pieces[1].features["EdgePictorialExtractor"][edge_jj]["original"]
+        flipped_edge_image_jj = chosen_pieces[1].features["EdgePictorialExtractor"][edge_jj]["flipped"]
         
         fig, axs = plt.subplots(2,2)
         axs[0,0].imshow(edge_image_ii)
