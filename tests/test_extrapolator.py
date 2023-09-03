@@ -94,14 +94,20 @@ class TestPOC(unittest.TestCase):
             
             plt.show()
         else:
-            fig3, axs_zoomed = plt.subplots(1,2)
             jj = 1 
+            fig3, axs_zoomed = plt.subplots(1,2)
             axs_zoomed[0].imshow(debug_masked_images[jj])
+            
             num_pad = width_extrapolation - edges_pixels[jj].shape[0]%width_extrapolation
             edge_padded = np.pad(edges_pixels[jj],((0,num_pad),(0,0)),constant_values=0)
             edge_img = edge_padded.reshape(-1,width_extrapolation,3)
             axs_zoomed[1].imshow(edge_img)
+            
+            
+            
             plt.show()
+
+
 
 
 

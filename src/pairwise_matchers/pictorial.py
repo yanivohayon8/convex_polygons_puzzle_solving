@@ -1,5 +1,7 @@
 import numpy as np
 from src.feature_extraction.extrapolator.lama_masking import reshape_line_to_image
+import matplotlib.pyplot as plt
+
 
 class PictorialMatcher():
     
@@ -26,7 +28,20 @@ class PictorialMatcher():
             self.total_num_edges+= num_coords
 
         self.matching_edges_scores = -np.inf * np.ones((self.total_num_edges,self.total_num_edges))
-    
+
+    def preprocess(self):
+        for edge1_i in range(self.total_num_edges):
+            piece1_i = self.edge2piece_index[edge1_i]
+            edge1_local_i = self.global_index2local_index[edge1_i]
+            edge1_pixels = self.pieces[piece1_i].features[self.feature][edge1_local_i]
+            self._preprocess(edge1_pixels)
+
+    def _preprocess(self,img):
+        raise NotImplementedError("Implement _preprocess (per edge image)")
+
+    def _scale(self,img:np.ndarray):
+        return img/255.0
+
     def pairwise(self):
         for edge1_i in range(self.total_num_edges):
     
@@ -50,6 +65,24 @@ class PictorialMatcher():
         global_index2 = self.local_index2global_index[f"{piece2}-{edge2}"]
         return self.matching_edges_scores[global_index1,global_index2] 
     
+
+    def plot_scores_histogram(self,ax=None):
+        scores = []
+
+        for edge1_i in range(self.total_num_edges):
+            for edge2_j in range(self.total_num_edges):
+            
+                if self.edge2pieceid[edge1_i] == self.edge2pieceid[edge2_j]:
+                    continue 
+                
+                scores.append(self.matching_edges_scores[edge1_i,edge2_j])
+        
+        if ax is None:
+            ax = plt.subplot()
+        
+        ax.hist(scores)
+
+
     def _score_pair(self,edge1_pixels:np.array,edge2_pixels:np.array):
         raise NotImplementedError("implement me")
 
@@ -123,6 +156,17 @@ class DotProductNoisslessMatcher(PictorialMatcher):
         super().__init__(pieces, "EdgePictorialExtractor")
         self.step_size = step_size # The images width should be almost same in case of noiseless puzzle. so it in this case, it is meaningless
 
+    def preprocess(self):
+        for edge1_i in range(self.total_num_edges):
+            piece1_i = self.edge2piece_index[edge1_i]
+            edge1_local_i = self.global_index2local_index[edge1_i]
+            edge1_images = self.pieces[piece1_i].features[self.feature][edge1_local_i]
+            self._preprocess(edge1_images["original"])
+            self._preprocess(edge1_images["flipped"])
+
+    def _preprocess(self, img):
+        return self._scale(img)
+        
     def _score_pair(self, edge1_img: dict, edge2_img: dict):
         feature_map_img = edge1_img["original"]
         kernel_img = edge2_img["flipped"]
@@ -144,8 +188,10 @@ class DotProductNoisslessMatcher(PictorialMatcher):
             receptive_field = feature_map_img[:,start_col:end_col]
             receptive_field_norm = np.linalg.norm(receptive_field)
             prod = np.sum(kernel_img*receptive_field)/receptive_field_norm/kernel_norm
+            # prod = -np.linalg.norm(receptive_field-kernel_img)/kernel_img.shape[1]
             products.append(prod)
             start_col += self.step_size
             end_col = start_col + kernel_img.shape[1]
 
         return max(products) 
+    

@@ -49,26 +49,27 @@ class TestGraphDrawer(unittest.TestCase):
             pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=100)
             pic_extractor.run()
 
-        if pictorial_matcher == "naive":
-            pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
-            pictorial_matcher.pairwise()
-        elif pictorial_matcher == "convV1":
-            pictorial_matcher = ConvolutionV1MatcherToDELETE(bag_of_pieces,self.extrapolation_width)
-            pictorial_matcher.pairwise()
-        elif pictorial_matcher == "DotProductNoisslessMatcher":
-            pictorial_matcher = DotProductNoisslessMatcher(bag_of_pieces)
-            pictorial_matcher.pairwise()
+        # if pictorial_matcher == "naive":
+        #     pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
+        #     pictorial_matcher.pairwise()
+        # elif pictorial_matcher == "convV1":
+        #     pictorial_matcher = ConvolutionV1MatcherToDELETE(bag_of_pieces,self.extrapolation_width)
+        #     pictorial_matcher.pairwise()
+        # elif pictorial_matcher == "DotProductNoisslessMatcher":
+        self.pictorial_matcher_ = DotProductNoisslessMatcher(bag_of_pieces)
+        self.pictorial_matcher_.preprocess()
+        self.pictorial_matcher_.pairwise()
 
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
                                                 edge_length_pairwiser.match_edges,
                                                 edge_length_pairwiser.match_pieces_score,
-                                                pictorial_matcher=pictorial_matcher)
+                                                pictorial_matcher=self.pictorial_matcher_)
         wrapper.build_graph()
         # wrapper.find_matching()
 
         return wrapper
 
-    def _draw(self,wrapper:MatchingGraphWrapper,ground_truth_wrapper:MatchingGraphWrapper,ax1,ax2):
+    def _draw_adjacency(self,wrapper:MatchingGraphWrapper,ground_truth_wrapper:MatchingGraphWrapper,ax1,ax2):
         drawer = MatchingGraphDrawer(ground_truth_wrapper)
         drawer.init()
 
@@ -77,8 +78,13 @@ class TestGraphDrawer(unittest.TestCase):
         drawer.draw_adjacency_graph(ground_truth_wrapper,ax=ax2)
         ax2.set_title("Noiseless")
 
+    def _draw_matching(self,wrapper:MatchingGraphWrapper,ground_truth_wrapper:MatchingGraphWrapper):
+        drawer = MatchingGraphDrawer(ground_truth_wrapper)
+        drawer.init()
         drawer.draw_graph_matching(wrapper)
         drawer.draw_graph_filtered_matching(wrapper)
+        self.pictorial_matcher_.plot_scores_histogram()
+
 
     def test_draw_ground_truth(self):
         db = "1"
@@ -90,7 +96,7 @@ class TestGraphDrawer(unittest.TestCase):
         plt.show()
     
 
-    def test_draw_noisless(self):
+    def test_draw_pictorial_matches(self):
         db = "1" 
         puzzle_num = 19 #13 #19
 
@@ -98,8 +104,9 @@ class TestGraphDrawer(unittest.TestCase):
         wrapper = self._load_graph(db,puzzle_num,1)
 
         fig, axs = plt.subplots(1,2)
-        self._draw(wrapper,ground_truth_wrapper,axs[0],axs[1])
+        self._draw_matching(wrapper,ground_truth_wrapper)
 
+       
         plt.show()
 
     # def test_draw_Inv9084_with_noise(self):

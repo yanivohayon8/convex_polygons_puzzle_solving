@@ -88,7 +88,7 @@ class TestEdgePictorialExtractor(unittest.TestCase):
 
         # PARAMS
         piece_index = 9
-        edge_index = 0
+        edge_index = 1
         sampling_height = 100
 
         chosen_piece = bag_of_pieces[piece_index]
