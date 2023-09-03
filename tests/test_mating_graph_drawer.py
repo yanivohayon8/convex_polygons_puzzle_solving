@@ -57,7 +57,6 @@ class TestGraphDrawer(unittest.TestCase):
         #     pictorial_matcher.pairwise()
         # elif pictorial_matcher == "DotProductNoisslessMatcher":
         self.pictorial_matcher_ = DotProductNoisslessMatcher(bag_of_pieces)
-        self.pictorial_matcher_.preprocess()
         self.pictorial_matcher_.pairwise()
 
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,

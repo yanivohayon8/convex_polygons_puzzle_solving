@@ -29,19 +29,7 @@ class PictorialMatcher():
 
         self.matching_edges_scores = -np.inf * np.ones((self.total_num_edges,self.total_num_edges))
 
-    def preprocess(self):
-        for edge1_i in range(self.total_num_edges):
-            piece1_i = self.edge2piece_index[edge1_i]
-            edge1_local_i = self.global_index2local_index[edge1_i]
-            edge1_pixels = self.pieces[piece1_i].features[self.feature][edge1_local_i]
-            self._preprocess(edge1_pixels)
-
-    def _preprocess(self,img):
-        raise NotImplementedError("Implement _preprocess (per edge image)")
-
-    def _scale(self,img:np.ndarray):
-        return img/255.0
-
+    
     def pairwise(self):
         for edge1_i in range(self.total_num_edges):
     
@@ -156,16 +144,6 @@ class DotProductNoisslessMatcher(PictorialMatcher):
         super().__init__(pieces, "EdgePictorialExtractor")
         self.step_size = step_size # The images width should be almost same in case of noiseless puzzle. so it in this case, it is meaningless
 
-    def preprocess(self):
-        for edge1_i in range(self.total_num_edges):
-            piece1_i = self.edge2piece_index[edge1_i]
-            edge1_local_i = self.global_index2local_index[edge1_i]
-            edge1_images = self.pieces[piece1_i].features[self.feature][edge1_local_i]
-            self._preprocess(edge1_images["original"])
-            self._preprocess(edge1_images["flipped"])
-
-    def _preprocess(self, img):
-        return self._scale(img)
         
     def _score_pair(self, edge1_img: dict, edge2_img: dict):
         feature_map_img = edge1_img["original"]

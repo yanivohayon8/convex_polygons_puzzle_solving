@@ -108,7 +108,6 @@ class TestDotProductNoisslessMatcher(unittest.TestCase):
         pic_extractor.run()
 
         pictorial_matcher = DotProductNoisslessMatcher(chosen_pieces)
-        pictorial_matcher.preprocess()
         pictorial_matcher.pairwise()
 
         score = pictorial_matcher.get_score(str(piece_ii),str(edge_ii),str(piece_jj),str(edge_jj))
