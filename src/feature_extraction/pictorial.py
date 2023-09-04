@@ -30,6 +30,31 @@ class EdgePictorialExtractor(Extractor):
         piece.features[self.__class__.__name__] = [x for _,x in zip(ordering_indexes,images_not_ordered)]
 
 
+class EdgePictorialAndNormalizeExtractor(EdgePictorialExtractor):
+
+    def run(self):
+        super().run()
+        images = []
+        channels_sum = np.zeros((3,1))
+        pixels_count = 0
+
+        # Do we have a RISK for numerical instability here?
+
+        for piece in self.pieces:
+            for edge  in range(piece.get_num_coords()):
+                img = piece.features[self.__class__.__name__][edge]["original"]
+                channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
+                pixels_count+= img.shape[0]*img.shape[1]
+
+        channels_mean = (channels_sum/pixels_count).astype(np.int).T
+        
+        for piece in self.pieces:
+            for edge  in range(piece.get_num_coords()):
+                for key_ in piece.features[self.__class__.__name__][edge].keys():
+                    img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
+                    piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
+
+
 
 def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_height:int):
     next_edge_index = (edge_index+1)%len(piece_coordinates)

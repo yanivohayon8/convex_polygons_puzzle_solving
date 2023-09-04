@@ -2,7 +2,7 @@ import unittest
 import cv2
 from src.piece import Piece
 import matplotlib.pyplot as plt
-from src.feature_extraction.pictorial import trans_image,image_edge,EdgePictorialExtractor
+from src.feature_extraction.pictorial import trans_image,image_edge,EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
 from src.puzzle import Puzzle
@@ -165,6 +165,32 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         assert abs(edge_ii_length_feature-edge_jj_length_feature) < small_number
 
         assert abs(edge_image_ii.shape[1]-edge_image_jj.shape[1]) < small_number, "Note: the edge length are not correct (as is it should be almost identical for noiseless puzzles)"
+
+class TestEdgePictorialAndNormalizeExtractor(unittest.TestCase):
+
+    def test_side_by_side(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        # PARAMS
+        sampling_height = 100
+        piece_ii = 9
+        edge_ii = 3
+        piece_jj = 7
+        edge_jj = 1
+        
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+        chosen_edges = [edge_ii,edge_jj]
+        
+        for edge,piece in zip(chosen_edges,chosen_pieces):
+            piece.load_image()
+
+        feature_extractor = EdgePictorialAndNormalizeExtractor(chosen_pieces,sampling_height=sampling_height)
+        feature_extractor.run()
 
 
 

@@ -13,17 +13,17 @@ class PictorialMatcher():
         self.edge2piece_index = {}
         self.local_index2global_index = {}
         self.global_index2local_index = {}
-        edge_i = 0
+        global_edge_index = 0
 
         for piece_i,piece in enumerate(pieces):
             num_coords = piece.get_num_coords()
 
             for edge in range(num_coords):
-                self.edge2pieceid[edge_i] = piece.id
-                self.local_index2global_index[f"{piece.id}-{edge}"] = edge_i
-                self.edge2piece_index[edge_i] = piece_i
-                self.global_index2local_index[edge_i] = edge
-                edge_i+=1
+                self.edge2pieceid[global_edge_index] = piece.id
+                self.local_index2global_index[f"{piece.id}-{edge}"] = global_edge_index
+                self.edge2piece_index[global_edge_index] = piece_i
+                self.global_index2local_index[global_edge_index] = edge
+                global_edge_index+=1
 
             self.total_num_edges+= num_coords
 
@@ -140,8 +140,8 @@ class ConvolutionV1MatcherToDELETE(NaiveExtrapolatorMatcher):
 
 class DotProductNoisslessMatcher(PictorialMatcher):
 
-    def __init__(self, pieces,step_size=50) -> None:
-        super().__init__(pieces, "EdgePictorialExtractor")
+    def __init__(self, pieces,feature_name ="EdgePictorialExtractor", step_size=50) -> None:
+        super().__init__(pieces, feature_name)
         self.step_size = step_size # The images width should be almost same in case of noiseless puzzle. so it in this case, it is meaningless
 
         
@@ -162,7 +162,7 @@ class DotProductNoisslessMatcher(PictorialMatcher):
         end_col = start_col + kernel_img.shape[1] # both images have the same height (it is sampling_height from the feature extractor)
         kernel_norm = np.linalg.norm(kernel_img)
 
-        while end_col < feature_map_img.shape[1]:
+        while end_col <= feature_map_img.shape[1]:
             receptive_field = feature_map_img[:,start_col:end_col]
             receptive_field_norm = np.linalg.norm(receptive_field)
             prod = np.sum(kernel_img*receptive_field)/receptive_field_norm/kernel_norm

@@ -6,7 +6,7 @@ from src.feature_extraction.geometric import EdgeLengthExtractor
 from src.pairwise_matchers.geometric import EdgeMatcher
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.feature_extraction.pictorial import EdgePictorialExtractor
+from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 from src.puzzle import Puzzle
 
@@ -86,7 +86,7 @@ class TestDotProductNoisslessMatcher(unittest.TestCase):
         assert np.isneginf(matcher.get_score("4","0","4","0"))
 
 
-    def test_two_pieces(self):
+    def test_two_edges(self):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -95,24 +95,136 @@ class TestDotProductNoisslessMatcher(unittest.TestCase):
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
         piece_ii = 9
-        edge_ii = 2
+        edge_ii = 3
         piece_jj = 7
-        edge_jj = 2
+        edge_jj = 1
         
         chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
         
         for piece in chosen_pieces:
             piece.load_image()
 
-        pic_extractor = EdgePictorialExtractor(chosen_pieces,sampling_height=100)
+        pic_extractor = EdgePictorialAndNormalizeExtractor(chosen_pieces,sampling_height=100)
+        pic_extractor.run()
+
+        pictorial_matcher = DotProductNoisslessMatcher(chosen_pieces,feature_name=pic_extractor.__class__.__name__)
+
+        # pictorial_matcher.pairwise()
+        # score = pictorial_matcher.get_score(str(piece_ii),str(edge_ii),str(piece_jj),str(edge_jj))
+        edge_ii_dict = chosen_pieces[0].features[pic_extractor.__class__.__name__][edge_ii]
+        edge_jj_dict = chosen_pieces[1].features[pic_extractor.__class__.__name__][edge_jj]
+        score = pictorial_matcher._score_pair(edge_ii_dict,edge_jj_dict)
+
+        fig, axs = plt.subplots(2,1)
+        fig.suptitle(f"Score: {score}")
+        
+        axs[0].set_title(f"P_{piece_ii}_E_{edge_ii}")
+        axs[0].imshow(edge_ii_dict["original"]) 
+        axs[1].set_title(f"P_{piece_jj}_E_{edge_jj} (FLIPPED)")
+        axs[1].imshow(edge_jj_dict["flipped"])
+
+        plt.show()
+
+    def test_two_pieces_EdgePictorialExtractor(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        piece_ii = 9
+        piece_jj = 7
+        
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+        
+        for piece in chosen_pieces:
+            piece.load_image()
+
+        pic_extractor = EdgePictorialExtractor(chosen_pieces,sampling_height=50)
+        feature_key = pic_extractor.__class__.__name__
         pic_extractor.run()
 
         pictorial_matcher = DotProductNoisslessMatcher(chosen_pieces)
         pictorial_matcher.pairwise()
 
-        score = pictorial_matcher.get_score(str(piece_ii),str(edge_ii),str(piece_jj),str(edge_jj))
-        print(score)
+        for edge_ii in range(chosen_pieces[0].get_num_coords()):
+            for edge_jj in range(chosen_pieces[1].get_num_coords()):
 
+                # Taking the flipped because of the pairwise function
+                # edge_image_ii = chosen_pieces[0].features["EdgePictorialExtractor"][edge_ii]["original"]
+                # flipped_edge_image_jj = chosen_pieces[1].features["EdgePictorialExtractor"][edge_jj]["flipped"]
+                edge_image_ii = chosen_pieces[0].features[feature_key][edge_ii]["original"]
+                flipped_edge_image_jj = chosen_pieces[1].features[feature_key][edge_jj]["flipped"]
+                score = pictorial_matcher.get_score(str(piece_ii),str(edge_ii),str(piece_jj),str(edge_jj))
+
+                fig, axs = plt.subplots(1,2)
+                fig.suptitle(f"Score: {score}")
+                edge_ii_name_v1 = f"P_{piece_ii}_E_{edge_ii}"
+                
+                edge_ii_name_v2 = f"P_{pictorial_matcher.edge2pieceid[edge_ii]}_E_{pictorial_matcher.global_index2local_index[edge_ii]}"
+
+                axs[0].set_title(f"{edge_ii_name_v1}\\{edge_ii_name_v2}")
+                axs[0].imshow(edge_image_ii)
+                edge_jj_name = f"P_{piece_jj}_E_{edge_jj}" 
+                axs[1].set_title(f"{edge_jj_name} (FLIPPED)")
+                axs[1].imshow(flipped_edge_image_jj)
+
+                fig.savefig(f"data/ofir/tmp/{edge_ii_name_v1}-{edge_jj_name}.png")
+                plt.close(fig)
+
+    def test_two_pieces_EdgePictorialAndNormalizeExtractor(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        piece_ii = 9
+        piece_jj = 7
+        
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+        
+        for piece in chosen_pieces:
+            piece.load_image()
+
+        pic_extractor = EdgePictorialAndNormalizeExtractor(chosen_pieces,sampling_height=50)
+        pic_extractor.run()
+        pictorial_matcher = DotProductNoisslessMatcher(chosen_pieces,feature_name=pic_extractor.__class__.__name__)
+        pictorial_matcher.pairwise()
+
+
+        # Running for the plotting only
+        pic_extractor_2 = EdgePictorialExtractor(chosen_pieces,sampling_height=50)
+        feature_key = pic_extractor_2.__class__.__name__
+        pic_extractor_2.run()
+
+
+        for edge_ii in range(chosen_pieces[0].get_num_coords()):
+            for edge_jj in range(chosen_pieces[1].get_num_coords()):
+
+                # Taking the flipped because of the pairwise function
+                # edge_image_ii = chosen_pieces[0].features["EdgePictorialExtractor"][edge_ii]["original"]
+                # flipped_edge_image_jj = chosen_pieces[1].features["EdgePictorialExtractor"][edge_jj]["flipped"]
+                edge_image_ii = chosen_pieces[0].features[feature_key][edge_ii]["original"]
+                flipped_edge_image_jj = chosen_pieces[1].features[feature_key][edge_jj]["flipped"]
+                score = pictorial_matcher.get_score(str(piece_ii),str(edge_ii),str(piece_jj),str(edge_jj))
+
+                fig, axs = plt.subplots(1,2)
+                fig.suptitle(f"Score: {score}")
+                edge_ii_name_v1 = f"P_{piece_ii}_E_{edge_ii}"
+                
+                edge_ii_name_v2 = f"P_{pictorial_matcher.edge2pieceid[edge_ii]}_E_{pictorial_matcher.global_index2local_index[edge_ii]}"
+
+                axs[0].set_title(f"{edge_ii_name_v1}\\{edge_ii_name_v2}")
+                axs[0].imshow(edge_image_ii)
+                edge_jj_name = f"P_{piece_jj}_E_{edge_jj}" 
+                axs[1].set_title(f"{edge_jj_name} (FLIPPED)")
+                axs[1].imshow(flipped_edge_image_jj)
+
+                fig.savefig(f"data/ofir/tmp/{edge_ii_name_v1}-{edge_jj_name}.png")
+                plt.close(fig)   
 
 
 class TestEdgeMatcher(unittest.TestCase):
