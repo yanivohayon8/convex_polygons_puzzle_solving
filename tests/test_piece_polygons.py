@@ -7,6 +7,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 from shapely import Polygon
 from shapely import affinity
+from PIL import Image
+from PIL import ImageDraw
+
+class TestPushCoordinatesOutwards(unittest.TestCase):
+
+    def test_coordinates_pushed(self):
+        original_coordinates = [
+                      (279.26156414925936,0.0),
+                        (0.0,400.418000125509),
+                        (325.5645334835908,1962.0680983081097),
+                        (1260.6015084925616,1329.154326230219)]
+        piece = Piece("0",original_coordinates)
+        
+        distance = 40
+        outwarded_polygon =  piece.push_original_coordinates(distance)
+        outwarded_coordinates = outwarded_polygon.exterior.coords[:-1]
+        image = Image.new("RGB",(2000,2000),0)
+        drawer = ImageDraw.Draw(image)
+        drawer.line(original_coordinates+[original_coordinates[0]],fill="red",width=10)
+        drawer.line(outwarded_coordinates+[outwarded_coordinates[0]],fill="green",width=10)
+
+        plt.imshow(image)
+        plt.show()
+
+        
+
+
+        
+
+
 
 
 class TestPieceAttributes(unittest.TestCase):
@@ -14,8 +44,6 @@ class TestPieceAttributes(unittest.TestCase):
     def test_inner_angle(self):
         # piece zero in puzzle Inv9084 puzzle 1
         angles = [70.78026064882025, 87.72737855452097, 67.56571608921074, 133.92664470744808]
-        
-
 
 class TestTwoPolygonsAlign(unittest.TestCase):
     

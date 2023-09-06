@@ -87,7 +87,35 @@ class Piece():
 
         vertex_index = max(edge_index_1,edge_index_2)
         return self.features["angles"][vertex_index]
+    
 
+    def _push_polygon_outwards(self,polygon:Polygon, distance:int):
+        # Find the center of the polygon
+        center = polygon.centroid
+        
+        # Create a list to store the new vertices
+        new_vertices = []
+        
+        # Iterate through the old vertices and push them outwards
+        for vertex in polygon.exterior.coords:
+            # Calculate the vector from the center to the vertex
+            vector = np.array(vertex) - np.array(center.coords[0])
+            
+            # Normalize the vector
+            norm_vector = vector / np.linalg.norm(vector)
+            
+            # Calculate the new vertex position
+            new_vertex = np.array(vertex) + distance * norm_vector
+            
+            new_vertices.append(new_vertex)
+        
+        # Create a new polygon from the updated vertices
+        new_polygon = Polygon(new_vertices)
+        
+        return new_polygon
+
+    def push_original_coordinates(self,distance:int)->Polygon:
+        return self._push_polygon_outwards(Polygon(self.coordinates),distance)
 
 def overlapping_area(polygons:list):
     '''
