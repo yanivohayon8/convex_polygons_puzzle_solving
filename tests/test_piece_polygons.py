@@ -20,13 +20,13 @@ class TestPushCoordinatesOutwards(unittest.TestCase):
                         (1260.6015084925616,1329.154326230219)]
         piece = Piece("0",original_coordinates)
         
-        distance = 40
+        distance = 10
         outwarded_polygon =  piece.push_original_coordinates(distance)
         outwarded_coordinates = outwarded_polygon.exterior.coords[:-1]
         image = Image.new("RGB",(2000,2000),0)
         drawer = ImageDraw.Draw(image)
-        drawer.line(original_coordinates+[original_coordinates[0]],fill="red",width=10)
-        drawer.line(outwarded_coordinates+[outwarded_coordinates[0]],fill="green",width=10)
+        drawer.line(original_coordinates+[original_coordinates[0]],fill="red",width=distance)
+        drawer.line(outwarded_coordinates+[outwarded_coordinates[0]],fill="green",width=distance)
 
         plt.imshow(image)
         plt.show()
