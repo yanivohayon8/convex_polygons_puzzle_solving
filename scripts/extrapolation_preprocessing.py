@@ -22,6 +22,10 @@ output_directory = f"{directory}/for_extrapolation"
 if not os.path.exists(output_directory):
     os.makedirs(output_directory)
 
+extrapolated_image_directory = f"{directory}/extrapolated"
+if not os.path.exists(extrapolated_image_directory):
+    os.makedirs(extrapolated_image_directory)
+
 with open(f"{output_directory}/params.txt","w") as f:
     f.write(f"line_width {args.line_width}")
 
@@ -35,13 +39,26 @@ for piece in bag_of_pieces:
     try:
         rgba_image = Image.open(piece.img_path)
         rgb_image = rgba_image.convert("RGB")
-        rgb_image.save(output_image_path,"PNG")
-        print(f"Piece {piece.id}: RGB image saved successfully.")
 
-        mask_image = Image.new("RGB",rgb_image.size,0)
-        coords = piece.coordinates + [piece.coordinates[0]]
+        padding_width = args.line_width
+        padding_height = args.line_width
+        width_offset = padding_width//2
+        height_offset = padding_height//2
+
+        final_rgb_img = Image.new("RGB",(rgb_image.width+padding_width,rgb_image.height+padding_height),color=0)
+        final_rgb_img.paste(rgb_image,box=(width_offset,height_offset))
+        final_rgb_img.save(output_image_path,"PNG")
+        print(f"Piece {piece.id}: RGB image saved successfully in {output_directory}.")
+
+        # coords = piece.coordinates + [piece.coordinates[0]]
+        polygon = piece.push_original_coordinates(args.line_width)
+        coords = [(coord[0]+width_offset,coord[1]+height_offset) for coord in polygon.exterior.coords]
+
+
+        mask_image = Image.new("RGB",final_rgb_img.size,0)
         drawer = ImageDraw.Draw(mask_image)
         drawer.line(coords,fill=(255,255,255),width=args.line_width)
+        
         output_mask_path = f"{output_directory}/{file_name}_mask.png"
         mask_image.save(output_mask_path)
         print(f"Piece {piece.id}: edge mask saved successfully.")
