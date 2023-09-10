@@ -9,7 +9,7 @@ import numpy as np
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,ConvolutionV1MatcherToDELETE
-from src.feature_extraction.pictorial import EdgePictorialExtractor
+from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 
 class TestGraphDrawer(unittest.TestCase):
@@ -45,18 +45,11 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
 
-        if "EdgePictorialExtractor" in pictorial_feature_extractor:
-            pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=100)
-            pic_extractor.run()
-
-        # if pictorial_matcher == "naive":
-        #     pictorial_matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
-        #     pictorial_matcher.pairwise()
-        # elif pictorial_matcher == "convV1":
-        #     pictorial_matcher = ConvolutionV1MatcherToDELETE(bag_of_pieces,self.extrapolation_width)
-        #     pictorial_matcher.pairwise()
-        # elif pictorial_matcher == "DotProductNoisslessMatcher":
-        self.pictorial_matcher_ = DotProductNoisslessMatcher(bag_of_pieces)
+        # pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=10)
+        pic_extractor = EdgePictorialAndNormalizeExtractor(bag_of_pieces,sampling_height=10)
+        pic_extractor.run()
+        
+        self.pictorial_matcher_ = DotProductNoisslessMatcher(bag_of_pieces,feature_name=pic_extractor.__class__.__name__)
         self.pictorial_matcher_.pairwise()
 
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
@@ -82,7 +75,7 @@ class TestGraphDrawer(unittest.TestCase):
         drawer.init()
         drawer.draw_graph_matching(wrapper)
         drawer.draw_graph_filtered_matching(wrapper)
-        self.pictorial_matcher_.plot_scores_histogram()
+        # self.pictorial_matcher_.plot_scores_histogram()
 
 
     def test_draw_ground_truth(self):
@@ -97,14 +90,14 @@ class TestGraphDrawer(unittest.TestCase):
 
     def test_draw_pictorial_matches(self):
         db = "1" 
-        puzzle_num = 19 #13 #19
+        puzzle_num = 13 #13 #19
 
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
         wrapper = self._load_graph(db,puzzle_num,1)
 
-        fig, axs = plt.subplots(1,2)
         self._draw_matching(wrapper,ground_truth_wrapper)
-
+        # fig, axs = plt.subplots(1,2)
+        # self._draw_adjacency(wrapper,ground_truth_wrapper,axs[0],axs[1])
        
         plt.show()
 

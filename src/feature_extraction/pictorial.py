@@ -53,12 +53,35 @@ class EdgePictorialAndNormalizeExtractor(EdgePictorialExtractor):
         channels_mean = (channels_sum/pixels_count).astype(np.int).T
         
         for piece in self.pieces:
-            for edge  in range(piece.get_num_coords()):
+            for edge  in range(piece.get_num_coords()): # ["original","flipped"]
                 for key_ in piece.features[self.__class__.__name__][edge].keys():
                     img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
                     piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
 
 
+class EdgePictorialExtractorOnExtrapolation(EdgePictorialExtractor):
+
+    def __init__(self, pieces,outward_distance, sampling_height=10):
+        super().__init__(pieces, sampling_height)
+        self.outward_distance = outward_distance
+
+    def extract_for_piece(self, piece: Piece):
+        piece.features[self.__class__.__name__] = []
+        
+        outwarded_polygon =  piece.push_original_coordinates(self.outward_distance)# corresponds to params.txt #self.sampling_height
+        outwarded_coordinates = outwarded_polygon.exterior.coords[:-1]
+
+        for edge_index in range(len(outwarded_coordinates)):
+
+            img = image_edge(piece.extrapolated_img,outwarded_coordinates,piece.get_origin_index(edge_index),
+                             self.sampling_height)
+            # images_not_ordered.append(
+            piece.features[self.__class__.__name__].append(
+                {
+                    "original":img,
+                    "flipped":np.flip(img,axis=(1))#np.flip(img,axis=(0,1))
+                }
+            )
 
 def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_height:int):
     next_edge_index = (edge_index+1)%len(piece_coordinates)

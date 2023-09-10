@@ -171,5 +171,10 @@ class DotProductNoisslessMatcher(PictorialMatcher):
             start_col += self.step_size
             end_col = start_col + kernel_img.shape[1]
 
-        return max(products) 
+        # return max(products) 
+        
+        if len(products) == 1:
+            return products[0]
+        
+        return np.mean(products[1:]) 
     
