@@ -33,7 +33,8 @@ class TestLoader(unittest.TestCase):
 
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
-        assert "0_mask" in bag_of_pieces[0].extrapolated_img_path
+        # assert "0_mask" in bag_of_pieces[0].extrapolated_img_path
+        assert "0_ext" in bag_of_pieces[0].extrapolated_img_path
 
 
 

@@ -17,6 +17,7 @@ class Puzzle():
         self.groundtruth_location_path = puzzle_directory + "/ground_truth_puzzle.csv"
         self.groundtruth_rels_path = puzzle_directory + "/ground_truth_rels.csv"
         self.pieces_path = puzzle_directory + "/pieces.csv"
+        self.stable_diffusion_extrapolation_path = puzzle_directory + "/Extrapolation"
         self.df_solution_locations = None
         self.df_solution_rels = None
         self.rels_as_mating = []
@@ -24,6 +25,7 @@ class Puzzle():
         self.pieces_images = {}
         self.noise = None
         self.matings_max_difference = None
+        self.df_raw_pieces = None
 
 
         # Because we give new edge numbers in ccw order for efficient code and debug, 
@@ -36,6 +38,7 @@ class Puzzle():
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
         self.df_solution_rels = pd.read_csv(self.groundtruth_rels_path)
         self.df_pieces = pd.read_csv(self.pieces_path)
+        self.df_raw_pieces = pd.read_csv(self.stable_diffusion_extrapolation_path+"/raw_pieces.csv")
         self._get_noise_on_puzzle()
     
     def _get_pieces2img_path(self,pieces):
@@ -53,7 +56,7 @@ class Puzzle():
                     piece.img_path = path
                     continue
     
-    def _get_pieces2extrapolated_img_path(self,pieces):
+    def _get_pieces2extrapolated_img_path_old(self,pieces):
         extentions = ["png","jpg"]
         img_paths = []  
         # [img_paths.extend(glob.glob(self.puzzle_directory+"\\*."+ext)) for ext in extentions]
@@ -69,7 +72,23 @@ class Puzzle():
                 if file_piece_id == id_str:
                     piece.extrapolated_img_path = path
                     continue
-        
+    
+    def _get_stabe_diffusion_extrapolation_img_path(self,pieces):
+        extentions = ["png","jpg"]
+        img_paths = []  
+        path_to_search = self.stable_diffusion_extrapolation_path+"\\*_ext."
+        [img_paths.extend(glob.glob(path_to_search+ext)) for ext in extentions]
+
+        for piece in pieces:
+            #id_str = str(piece.id)
+            id_str = str(int(float(piece.id))) # The id is int written as double in Ofir ground truth, but the image name is in int...
+            for path in img_paths:
+                file_name = path.split("\\")[-1].split(".")[0]
+                tmp = file_name.split("-")[-1]
+                file_piece_id = tmp.split("_")[0]
+                if file_piece_id == id_str:
+                    piece.extrapolated_img_path = path
+                    continue
     
     def _get_noise_on_puzzle(self):
         try:
@@ -98,7 +117,8 @@ class Puzzle():
         pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
         self._preprocess(pieces)
         self._get_pieces2img_path(pieces)
-        self._get_pieces2extrapolated_img_path(pieces)
+        # self._get_pieces2extrapolated_img_path_old(pieces)
+        self._get_stabe_diffusion_extrapolation_img_path(pieces)
         return pieces
 
     def get_ground_truth_puzzle(self,csv_conv="Ofir"):
