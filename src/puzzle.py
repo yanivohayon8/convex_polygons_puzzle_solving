@@ -111,7 +111,7 @@ class Puzzle():
                 print("An error occurred:", str(e))
 
         
-        
+     
 
     def get_bag_of_pieces(self,csv_conv="Ofir"):
         pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
@@ -119,6 +119,7 @@ class Puzzle():
         self._get_pieces2img_path(pieces)
         # self._get_pieces2extrapolated_img_path_old(pieces)
         self._get_stabe_diffusion_extrapolation_img_path(pieces)
+        self._get_raw_coordinates(pieces)
         return pieces
 
     def get_ground_truth_puzzle(self,csv_conv="Ofir"):
@@ -128,6 +129,17 @@ class Puzzle():
         #self._get_pieces2img_path(pieces)
         polygons = [piece.polygon for piece in pieces]
         return polygons
+
+    def _get_raw_coordinates(self,pieces):
+        '''
+            This function is used to load the raw pieces - a csv file directly from Ofir input without changes
+            These coordinates are used to extract the pictorial content of the extrapolated edges using diffusion model...
+        '''
+        raw_pieces =  self._pieces_pd2list(self.df_raw_pieces)
+
+        for raw_piece,piece in zip (raw_pieces,pieces):
+            piece.raw_coordinates = raw_piece.coordinates
+
 
     def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
         if csv_conv!="Ofir":

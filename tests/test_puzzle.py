@@ -36,6 +36,11 @@ class TestLoader(unittest.TestCase):
         # assert "0_mask" in bag_of_pieces[0].extrapolated_img_path
         assert "0_ext" in bag_of_pieces[0].extrapolated_img_path
 
+        assert bag_of_pieces[0].raw_coordinates[0][0]-(-187) < 1
+        assert bag_of_pieces[0].raw_coordinates[0][1]-(-922) < 1
+        
+
+
 
 
 if __name__ == '__main__':

@@ -18,6 +18,7 @@ class Piece():
         self.ccw_edge2origin_edge = {}
         self.extrapolated_img_path = extrapolated_img_path
         self.extrapolated_img = None
+        self.raw_coordinates = None # Coordinates Ofir computed without any my postprocessing. For extrating the stabe diffustion extrapolation pictorial content
 
     def load_image(self):
         self.img = cv2.imread(self.img_path)
