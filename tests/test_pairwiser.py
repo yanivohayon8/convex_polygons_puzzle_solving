@@ -94,17 +94,18 @@ class TestDotProductNoisslessMatcher(unittest.TestCase):
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
 
-        piece_ii = 9
-        edge_ii = 3
-        piece_jj = 7
-        edge_jj = 1
+        piece_ii = 5
+        edge_ii = 1
+        piece_jj = 6
+        edge_jj = 0
         
         chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
         
         for piece in chosen_pieces:
             piece.load_image()
 
-        pic_extractor = EdgePictorialAndNormalizeExtractor(chosen_pieces,sampling_height=100)
+        pic_extractor = EdgePictorialExtractor(chosen_pieces,sampling_height=10)
+        # pic_extractor = EdgePictorialAndNormalizeExtractor(chosen_pieces,sampling_height=10)
         pic_extractor.run()
 
         pictorial_matcher = DotProductNoisslessMatcher(chosen_pieces,feature_name=pic_extractor.__class__.__name__)

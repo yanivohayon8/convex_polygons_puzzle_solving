@@ -2,7 +2,7 @@ import unittest
 import cv2
 from src.piece import Piece
 import matplotlib.pyplot as plt
-from src.feature_extraction.pictorial import trans_image,image_edge,EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
+from src.feature_extraction.pictorial import trans_image,image_edge,EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor,EdgePictorialExtractorOnExtrapolation
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
 from src.puzzle import Puzzle
@@ -76,9 +76,10 @@ class TestLamaExtrapolation(unittest.TestCase):
         assert abs(edge_ii_length -  edge_jj_length) < width_extrapolation, f"{edges_names[0]} length is {edge_ii_length} and {edges_names[1]} length is {edge_jj_length}. The diffrence is too big "
 
 
+
 class TestEdgePictorialExtractor(unittest.TestCase):
     
-    def test_single_edge(self):
+    def test_original_image_single_edge(self):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -107,7 +108,7 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         edge_length = chosen_piece.features["edges_length"][chosen_piece.ccw_edge2origin_edge[edge_index]]
         assert abs(edge_length-edge_image_.shape[1]) < small_number
 
-    def test_side_by_side(self):
+    def test_original_image_side_by_side(self):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -118,7 +119,7 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         # PARAMS
         sampling_height = 100
         piece_ii = 9
-        edge_ii = 3
+        edge_ii = 0
         piece_jj = 7
         edge_jj = 1
         
@@ -165,6 +166,44 @@ class TestEdgePictorialExtractor(unittest.TestCase):
         assert abs(edge_ii_length_feature-edge_jj_length_feature) < small_number
 
         assert abs(edge_image_ii.shape[1]-edge_image_jj.shape[1]) < small_number, "Note: the edge length are not correct (as is it should be almost identical for noiseless puzzles)"
+
+    def test_extra_image_single_edge(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        # PARAMS
+        piece_index = 9
+        edge_index = 0
+        sampling_height = 100 # equal to the value in extrapolated/params.txt
+        outward_distance = 10  # equals to params.txt
+
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_extrapolated_image()
+        chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
+        feature_extractor_extrapolator = EdgePictorialExtractorOnExtrapolation([chosen_piece],outward_distance,
+                                                                   sampling_height=sampling_height+outward_distance)
+        feature_extractor_extrapolator.run()
+
+        edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["original"]
+
+        chosen_piece.load_image()
+        feature_extractor = EdgePictorialExtractor([chosen_piece],sampling_height=sampling_height)
+        feature_extractor.run()
+
+        edge_image_ = chosen_piece.features[feature_extractor.__class__.__name__][edge_index]["original"]
+        
+        fig, axs = plt.subplots(2,1)
+
+        axs[0].set_title("Original")
+        axs[0].imshow(edge_image_)
+        axs[1].set_title("Extrapolated")
+        axs[1].imshow(edge_extra_image_)
+
+        plt.show()
 
 class TestEdgePictorialAndNormalizeExtractor(unittest.TestCase):
 
