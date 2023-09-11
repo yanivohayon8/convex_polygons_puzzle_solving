@@ -38,6 +38,7 @@ class TestLoader(unittest.TestCase):
 
         assert bag_of_pieces[0].raw_coordinates[0][0]-(-187) < 1
         assert bag_of_pieces[0].raw_coordinates[0][1]-(-922) < 1
+        assert bag_of_pieces[0].extrapolation_details.width == 30
         
 
 

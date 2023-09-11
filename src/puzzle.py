@@ -1,5 +1,5 @@
 import pandas as pd
-from src.piece import Piece
+from src.piece import Piece,StableDiffusionExtrapolationDetails
 from shapely.geometry.polygon import orient as orient_as_ccw
 from src.mating import Mating
 import glob
@@ -120,6 +120,8 @@ class Puzzle():
         # self._get_pieces2extrapolated_img_path_old(pieces)
         self._get_stabe_diffusion_extrapolation_img_path(pieces)
         self._get_raw_coordinates(pieces)
+        self._get_extrapolation_details(pieces)
+
         return pieces
 
     def get_ground_truth_puzzle(self,csv_conv="Ofir"):
@@ -130,6 +132,17 @@ class Puzzle():
         polygons = [piece.polygon for piece in pieces]
         return polygons
 
+
+    def _get_extrapolation_details(self,pieces):
+        with open(self.stable_diffusion_extrapolation_path+"/extrapolation_details.json", "r") as file:
+            data = json.load(file)
+            for piece in pieces:
+                x_offset = data[f"{piece.id}_x_offset"]
+                y_offset = data[f"{piece.id}_y_offset"]
+                scale_factor = data["scale_factor"]
+                width = data["pixels_extrapolated"]
+                piece.extrapolation_details = StableDiffusionExtrapolationDetails(x_offset,y_offset,scale_factor,width)
+
     def _get_raw_coordinates(self,pieces):
         '''
             This function is used to load the raw pieces - a csv file directly from Ofir input without changes
@@ -139,7 +152,7 @@ class Puzzle():
 
         for raw_piece,piece in zip (raw_pieces,pieces):
             piece.raw_coordinates = raw_piece.coordinates
-
+    
 
     def _pieces_pd2list(self,df:pd.DataFrame,csv_conv="Ofir"):
         if csv_conv!="Ofir":

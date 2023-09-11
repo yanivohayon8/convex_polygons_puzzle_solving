@@ -18,7 +18,8 @@ class Piece():
         self.ccw_edge2origin_edge = {}
         self.extrapolated_img_path = extrapolated_img_path
         self.extrapolated_img = None
-        self.raw_coordinates = None # Coordinates Ofir computed without any my postprocessing. For extrating the stabe diffustion extrapolation pictorial content
+        self.raw_coordinates = None # Coordinates Ofir computed without any of my postprocessing. For extrating the stabe diffustion extrapolation pictorial content
+        self.extrapolation_details = None
 
     def load_image(self):
         self.img = cv2.imread(self.img_path)
@@ -153,3 +154,17 @@ def semi_dice_coef_overlapping(polygons:list):
         dice_sum+= curr_intersect_with_other.area/shapely_polygons[i].area
 
     return dice_sum
+
+
+
+
+class StableDiffusionExtrapolationDetails():
+    '''
+        Details from the extrapolation_details.json 
+        from the stable diffusion extrapolation
+    '''
+    def __init__(self,x_offset,y_offset,scale_factor,width) -> None:
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.scale_factor = scale_factor
+        self.width = width
