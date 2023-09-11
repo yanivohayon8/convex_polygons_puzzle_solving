@@ -270,3 +270,5 @@ class Puzzle():
         
         
         return count_correct/len(ground_truth_matings)
+
+

@@ -6,6 +6,32 @@ from shapely import Polygon,Point
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+from src.puzzle import Puzzle
+
+
+class TestPocStableDiffusion(unittest.TestCase):
+
+    def test_load_piece(self):
+        db = "1"
+        puzzle_num = "19"
+        puzzle_noise_level = 0
+        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
+        puzzle = Puzzle(puzzle_directory)
+        puzzle.load()
+
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+        piece = bag_of_pieces[0]
+        coords = piece.raw_coordinates
+        shifted_coords = piece.extrapolation_details.match_piece_to_img(coords)
+        piece.load_extrapolated_image()
+        plt.imshow(piece.extrapolated_img)
+        plt.fill(
+                shifted_coords[:, 0],
+                shifted_coords[:, 1],
+                alpha=0.5,
+                color='orange')
+        plt.show()
+
 
 class TestPOC(unittest.TestCase):
     

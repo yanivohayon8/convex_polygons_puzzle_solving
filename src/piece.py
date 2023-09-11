@@ -19,7 +19,7 @@ class Piece():
         self.extrapolated_img_path = extrapolated_img_path
         self.extrapolated_img = None
         self.raw_coordinates = None # Coordinates Ofir computed without any of my postprocessing. For extrating the stabe diffustion extrapolation pictorial content
-        self.extrapolation_details = None
+        self.extrapolation_details = None # instance of StableDiffusionExtrapolationDetails
 
     def load_image(self):
         self.img = cv2.imread(self.img_path)
@@ -163,8 +163,26 @@ class StableDiffusionExtrapolationDetails():
         Details from the extrapolation_details.json 
         from the stable diffusion extrapolation
     '''
-    def __init__(self,x_offset,y_offset,scale_factor,width) -> None:
+    def __init__(self,x_offset,y_offset,scale_factor,width,should_denormalize=True) -> None:
         self.x_offset = x_offset
         self.y_offset = y_offset
         self.scale_factor = scale_factor
         self.width = width
+        self.should_denormalize= should_denormalize
+    
+    def match_piece_to_img(self,coords:np.array):
+        shifted_coords = np.copy(coords)
+
+        if self.scale_factor != 1.0:
+            for i, vertice in enumerate(coords):
+                shifted_coords[i][0] = vertice[0] * self.scale_factor
+                shifted_coords[i][1] = vertice[1] * self.scale_factor
+        
+        if self.should_denormalize:
+            denormalization_value = np.min(shifted_coords, axis=0)
+        else:
+            denormalization_value = np.array([0, 0])
+        shifted_coords[:, 0] = shifted_coords[:, 0] - denormalization_value[0] + self.x_offset
+        shifted_coords[:, 1] = shifted_coords[:, 1] - denormalization_value[1] + self.y_offset
+
+        return shifted_coords
