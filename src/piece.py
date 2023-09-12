@@ -163,11 +163,11 @@ class StableDiffusionExtrapolationDetails():
         Details from the extrapolation_details.json 
         from the stable diffusion extrapolation
     '''
-    def __init__(self,x_offset,y_offset,scale_factor,width,should_denormalize=True) -> None:
+    def __init__(self,x_offset,y_offset,scale_factor,height,should_denormalize=True) -> None:
         self.x_offset = x_offset
         self.y_offset = y_offset
         self.scale_factor = scale_factor
-        self.width = width
+        self.height = height
         self.should_denormalize= should_denormalize
     
     def match_piece_to_img(self,coords:np.array):

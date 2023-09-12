@@ -140,8 +140,8 @@ class Puzzle():
                 x_offset = data[f"{piece.id}_x_offset"]
                 y_offset = data[f"{piece.id}_y_offset"]
                 scale_factor = data["scale_factor"]
-                width = data["pixels_extrapolated"]
-                piece.extrapolation_details = StableDiffusionExtrapolationDetails(x_offset,y_offset,scale_factor,width)
+                height = data["pixels_extrapolated"]
+                piece.extrapolation_details = StableDiffusionExtrapolationDetails(x_offset,y_offset,scale_factor,height)
 
     def _get_raw_coordinates(self,pieces):
         '''
