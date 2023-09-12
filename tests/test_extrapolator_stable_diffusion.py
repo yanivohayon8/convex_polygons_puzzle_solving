@@ -6,6 +6,34 @@ from src.puzzle import Puzzle
 import matplotlib.pyplot as plt
 import cv2
 
+
+class TestStableDiffusionExtractor(unittest.TestCase):
+
+    def test_edge_extrapolated(self,piece_index = 0,edge_index = 3):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_extrapolated_image()
+        chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
+        extrapolation_height = chosen_piece.extrapolation_details.height//2 # rule of thumb because there is a miss match between the extrapolated height to the json
+        feature_extractor_extrapolator = StableDiffusionExtrapolationExtractor([chosen_piece],
+                                                                               extrapolation_height=extrapolation_height)
+        feature_extractor_extrapolator.run()
+        edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["original"]
+
+        ax = plt.subplot()
+        ax.set_title("Extrapolated")
+        ax.imshow(edge_extra_image_)
+
+        plt.show()
+
+
+
 class TestPocStableDiffusion(unittest.TestCase):
 
     def test_load_piece(self,piece_index=4):

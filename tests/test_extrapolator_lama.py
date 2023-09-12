@@ -10,36 +10,6 @@ from src.puzzle import Puzzle
 from src.feature_extraction.extrapolator.stable_diffusion import StableDiffusionExtrapolationExtractor
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 
-# class TestStableDiffusionExtractor(unittest.TestCase):
-
-#     def test_edge_extrapolated(self):
-#         db = 1
-#         puzzle_num = 19
-#         puzzle_noise_level = 0
-#         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-#         puzzle.load()
-#         bag_of_pieces = puzzle.get_bag_of_pieces()
-
-#         # PARAMS
-#         piece_index = 0
-#         edge_index = 3
-#         sampling_height = 30 # TO BE DELETE?
-
-#         chosen_piece = bag_of_pieces[piece_index]
-#         chosen_piece.load_extrapolated_image()
-#         chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
-#         feature_extractor_extrapolator = StableDiffusionExtrapolationExtractor([chosen_piece],sampling_height=sampling_height)
-#         feature_extractor_extrapolator.run()
-
-#         edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["original"]
-
-#         ax = plt.subplot()
-
-#         ax.set_title("Extrapolated")
-#         ax.imshow(edge_extra_image_)
-
-#         plt.show()
-
 
 
 
