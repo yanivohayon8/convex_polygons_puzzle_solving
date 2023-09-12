@@ -17,8 +17,9 @@ class SDExtrapolatorExtractor(Extractor):
         shifted_coords = piece.extrapolation_details.match_piece_to_img(raw_coords)
         
 
-        for edge_index in range(len(shifted_coords)):
-            
+        for edge_index_ in range(len(shifted_coords)):
+            edge_index = piece.get_origin_index(edge_index_)
+
             next_edge_index = (edge_index+1)%len(shifted_coords)
             angle = find_rotation_angle(shifted_coords,edge_index,next_edge_index)
             edge_row = shifted_coords[edge_index][1]
@@ -32,12 +33,12 @@ class SDExtrapolatorExtractor(Extractor):
             min_row,min_col = np.min(non_background_indices,axis=0)
             max_row,max_col = np.max(non_background_indices,axis=0)
 
-            # img = translated_img[:self.extrapolation_height,min_col:min_col+edge_width]
-            img = translated_img[:max_row,min_col:min_col+edge_width]
+            img = translated_img[:self.extrapolation_height,min_col:min_col+edge_width]
+            # img = translated_img[:max_row,min_col:min_col+edge_width]
 
             piece.features[self.__class__.__name__].append(
                 {
-                    "original":img,
+                    "same":img,
                     "flipped":np.flip(img,axis=(1))#np.flip(img,axis=(0,1))
                 }
             )
@@ -54,8 +55,9 @@ class SDOriginalExtractor(Extractor):
         raw_coords = piece.raw_coordinates
         shifted_coords = piece.extrapolation_details.match_piece_to_img(raw_coords)
         
-        for edge_index in range(len(shifted_coords)):
-            
+        for edge_index_ in range(len(shifted_coords)):
+            edge_index = piece.get_origin_index(edge_index_)
+
             next_edge_index = (edge_index+1)%len(shifted_coords)
             angle = find_rotation_angle(shifted_coords,edge_index,next_edge_index)
             edge_row = shifted_coords[edge_index][1]
@@ -72,7 +74,7 @@ class SDOriginalExtractor(Extractor):
 
             piece.features[self.__class__.__name__].append(
                 {
-                    "original":img,
+                    "same":img,
                     "flipped":np.flip(img,axis=(1))#np.flip(img,axis=(0,1))
                 }
             )

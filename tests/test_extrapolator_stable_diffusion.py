@@ -19,12 +19,12 @@ class TestStableDiffusionExtractor(unittest.TestCase):
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_extrapolated_image()
-        chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
+        # chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
         extrapolation_height = chosen_piece.extrapolation_details.height#//2 # rule of thumb because there is a miss match between the extrapolated height to the json
         feature_extractor_extrapolator = SDExtrapolatorExtractor([chosen_piece],
                                                                                extrapolation_height=extrapolation_height)
         feature_extractor_extrapolator.run()
-        edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["original"]
+        edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
 
         ax = plt.subplot()
         ax.set_title("Extrapolated")
@@ -42,14 +42,14 @@ class TestStableDiffusionExtractor(unittest.TestCase):
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_stable_diffusion_original_image()
-        chosen_piece.stable_diffusion_original_img = cv2.cvtColor(chosen_piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
+        # chosen_piece.stable_diffusion_original_img = cv2.cvtColor(chosen_piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
         extrapolation_height = chosen_piece.extrapolation_details.height//2# rule of thumb because there is a miss match between the extrapolated height to the json
         feature_extractor_extrapolator = SDOriginalExtractor([chosen_piece],sampling_height=extrapolation_height)
         feature_extractor_extrapolator.run()
-        edge_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["original"]
+        edge_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
 
         ax = plt.subplot()
-        ax.set_title("original")
+        ax.set_title("same")
         ax.imshow(edge_image_)
 
         plt.show()
@@ -94,7 +94,7 @@ class TestPocStableDiffusion(unittest.TestCase):
         coords = piece.raw_coordinates
         shifted_coords = piece.extrapolation_details.match_piece_to_img(coords)
         piece.load_stable_diffusion_original_image()
-        piece.stable_diffusion_original_img = cv2.cvtColor(piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
+        # piece.stable_diffusion_original_img = cv2.cvtColor(piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
 
         plt.imshow(piece.stable_diffusion_original_img)
         plt.fill(
@@ -117,7 +117,7 @@ class TestPocStableDiffusion(unittest.TestCase):
         coords = piece.raw_coordinates
         shifted_coords = piece.extrapolation_details.match_piece_to_img(coords)
         piece.load_extrapolated_image()
-        piece.extrapolated_img = cv2.cvtColor(piece.extrapolated_img,cv2.COLOR_BGR2RGB)
+        # piece.extrapolated_img = cv2.cvtColor(piece.extrapolated_img,cv2.COLOR_BGR2RGB)
 
         next_edge_index = (edge_index+1)%len(shifted_coords)
         angle = find_rotation_angle(shifted_coords,edge_index,next_edge_index)
@@ -177,7 +177,7 @@ class TestPocStableDiffusion(unittest.TestCase):
         coords = piece.raw_coordinates
         shifted_coords = piece.extrapolation_details.match_piece_to_img(coords)
         piece.load_stable_diffusion_original_image()
-        piece.stable_diffusion_original_img = cv2.cvtColor(piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
+        # piece.stable_diffusion_original_img = cv2.cvtColor(piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
 
         next_edge_index = (edge_index+1)%len(shifted_coords)
         angle = find_rotation_angle(shifted_coords,edge_index,next_edge_index)

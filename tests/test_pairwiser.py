@@ -7,43 +7,50 @@ from src.pairwise_matchers.geometric import EdgeMatcher
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
 from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
+from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
 from src.puzzle import Puzzle
 
 
-class TestlamaMatcher(unittest.TestCase):
+class TestStableDiffusionExtrapolators(unittest.TestCase):
 
-    def test_toy_example(self):
-        # bag_of_pieces = [
-        #     Piece("3",[(359.6934234692053,0.0),(0.0,1182.1466364589978),(552.5547553983743,664.8981548785887)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-3_mask.png'),
-        #     Piece("4",[(892.8888169403926,2033.45176941104),(0.0,0.0),(211.833995449535,1002.4259449236998)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-4_mask.png'),
-        #     Piece("5",[(0.0,1595.1806656860645),(160.30040305844886,1601.4394492589781),(474.0201114068477,912.6414795354285),(11.914194622491777,0.0)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-5_mask.png'),
-        #     Piece("6",[(1022.2569034805347,0.0),(0.0,68.71924696099452),(321.1597911884128,744.9290577022039)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-6_mask.png')
-        # ]
-
-        bag_of_pieces = [
-            Piece("3",[(359.6934234692053,0.0),(0.0,1182.1466364589978),(552.5547553983743,664.8981548785887)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-3_mask.png'),
-            Piece("4",[(892.8888169403926,2033.45176941104),(0.0,0.0),(211.833995449535,1002.4259449236998)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-4_mask.png')
-        ]
-
-        for piece in bag_of_pieces:
-            piece.load_extrapolated_image()
+    def test_toy_example(self,piece_ii = 5,edge_ii = 2, piece_jj = 3,edge_jj = 1,sample_height=10):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
         
-        feature_extractor = LamaEdgeExtrapolator(bag_of_pieces)
-        feature_extractor.run()
+        for piece in chosen_pieces:
+            piece.load_extrapolated_image()
+            piece.load_stable_diffusion_original_image()
 
-        matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
-        matcher.pairwise()
+        extrapolation_extractor = SDExtrapolatorExtractor(chosen_pieces,extrapolation_height=sample_height)
+        extrapolation_extractor.run()
 
-        score = matcher.get_score("3","0","4","2")
-        print(score)
-        assert np.isneginf(matcher.get_score("3","0","3","2"))
-        assert np.isneginf(matcher.get_score("3","0","3","1"))
-        assert np.isneginf(matcher.get_score("3","0","3","0"))
-        assert np.isneginf(matcher.get_score("4","0","4","2"))
-        assert np.isneginf(matcher.get_score("4","0","4","1"))
-        assert np.isneginf(matcher.get_score("4","0","4","0"))
+        original_extractor = SDOriginalExtractor(chosen_pieces,sampling_height=sample_height)
+        original_extractor.run()
 
+        pictorial_matcher = DotProductExtraToOriginalMatcher(chosen_pieces,
+                                                             extrapolation_extractor.__class__.__name__,
+                                                             original_extractor.__class__.__name__)
+
+        edge_ii_img = chosen_pieces[0].features[extrapolation_extractor.__class__.__name__][edge_ii]["same"]
+        edge_jj_img = chosen_pieces[1].features[original_extractor.__class__.__name__][edge_jj]["flipped"]
+        score = pictorial_matcher._score_pair(edge_ii_img,edge_jj_img)
+
+        fig, axs = plt.subplots(2,1)
+        fig.suptitle(f"Score: {score}")
+        
+        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (FLIPPED)")
+        axs[0].imshow(edge_jj_img)
+        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated")
+        axs[1].imshow(edge_ii_img) 
+
+        plt.show()
 
 
 class TestDotProductNoisslessMatcher(unittest.TestCase):
@@ -227,6 +234,38 @@ class TestDotProductNoisslessMatcher(unittest.TestCase):
                 fig.savefig(f"data/ofir/tmp/{edge_ii_name_v1}-{edge_jj_name}.png")
                 plt.close(fig)   
 
+class TestlamaMatcher(unittest.TestCase):
+
+    def test_toy_example(self):
+        # bag_of_pieces = [
+        #     Piece("3",[(359.6934234692053,0.0),(0.0,1182.1466364589978),(552.5547553983743,664.8981548785887)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-3_mask.png'),
+        #     Piece("4",[(892.8888169403926,2033.45176941104),(0.0,0.0),(211.833995449535,1002.4259449236998)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-4_mask.png'),
+        #     Piece("5",[(0.0,1595.1806656860645),(160.30040305844886,1601.4394492589781),(474.0201114068477,912.6414795354285),(11.914194622491777,0.0)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-5_mask.png'),
+        #     Piece("6",[(1022.2569034805347,0.0),(0.0,68.71924696099452),(321.1597911884128,744.9290577022039)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-6_mask.png')
+        # ]
+
+        bag_of_pieces = [
+            Piece("3",[(359.6934234692053,0.0),(0.0,1182.1466364589978),(552.5547553983743,664.8981548785887)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-3_mask.png'),
+            Piece("4",[(892.8888169403926,2033.45176941104),(0.0,0.0),(211.833995449535,1002.4259449236998)],extrapolated_img_path='../ConvexDrawingDataset/DB1/Puzzle19/noise_0\\extrapolated\\rgb-4_mask.png')
+        ]
+
+        for piece in bag_of_pieces:
+            piece.load_extrapolated_image()
+        
+        feature_extractor = LamaEdgeExtrapolator(bag_of_pieces)
+        feature_extractor.run()
+
+        matcher = NaiveExtrapolatorMatcher(bag_of_pieces)
+        matcher.pairwise()
+
+        score = matcher.get_score("3","0","4","2")
+        print(score)
+        assert np.isneginf(matcher.get_score("3","0","3","2"))
+        assert np.isneginf(matcher.get_score("3","0","3","1"))
+        assert np.isneginf(matcher.get_score("3","0","3","0"))
+        assert np.isneginf(matcher.get_score("4","0","4","2"))
+        assert np.isneginf(matcher.get_score("4","0","4","1"))
+        assert np.isneginf(matcher.get_score("4","0","4","0"))
 
 class TestEdgeMatcher(unittest.TestCase):
     

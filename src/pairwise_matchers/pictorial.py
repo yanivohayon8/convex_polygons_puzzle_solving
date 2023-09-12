@@ -1,6 +1,6 @@
 import numpy as np
-from src.feature_extraction.extrapolator.lama_masking import reshape_line_to_image
 import matplotlib.pyplot as plt
+from src.feature_extraction.extrapolator.lama_masking import reshape_line_to_image
 
 
 class PictorialMatcher():
@@ -178,3 +178,7 @@ class DotProductNoisslessMatcher(PictorialMatcher):
         
         return np.mean(products[1:]) 
     
+
+
+
+
