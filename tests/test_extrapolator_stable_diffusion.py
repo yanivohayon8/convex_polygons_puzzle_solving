@@ -1,5 +1,5 @@
 import unittest
-from src.feature_extraction.extrapolator.stable_diffusion import StableDiffusionExtrapolationExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 import numpy as np
 from src.puzzle import Puzzle
@@ -21,7 +21,7 @@ class TestStableDiffusionExtractor(unittest.TestCase):
         chosen_piece.load_extrapolated_image()
         chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
         extrapolation_height = chosen_piece.extrapolation_details.height//2 # rule of thumb because there is a miss match between the extrapolated height to the json
-        feature_extractor_extrapolator = StableDiffusionExtrapolationExtractor([chosen_piece],
+        feature_extractor_extrapolator = SDExtrapolatorExtractor([chosen_piece],
                                                                                extrapolation_height=extrapolation_height)
         feature_extractor_extrapolator.run()
         edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["original"]
@@ -31,6 +31,8 @@ class TestStableDiffusionExtractor(unittest.TestCase):
         ax.imshow(edge_extra_image_)
 
         plt.show()
+    
+    
 
 
 

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from src.puzzle import Puzzle
-from src.feature_extraction.extrapolator.stable_diffusion import StableDiffusionExtrapolationExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 
 
