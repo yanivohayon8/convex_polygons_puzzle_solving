@@ -12,12 +12,14 @@ class Piece():
         self.polygon = Polygon(coordinates)
         self.coordinates = coordinates
         self.original_coordinates = coordinates # before ccw in puzzle._preprocess
-        self.img_path = img_path
-        self.img = None
         self.features = {}
         self.ccw_edge2origin_edge = {}
+        self.img_path = img_path
+        self.img = None
         self.extrapolated_img_path = extrapolated_img_path
         self.extrapolated_img = None
+        self.stable_diffusion_original_img_path = ""
+        self.stable_diffusion_original_img = None
         self.raw_coordinates = None # Coordinates Ofir computed without any of my postprocessing. For extrating the stabe diffustion extrapolation pictorial content
         self.extrapolation_details = None # instance of StableDiffusionExtrapolationDetails
 
@@ -29,6 +31,9 @@ class Piece():
         self.extrapolated_img = cv2.imread(self.extrapolated_img_path)
         # self.extrapolated_img = cv2.cvtColor(self.extrapolated_img,cv2.COLOR_BGR2LAB)
         # self.extrapolated_img = cv2.cvtColor(self.extrapolated_img,cv2.COLOR_BGR2HSV)
+
+    def load_stable_diffusion_original_image(self):
+        self.stable_diffusion_original_img = cv2.imread(self.stable_diffusion_original_img_path)
 
     def get_coords(self):
         '''
