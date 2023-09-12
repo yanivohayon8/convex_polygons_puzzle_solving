@@ -1,5 +1,5 @@
 import unittest
-from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 import numpy as np
 from src.puzzle import Puzzle
@@ -20,7 +20,7 @@ class TestStableDiffusionExtractor(unittest.TestCase):
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_extrapolated_image()
         chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
-        extrapolation_height = chosen_piece.extrapolation_details.height//2 # rule of thumb because there is a miss match between the extrapolated height to the json
+        extrapolation_height = chosen_piece.extrapolation_details.height#//2 # rule of thumb because there is a miss match between the extrapolated height to the json
         feature_extractor_extrapolator = SDExtrapolatorExtractor([chosen_piece],
                                                                                extrapolation_height=extrapolation_height)
         feature_extractor_extrapolator.run()
@@ -29,6 +29,28 @@ class TestStableDiffusionExtractor(unittest.TestCase):
         ax = plt.subplot()
         ax.set_title("Extrapolated")
         ax.imshow(edge_extra_image_)
+
+        plt.show()
+    
+    def test_edge_original(self,piece_index = 0,edge_index = 3):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_stable_diffusion_original_image()
+        chosen_piece.stable_diffusion_original_img = cv2.cvtColor(chosen_piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
+        extrapolation_height = chosen_piece.extrapolation_details.height//2# rule of thumb because there is a miss match between the extrapolated height to the json
+        feature_extractor_extrapolator = SDOriginalExtractor([chosen_piece],sampling_height=extrapolation_height)
+        feature_extractor_extrapolator.run()
+        edge_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["original"]
+
+        ax = plt.subplot()
+        ax.set_title("original")
+        ax.imshow(edge_image_)
 
         plt.show()
     
@@ -115,7 +137,7 @@ class TestPocStableDiffusion(unittest.TestCase):
         # max_row,max_col = np.max(non_background_indices,axis=0)
         # cropped_img = translated_img[min_row:max_row,min_col:max_col]
         
-        max_row = piece.extrapolation_details.height//2 # rule of thumb because there is a miss match between the extrapolated height to the json
+        max_row = piece.extrapolation_details.height#//2 # rule of thumb because there is a miss match between the extrapolated height to the json
         cropped_img = translated_img[:max_row,min_col:min_col+edge_width]
 
         
@@ -142,7 +164,6 @@ class TestPocStableDiffusion(unittest.TestCase):
 
         plt.show()
         
-
     def test_translate_piece_on_original_edge(self,piece_index=5,edge_index=1):
         db = "1"
         puzzle_num = "19"
@@ -166,7 +187,7 @@ class TestPocStableDiffusion(unittest.TestCase):
         next_edge_col = shifted_coords[next_edge_index][0]
         edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
 
-        height_sampling = piece.extrapolation_details.height//2
+        height_sampling = piece.extrapolation_details.height#//3
         translated_img = trans_image(piece.stable_diffusion_original_img,edge_col,edge_row,angle,edge_row-height_sampling,edge_col)
 
         non_background_indices = np.argwhere(np.any(translated_img != [0,0,0],axis=2))
