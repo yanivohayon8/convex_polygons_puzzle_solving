@@ -79,30 +79,52 @@ class SDOriginalExtractor(Extractor):
                 }
             )
 
-# class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
+class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
 
-#     def run(self):
-#         super().run()
-#         images = []
-#         channels_sum = np.zeros((3,1))
-#         pixels_count = 0
+    def run(self):
+        super().run()
+        channels_sum = np.zeros((3,1))
+        pixels_count = 0
 
-#         # Do we have a RISK for numerical instability here?
+        # Do we have a RISK for numerical instability here?
 
-#         for piece in self.pieces:
-#             for edge  in range(piece.get_num_coords()):
-#                 img = piece.features[self.__class__.__name__][edge]["original"]
-#                 channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
-#                 pixels_count+= img.shape[0]*img.shape[1]
+        for piece in self.pieces:
+            for edge  in range(piece.get_num_coords()):
+                img = piece.features[self.__class__.__name__][edge]["same"]
+                channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
+                pixels_count+= img.shape[0]*img.shape[1]
 
-#         channels_mean = (channels_sum/pixels_count).astype(np.int).T
+        channels_mean = (channels_sum/pixels_count).astype(np.int).T
         
-#         for piece in self.pieces:
-#             for edge  in range(piece.get_num_coords()): # ["original","flipped"]
-#                 for key_ in piece.features[self.__class__.__name__][edge].keys():
-#                     img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
-#                     piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
+        for piece in self.pieces:
+            for edge  in range(piece.get_num_coords()): # ["original","flipped"]
+                for key_ in piece.features[self.__class__.__name__][edge].keys():
+                    img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
+                    piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
 
+
+class NormalizeSDOriginalExtractor(SDOriginalExtractor):
+
+    def run(self):
+        super().run()
+        channels_sum = np.zeros((3,1))
+        pixels_count = 0
+
+        # Do we have a RISK for numerical instability here?
+
+        for piece in self.pieces:
+            for edge  in range(piece.get_num_coords()):
+                img = piece.features[self.__class__.__name__][edge]["same"]
+                channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
+                pixels_count+= img.shape[0]*img.shape[1]
+
+        channels_mean = (channels_sum/pixels_count).astype(np.int).T
+        
+        for piece in self.pieces:
+            for edge  in range(piece.get_num_coords()): # ["original","flipped"]
+                for key_ in piece.features[self.__class__.__name__][edge].keys():
+                    img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
+                    piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
 
 # def get_edge_image(extrapolation_img:np.ndarray,original_coordinates:list,edge_index:int,extrapolation_height:int):
 #     next_edge_index = (edge_index+1)%len(original_coordinates)
