@@ -46,14 +46,14 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         fig, axs = plt.subplots(2,1)
         fig.suptitle(f"Score: {score}")
         
-        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (FLIPPED)")
+        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (SAME)")
         axs[0].imshow(edge_jj_img)
-        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated")
+        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (FLIPPED)")
         axs[1].imshow(edge_ii_img) 
 
         plt.show()
 
-    def test_normalized_image_toy_example(self,piece_ii = 5,edge_ii = 2, piece_jj = 3,edge_jj = 1,sample_height=10):
+    def test_normalized_image_toy_example(self,piece_ii = 5,edge_ii = 2, piece_jj = 3,edge_jj = 1,sample_height=3):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -83,9 +83,9 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         fig, axs = plt.subplots(2,1)
         fig.suptitle(f"Score: {score}")
         
-        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (FLIPPED)")
+        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (SAME)")
         axs[0].imshow(edge_jj_img)
-        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated")
+        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (FLIPPED)")
         axs[1].imshow(edge_ii_img) 
 
         plt.show()

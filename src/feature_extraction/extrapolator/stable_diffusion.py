@@ -39,7 +39,7 @@ class SDExtrapolatorExtractor(Extractor):
             piece.features[self.__class__.__name__].append(
                 {
                     "same":img,
-                    "flipped":np.flip(img,axis=(1))#np.flip(img,axis=(0,1))
+                    "flipped":np.flip(img,axis=(0))#np.flip(img,axis=(0,1))
                 }
             )
 
@@ -75,7 +75,7 @@ class SDOriginalExtractor(Extractor):
             piece.features[self.__class__.__name__].append(
                 {
                     "same":img,
-                    "flipped":np.flip(img,axis=(1))#np.flip(img,axis=(0,1))
+                    "flipped":np.flip(img,axis=(0,1))#np.flip(img,axis=(0,1))
                 }
             )
 
@@ -125,18 +125,3 @@ class NormalizeSDOriginalExtractor(SDOriginalExtractor):
                 for key_ in piece.features[self.__class__.__name__][edge].keys():
                     img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
                     piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
-
-# def get_edge_image(extrapolation_img:np.ndarray,original_coordinates:list,edge_index:int,extrapolation_height:int):
-#     next_edge_index = (edge_index+1)%len(original_coordinates)
-#     angle = find_rotation_angle(original_coordinates,edge_index,next_edge_index)
-#     edge_row = original_coordinates[edge_index][1]
-#     edge_col = original_coordinates[edge_index][0]
-#     next_edge_row = original_coordinates[next_edge_index][1]
-#     next_edge_col = original_coordinates[next_edge_index][0]
-#     edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
-#     translated_img = trans_image(extrapolation_img,edge_col,edge_row,angle,edge_row,edge_col)
-
-#     non_background_indices = np.argwhere(np.any(translated_img != [0,0,0],axis=2))
-#     min_row,min_col = np.min(non_background_indices,axis=0)
-
-#     return translated_img[:extrapolation_height,min_col:min_col+edge_width]

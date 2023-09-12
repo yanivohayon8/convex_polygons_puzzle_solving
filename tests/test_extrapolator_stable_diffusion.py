@@ -9,7 +9,7 @@ import cv2
 
 class TestStableDiffusionExtractor(unittest.TestCase):
 
-    def test_edge_extrapolated(self,piece_index = 0,edge_index = 3):
+    def test_edge_extrapolated(self,piece_index = 5,edge_index = 2):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -25,14 +25,17 @@ class TestStableDiffusionExtractor(unittest.TestCase):
                                                                                extrapolation_height=extrapolation_height)
         feature_extractor_extrapolator.run()
         edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
+        edge_extra_image_flipped = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["flipped"]
 
-        ax = plt.subplot()
-        ax.set_title("Extrapolated")
-        ax.imshow(edge_extra_image_)
+        fig,axs = plt.subplots(1,2)
+        axs[0].set_title("Extrapolated (SAME)")
+        axs[0].imshow(edge_extra_image_)
+        axs[1].set_title("Extrapolated (FLIPPED)")
+        axs[1].imshow(edge_extra_image_flipped)
 
         plt.show()
     
-    def test_edge_original(self,piece_index = 0,edge_index = 3):
+    def test_edge_original(self,piece_index = 0,edge_index = 1):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -47,10 +50,13 @@ class TestStableDiffusionExtractor(unittest.TestCase):
         feature_extractor_extrapolator = SDOriginalExtractor([chosen_piece],sampling_height=extrapolation_height)
         feature_extractor_extrapolator.run()
         edge_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
+        edge_image_flipped = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["flipped"]
 
-        ax = plt.subplot()
-        ax.set_title("same")
-        ax.imshow(edge_image_)
+        fig,axs = plt.subplots(1,2)
+        axs[0].set_title("same")
+        axs[0].imshow(edge_image_)
+        axs[1].set_title("flipped")
+        axs[1].imshow(edge_image_flipped)
 
         plt.show()
     
@@ -94,7 +100,7 @@ class TestStableDiffusionExtractor(unittest.TestCase):
         edge_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
 
         ax = plt.subplot()
-        ax.set_title("same")
+        ax.set_title("Original")
         ax.imshow(edge_image_)
 
         plt.show()
