@@ -83,6 +83,32 @@ class EdgePictorialExtractorOnExtrapolation(EdgePictorialExtractor):
                 }
             )
 
+
+def find_rotation_angle(piece_coordinates:list,edge_index:int,next_edge_index:int):
+    edge_row = piece_coordinates[edge_index][1]
+    edge_col = piece_coordinates[edge_index][0]
+    next_edge_row = piece_coordinates[next_edge_index][1]
+    next_edge_col = piece_coordinates[next_edge_index][0]
+    angle = np.arctan((next_edge_row-edge_row)/(next_edge_col-edge_col))*180/np.pi
+
+    if next_edge_col-edge_col < 0:
+        angle +=180
+    
+    return angle
+
+def padd_image_before_translate(img:np.array,edge_width):
+    num_row_padded = 0
+        
+    if edge_width>img.shape[0]:
+        num_row_padded = edge_width - img.shape[0]
+    
+    num_col_padded = 0
+    
+    if edge_width>img.shape[1]:
+        num_col_padded = edge_width - img.shape[1]
+
+    return np.pad(img,((0,num_row_padded),(0,num_col_padded),(0,0)),constant_values=0)
+
 def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_height:int):
     next_edge_index = (edge_index+1)%len(piece_coordinates)
     edge_row = piece_coordinates[edge_index][1]
@@ -107,7 +133,8 @@ def image_edge(img:np.ndarray,piece_coordinates:list,edge_index:int,sampling_hei
 
     img_padded = np.pad(img,((0,num_row_padded),(0,num_col_padded),(0,0)),constant_values=0)
     img_translated_shift_down = trans_image(img_padded,edge_col,edge_row,angle,edge_row-sampling_height,edge_col)
-    return img_translated_shift_down[:sampling_height,:edge_width]
+    # img_translated_shift_down = trans_image(img_padded,edge_col,edge_row,angle,edge_row,edge_col)
+    return img_translated_shift_down[:sampling_height,:edge_width]#[:sampling_height,:edge_width]
 
 
 
