@@ -7,13 +7,14 @@ from src.pairwise_matchers.geometric import EdgeMatcher
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
 from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
-from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor,NormalizeSDOriginalExtractor,NormalizeSDExtrapolatorExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
 from src.puzzle import Puzzle
 
 
 class TestStableDiffusionExtrapolators(unittest.TestCase):
+
 
     def test_toy_example(self,piece_ii = 5,edge_ii = 2, piece_jj = 3,edge_jj = 1,sample_height=10):
         db = 1
@@ -52,6 +53,42 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
 
         plt.show()
 
+    def test_normalized_image_toy_example(self,piece_ii = 5,edge_ii = 2, piece_jj = 3,edge_jj = 1,sample_height=10):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+        
+        for piece in chosen_pieces:
+            piece.load_extrapolated_image()
+            piece.load_stable_diffusion_original_image()
+
+        extrapolation_extractor = NormalizeSDExtrapolatorExtractor(chosen_pieces,extrapolation_height=sample_height)
+        extrapolation_extractor.run()
+
+        original_extractor = NormalizeSDOriginalExtractor(chosen_pieces,sampling_height=sample_height)
+        original_extractor.run()
+
+        pictorial_matcher = DotProductExtraToOriginalMatcher(chosen_pieces,
+                                                             extrapolation_extractor.__class__.__name__,
+                                                             original_extractor.__class__.__name__)
+
+        edge_ii_img = chosen_pieces[0].features[extrapolation_extractor.__class__.__name__][edge_ii]["same"]
+        edge_jj_img = chosen_pieces[1].features[original_extractor.__class__.__name__][edge_jj]["flipped"]
+        score = pictorial_matcher._score_pair(edge_ii_img,edge_jj_img)
+
+        fig, axs = plt.subplots(2,1)
+        fig.suptitle(f"Score: {score}")
+        
+        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (FLIPPED)")
+        axs[0].imshow(edge_jj_img)
+        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated")
+        axs[1].imshow(edge_ii_img) 
+
+        plt.show()
 
 class TestDotProductNoisslessMatcher(unittest.TestCase):
 
