@@ -16,7 +16,7 @@ from src.puzzle import Puzzle
 class TestStableDiffusionExtrapolators(unittest.TestCase):
 
 
-    def test_toy_example(self,piece_ii = 5,edge_ii = 2, piece_jj = 3,edge_jj = 1,sample_height=10):
+    def test_toy_example(self,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0,sample_height=10):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -39,17 +39,17 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
                                                              extrapolation_extractor.__class__.__name__,
                                                              original_extractor.__class__.__name__)
 
-        edge_ii_img = chosen_pieces[0].features[extrapolation_extractor.__class__.__name__][edge_ii]["same"]
-        edge_jj_img = chosen_pieces[1].features[original_extractor.__class__.__name__][edge_jj]["flipped"]
-        score = pictorial_matcher._score_pair(edge_ii_img,edge_jj_img)
+        edge_ii_extra_img = chosen_pieces[0].features[extrapolation_extractor.__class__.__name__][edge_ii]["same"]
+        edge_jj_original_img = chosen_pieces[1].features[original_extractor.__class__.__name__][edge_jj]["flipped"]
+        score = pictorial_matcher._score_pair(edge_ii_extra_img,edge_jj_original_img)
 
         fig, axs = plt.subplots(2,1)
         fig.suptitle(f"Score: {score}")
         
         axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (SAME)")
-        axs[0].imshow(edge_jj_img)
+        axs[0].imshow(edge_jj_original_img)
         axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (FLIPPED)")
-        axs[1].imshow(edge_ii_img) 
+        axs[1].imshow(edge_ii_extra_img) 
 
         plt.show()
 
@@ -93,9 +93,9 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         plt.show()
 
     
-    def test_normalized_image_pair_best_buddies(self,piece_ii = 5,edge_ii = 2,
-                                           piece_jj = 3,edge_jj = 1,
-                                           sample_height=5):
+    def test_normalized_image_pair_best_buddies(self,piece_ii = 3,edge_ii = 2,
+                                           piece_jj = 4,edge_jj = 0,
+                                           sample_height=10):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -131,14 +131,14 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         fig.suptitle(f"Score: {pictorial_matcher.get_score(piece_ii,edge_ii,piece_jj,edge_jj)}")
         
         '''VERIFY THIS PLOTTING...'''
-        # axs[0,0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (FLIPPED)")
-        # axs[0,0].imshow(edge_jj_img_flipped)
-        # axs[0,1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (SAME)")
-        # axs[0,1].imshow(edge_ii_img_extra_same) 
-        # axs[1,0].set_title(f"P_{piece_jj}_E_{edge_jj} Extrapolated (SAME)")
-        # axs[1,0].imshow(edge_jj_img_extra_same)
-        # axs[1,1].set_title(f"P_{piece_ii}_E_{edge_ii} Original (FLIPPED)")
-        # axs[1,1].imshow(edge_ii_img_flipped) 
+        axs[0,0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (FLIPPED)")
+        axs[0,0].imshow(edge_jj_img_flipped)
+        axs[0,1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (SAME)")
+        axs[0,1].imshow(edge_ii_img_extra_same) 
+        axs[1,0].set_title(f"P_{piece_ii}_E_{edge_ii} Original (FLIPPED)")
+        axs[1,0].imshow(edge_ii_img_flipped) 
+        axs[1,1].set_title(f"P_{piece_jj}_E_{edge_jj} Extrapolated (SAME)")
+        axs[1,1].imshow(edge_jj_img_extra_same)
 
         plt.show()
 

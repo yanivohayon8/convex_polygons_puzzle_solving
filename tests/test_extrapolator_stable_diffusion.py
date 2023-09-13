@@ -108,10 +108,10 @@ class TestStableDiffusionExtractor(unittest.TestCase):
 
 class TestPocStableDiffusion(unittest.TestCase):
 
-    def test_load_extrapolation_image(self,piece_index=4):
+    def test_load_extrapolation_image(self,piece_index=6):
         db = "1"
         puzzle_num = "19"
-        puzzle_noise_level = 0
+        puzzle_noise_level = 2
         puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         puzzle.load()
@@ -129,7 +129,7 @@ class TestPocStableDiffusion(unittest.TestCase):
                 color='orange')
         plt.show()
 
-    def test_load_original_image(self,piece_index=5):
+    def test_load_original_image(self,piece_index=0):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0

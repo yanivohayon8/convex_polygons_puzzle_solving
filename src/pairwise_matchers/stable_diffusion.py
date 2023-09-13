@@ -26,11 +26,12 @@ class DotProductExtraToOriginalMatcher(PictorialMatcher):
                 edge2_local_j = self.global_index2local_index[edge2_j]
                 edge2_original_pixels = self.pieces[piece2_j].features[self.feature_original][edge2_local_j]
                 
-                self.matching_edges_scores[edge1_i,edge2_j] = self._score_pair(edge1_extrapolated_pixels["same"],edge2_original_pixels["flipped"])
+                self.matching_edges_scores[edge1_i,edge2_j] = self._score_pair(edge1_extrapolated_pixels["same"],
+                                                                               edge2_original_pixels["flipped"])
     
     def _score_pair(self, edge1_img:np.array, edge2_img:np.array):
-        feature_map_img = edge1_img
-        kernel_img = edge2_img
+        feature_map_img = edge1_img.copy()
+        kernel_img = edge2_img.copy()
         
         assert feature_map_img.shape[0] == kernel_img.shape[0]
 
@@ -39,16 +40,29 @@ class DotProductExtraToOriginalMatcher(PictorialMatcher):
             feature_map_img = kernel_img
             kernel_img = tmp
         
+        feature_map_img = feature_map_img.astype(np.double)
+        kernel_img = kernel_img.astype(np.double)
+
         products = [-np.inf]
         start_col = 0
         end_col = start_col + kernel_img.shape[1] # both images have the same height (it is sampling_height from the feature extractor)
+
         kernel_norm = np.linalg.norm(kernel_img)
+
+        masking = np.ones_like(kernel_img)
+        # next_item = 1
+        # step_item = 0.9
+
+        # for row in range(masking.shape[0]):
+        #     masking[row,:] = masking[row,:]*next_item
+        #     next_item *= step_item
 
         while end_col <= feature_map_img.shape[1]:
             receptive_field = feature_map_img[:,start_col:end_col]
             receptive_field_norm = np.linalg.norm(receptive_field)
-            prod = np.sum(kernel_img*receptive_field)/receptive_field_norm/kernel_norm
             # prod = -np.linalg.norm(receptive_field-kernel_img)/kernel_img.size
+            prod = np.sum(kernel_img*receptive_field*masking)/receptive_field_norm/kernel_norm
+            # prod = np.sum(kernel_img*receptive_field*masking)/receptive_field_norm/kernel_norm
             products.append(prod)
             start_col += self.step_size
             end_col = start_col + kernel_img.shape[1]
