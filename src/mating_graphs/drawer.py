@@ -166,7 +166,10 @@ class MatchingGraphDrawer():
     def _draw_ground_truth_matching(self,layout="planar",title="Ground Truth Matching",ax=None):
         self._draw_general_layout(self.noiseless_ground_truth_wrapper.potential_matings_graph,layout=layout,title=title,ax=ax)
     
-    def _draw_graph_matching(self,matings_graph:nx.Graph,layout="planar",title="Matching Graph",ax=None):
+    def _draw_graph_matching(self,matings_graph:nx.Graph,
+                             layout="planar",title="Matching Graph",
+                             ax=None,
+                             max_edge_weight = None,min_edge_weight = None):
 
         if ax is None:
             # If no existing axis is provided, create a new figure and axis
@@ -189,8 +192,15 @@ class MatchingGraphDrawer():
         edge_weights = [matings_graph[u][v]['compatibility'] for u, v in matings_graph.edges()]
         cmap = plt.cm.get_cmap('plasma')
         
+        if max_edge_weight is None:
+            max_edge_weight = max(edge_weights)
+        
+        if min_edge_weight is None:
+            min_edge_weight = min(edge_weights)
+        
         edges = nx.draw_networkx_edges(my_graph, self.node2position, edge_color=edge_weights, edge_cmap=cmap,
-                                    width=2.0, ax=ax, edge_vmin=min(edge_weights), edge_vmax=max(edge_weights))
+                                    width=2.0, ax=ax, 
+                                    edge_vmin=min_edge_weight, edge_vmax=max_edge_weight)
 
         cb = plt.colorbar(edges, ax=ax, label='Comptatibility')
 
@@ -199,8 +209,18 @@ class MatchingGraphDrawer():
 
         nx.draw_networkx_edges(my_graph, self.node2position, edge_color="gray",edgelist=self.noiseless_ground_truth_wrapper.pieces_only_graph.edges)
 
-    def draw_graph_matching(self,graph_wrapper:MatchingGraphWrapper,layout="planar",title="Matching Graph",ax=None):
-        self._draw_graph_matching(graph_wrapper.potential_matings_graph,layout=layout,title=title,ax=ax)
+    def draw_graph_matching(self,graph_wrapper:MatchingGraphWrapper,
+                            layout="planar",title="Matching Graph",
+                            ax=None,
+                            max_edge_weight = None,min_edge_weight = None):
+        self._draw_graph_matching(graph_wrapper.potential_matings_graph,
+                                  layout=layout,title=title,ax=ax,
+                                  max_edge_weight=max_edge_weight,min_edge_weight=min_edge_weight)
     
-    def draw_graph_filtered_matching(self,graph_wrapper:MatchingGraphWrapper,layout="planar",title="Filtered Matching Graph",ax=None):
-        self._draw_graph_matching(graph_wrapper.filtered_potential_matings_graph,layout=layout,title=title,ax=ax)
+    def draw_graph_filtered_matching(self,graph_wrapper:MatchingGraphWrapper,
+                                     layout="planar",title="Filtered Matching Graph",
+                                     ax=None,
+                                     max_edge_weight = None,min_edge_weight = None):
+        self._draw_graph_matching(graph_wrapper.filtered_potential_matings_graph,
+                                  layout=layout,title=title,ax=ax,
+                                  max_edge_weight = max_edge_weight,min_edge_weight = min_edge_weight)

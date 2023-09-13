@@ -10,7 +10,8 @@ from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
 class MatchingGraphWrapper():
 
     def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
-                 geometric_match_pieces_score=None,pictorial_matcher:NaiveExtrapolatorMatcher=None) -> None:
+                 geometric_match_pieces_score=None,pictorial_matcher:NaiveExtrapolatorMatcher=None,
+                 compatibility_threshold=0.2) -> None:
         self.pieces = pieces
         self.id2piece = id2piece
         self.geometric_match_edges = geometric_match_edges
@@ -20,6 +21,7 @@ class MatchingGraphWrapper():
         self.filtered_potential_matings_graph = None
         self.pieces_only_graph = None#nx.Graph()
         self.adjacency_graph = None
+        self.compatibility_threshold = compatibility_threshold
 
     def _name_node(self,piece_name,edge_name):
         return f"P_{piece_name}_E_{edge_name}"
@@ -71,15 +73,18 @@ class MatchingGraphWrapper():
         for node, attributes in self.potential_matings_graph.nodes(data=True):
             self.filtered_potential_matings_graph.add_node(node, **attributes)
 
-        compatibilities = [edge_attributes[2]["compatibility"] for edge_attributes in self.potential_matings_graph.edges(data=True)]
-        sorted_edges = [x for _, x in sorted(zip(compatibilities, self.potential_matings_graph.edges),reverse=True)] #sorted(compatibilities, key=lambda edge: compatibilities[edge], reverse=True)
-        num_edges = len(sorted_edges)
-        quartile_threshold  = int(0.5* num_edges) #int(0.75 * num_edges)
-        top_quartile_edges = sorted_edges[:quartile_threshold]
+        filtered_edges = [edge_attributes for edge_attributes in self.potential_matings_graph.edges(data=True) if edge_attributes[2]["compatibility"] >= self.compatibility_threshold]
+        self.filtered_potential_matings_graph.add_edges_from(filtered_edges)    
 
-        for source, target in top_quartile_edges:
-            attributes = self.potential_matings_graph[source][target]
-            self.filtered_potential_matings_graph.add_edge(source, target, **attributes)
+        # compatibilities = [edge_attributes[2]["compatibility"] for edge_attributes in self.potential_matings_graph.edges(data=True)]
+        # sorted_edges = [x for _, x in sorted(zip(compatibilities, self.potential_matings_graph.edges),reverse=True)] #sorted(compatibilities, key=lambda edge: compatibilities[edge], reverse=True)
+        # num_edges = len(sorted_edges)
+        # quartile_threshold  = num_edges #int(0.5* num_edges) #int(0.75 * num_edges)
+        # top_quartile_edges = sorted_edges[:quartile_threshold]
+
+        # for source, target in top_quartile_edges:
+        #     attributes = self.potential_matings_graph[source][target]
+        #     self.filtered_potential_matings_graph.add_edge(source, target, **attributes)
 
 
     def build_graph(self):
