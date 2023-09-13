@@ -48,7 +48,7 @@ class DotProductExtraToOriginalMatcher(PictorialMatcher):
             receptive_field = feature_map_img[:,start_col:end_col]
             receptive_field_norm = np.linalg.norm(receptive_field)
             prod = np.sum(kernel_img*receptive_field)/receptive_field_norm/kernel_norm
-            # prod = -np.linalg.norm(receptive_field-kernel_img)/kernel_img.shape[1]
+            # prod = -np.linalg.norm(receptive_field-kernel_img)/kernel_img.size
             products.append(prod)
             start_col += self.step_size
             end_col = start_col + kernel_img.shape[1]
@@ -57,3 +57,8 @@ class DotProductExtraToOriginalMatcher(PictorialMatcher):
             return products[0]
         
         return np.mean(products[1:])
+    
+    def get_score(self, piece1, edge1, piece2, edge2):
+        score1 = super().get_score(piece1, edge1, piece2, edge2)
+        score2 = super().get_score(piece2,edge2, piece1,edge1)
+        return (score1 + score2)/2

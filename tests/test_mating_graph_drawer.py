@@ -59,7 +59,7 @@ class TestGraphDrawer(unittest.TestCase):
         # self.pictorial_matcher_.pairwise()
 
 
-        sampling_height = 3
+        sampling_height = 10
         extrapolator_extractor = NormalizeSDExtrapolatorExtractor(bag_of_pieces,extrapolation_height=sampling_height)
         extrapolator_extractor.run()
 
@@ -114,7 +114,7 @@ class TestGraphDrawer(unittest.TestCase):
 
     def test_draw_pictorial_matches(self):
         db = "1" 
-        puzzle_num = 19 #13 #20
+        puzzle_num = 20 #13 #20
 
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
         wrapper = self._load_graph(db,puzzle_num,1)
