@@ -200,14 +200,16 @@ class MatchingGraphDrawer():
         
         edges = nx.draw_networkx_edges(my_graph, self.node2position, edge_color=edge_weights, edge_cmap=cmap,
                                     width=2.0, ax=ax, 
-                                    edge_vmin=min_edge_weight, edge_vmax=max_edge_weight)
+                                    edge_vmin=min_edge_weight, edge_vmax=max_edge_weight,
+                                    edgelist=matings_graph.edges(data=True))
 
         cb = plt.colorbar(edges, ax=ax, label='Comptatibility')
 
         # Set the title for the plot
         ax.set_title(title)
 
-        nx.draw_networkx_edges(my_graph, self.node2position, edge_color="gray",edgelist=self.noiseless_ground_truth_wrapper.pieces_only_graph.edges)
+        nx.draw_networkx_edges(my_graph, self.node2position, edge_color="gray",
+                               edgelist=self.noiseless_ground_truth_wrapper.pieces_only_graph.edges)
 
     def draw_graph_matching(self,graph_wrapper:MatchingGraphWrapper,
                             layout="planar",title="Matching Graph",
