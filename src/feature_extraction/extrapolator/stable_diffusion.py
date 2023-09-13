@@ -94,12 +94,14 @@ class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
                 channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
                 pixels_count+= img.shape[0]*img.shape[1]
 
-        channels_mean = (channels_sum/pixels_count).astype(np.int).T
+        # channels_mean = (channels_sum/pixels_count).astype(np.int).T
+        channels_mean = (channels_sum/pixels_count).astype(np.double).T
         
         for piece in self.pieces:
             for edge  in range(piece.get_num_coords()): # ["original","flipped"]
                 for key_ in piece.features[self.__class__.__name__][edge].keys():
-                    img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
+                    # img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
+                    img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.double)
                     piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
 
 
@@ -118,10 +120,12 @@ class NormalizeSDOriginalExtractor(SDOriginalExtractor):
                 channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
                 pixels_count+= img.shape[0]*img.shape[1]
 
-        channels_mean = (channels_sum/pixels_count).astype(np.int).T
+        # channels_mean = (channels_sum/pixels_count).astype(np.int).T
+        channels_mean = (channels_sum/pixels_count).astype(np.double).T
         
         for piece in self.pieces:
             for edge  in range(piece.get_num_coords()): # ["original","flipped"]
                 for key_ in piece.features[self.__class__.__name__][edge].keys():
-                    img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
+                    # img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
+                    img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.double)
                     piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean

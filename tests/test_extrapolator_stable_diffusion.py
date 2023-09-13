@@ -79,7 +79,7 @@ class TestStableDiffusionExtractor(unittest.TestCase):
 
         ax = plt.subplot()
         ax.set_title("Extrapolated")
-        ax.imshow(edge_extra_image_)
+        ax.imshow(edge_extra_image_.astype(np.int))
 
         plt.show()
     
@@ -101,7 +101,7 @@ class TestStableDiffusionExtractor(unittest.TestCase):
 
         ax = plt.subplot()
         ax.set_title("Original")
-        ax.imshow(edge_image_)
+        ax.imshow(edge_image_.astype(np.int))
 
         plt.show()
 

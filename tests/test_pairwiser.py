@@ -86,9 +86,9 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         fig.suptitle(f"Score: {score}")
         
         axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (SAME)")
-        axs[0].imshow(edge_jj_img)
+        axs[0].imshow(edge_jj_img.astype(np.int))
         axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (FLIPPED)")
-        axs[1].imshow(edge_ii_img) 
+        axs[1].imshow(edge_ii_img.astype(np.int)) 
 
         plt.show()
 
@@ -132,13 +132,13 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         
         '''VERIFY THIS PLOTTING...'''
         axs[0,0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (FLIPPED)")
-        axs[0,0].imshow(edge_jj_img_flipped)
+        axs[0,0].imshow(edge_jj_img_flipped.astype(np.int))
         axs[0,1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (SAME)")
-        axs[0,1].imshow(edge_ii_img_extra_same) 
+        axs[0,1].imshow(edge_ii_img_extra_same.astype(np.int)) 
         axs[1,0].set_title(f"P_{piece_ii}_E_{edge_ii} Original (FLIPPED)")
-        axs[1,0].imshow(edge_ii_img_flipped) 
+        axs[1,0].imshow(edge_ii_img_flipped.astype(np.int)) 
         axs[1,1].set_title(f"P_{piece_jj}_E_{edge_jj} Extrapolated (SAME)")
-        axs[1,1].imshow(edge_jj_img_extra_same)
+        axs[1,1].imshow(edge_jj_img_extra_same.astype(np.int))
 
         plt.show()
 
