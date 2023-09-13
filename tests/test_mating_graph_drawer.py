@@ -12,10 +12,13 @@ from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,Convolution
 from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 
+from src.feature_extraction.extrapolator.stable_diffusion import NormalizeSDExtrapolatorExtractor,NormalizeSDOriginalExtractor
+from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
+
 class TestGraphDrawer(unittest.TestCase):
     
     def _load_graph(self,db,puzzle_num,puzzle_noise_level,
-                    img_type="original",
+                    img_type="stable_diffusion",
                     geo_feature_extractors=["angle","length"],
                     pictorial_feature_extractor=["EdgePictorialExtractor"],
                     pictorial_matcher="DotProductNoisslessMatcher"):
@@ -33,6 +36,9 @@ class TestGraphDrawer(unittest.TestCase):
                 piece.load_image()
             elif img_type == "extrapolated":
                 piece.load_extrapolated_image()
+            elif img_type == "stable_diffusion":
+                piece.load_extrapolated_image()
+                piece.load_stable_diffusion_original_image()
 
         if "length" in  geo_feature_extractors:
             edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
@@ -46,10 +52,24 @@ class TestGraphDrawer(unittest.TestCase):
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
 
         # pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=10)
-        pic_extractor = EdgePictorialAndNormalizeExtractor(bag_of_pieces,sampling_height=10)
-        pic_extractor.run()
+        # pic_extractor = EdgePictorialAndNormalizeExtractor(bag_of_pieces,sampling_height=10)
+        # pic_extractor.run()
         
-        self.pictorial_matcher_ = DotProductNoisslessMatcher(bag_of_pieces,feature_name=pic_extractor.__class__.__name__)
+        # self.pictorial_matcher_ = DotProductNoisslessMatcher(bag_of_pieces,feature_name=pic_extractor.__class__.__name__)
+        # self.pictorial_matcher_.pairwise()
+
+
+        sampling_height = 3
+        extrapolator_extractor = NormalizeSDExtrapolatorExtractor(bag_of_pieces,extrapolation_height=sampling_height)
+        extrapolator_extractor.run()
+
+        original_extractor = NormalizeSDOriginalExtractor(bag_of_pieces,sampling_height=sampling_height)
+        original_extractor.run()
+
+        self.pictorial_matcher_ = DotProductExtraToOriginalMatcher(bag_of_pieces,
+                                                                   extrapolator_extractor.__class__.__name__,
+                                                                   original_extractor.__class__.__name__,
+                                                                   step_size=50)
         self.pictorial_matcher_.pairwise()
 
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
@@ -73,8 +93,12 @@ class TestGraphDrawer(unittest.TestCase):
     def _draw_matching(self,wrapper:MatchingGraphWrapper,ground_truth_wrapper:MatchingGraphWrapper):
         drawer = MatchingGraphDrawer(ground_truth_wrapper)
         drawer.init()
-        drawer.draw_graph_matching(wrapper)
-        drawer.draw_graph_filtered_matching(wrapper)
+
+        # Because we you use the normalized dot product
+        min_edge_weight = -1
+        max_edge_weight = 1
+        drawer.draw_graph_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+        drawer.draw_graph_filtered_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
         # self.pictorial_matcher_.plot_scores_histogram()
 
 
@@ -90,7 +114,7 @@ class TestGraphDrawer(unittest.TestCase):
 
     def test_draw_pictorial_matches(self):
         db = "1" 
-        puzzle_num = 13 #13 #19
+        puzzle_num = 19 #13 #20
 
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
         wrapper = self._load_graph(db,puzzle_num,1)
