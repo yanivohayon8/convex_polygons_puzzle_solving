@@ -11,7 +11,7 @@ class MatchingGraphWrapper():
 
     def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
                  geometric_match_pieces_score=None,pictorial_matcher:NaiveExtrapolatorMatcher=None,
-                 compatibility_threshold=0.2) -> None:
+                 compatibility_threshold=0.1) -> None:
         self.pieces = pieces
         self.id2piece = id2piece
         self.geometric_match_edges = geometric_match_edges
