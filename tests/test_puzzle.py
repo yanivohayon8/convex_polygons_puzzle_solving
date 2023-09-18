@@ -41,7 +41,16 @@ class TestLoader(unittest.TestCase):
         assert bag_of_pieces[0].extrapolation_details.height == 30
         
 
-
+    def test_load_puzzle_with_missing_pieces(self):
+        db = "5"
+        puzzle_num = "1"
+        puzzle_noise_level = 0
+        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
+        puzzle = Puzzle(puzzle_directory)
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+        print(puzzle.matings_max_difference)
+        assert len(bag_of_pieces) == 9
 
 
 if __name__ == '__main__':
