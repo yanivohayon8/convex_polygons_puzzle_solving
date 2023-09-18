@@ -17,6 +17,36 @@ from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatc
 
 class TestGraphDrawer(unittest.TestCase):
     
+    def _load_apictorial_graph(self,db,puzzle_num,puzzle_noise_level,
+                    img_type="stable_diffusion",
+                    geo_feature_extractors=["angle","length"]):
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        id2piece = {}
+
+        for piece in bag_of_pieces:
+            id2piece[piece.id] = piece
+        
+        if "length" in  geo_feature_extractors:
+            edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
+            edge_length_extractor.run()
+
+        if "angle" in geo_feature_extractors:
+            angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
+            angles_extractor.run()
+
+        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
+        edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
+
+        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
+                                                edge_length_pairwiser.match_edges,
+                                                edge_length_pairwiser.match_pieces_score)
+        wrapper.build_graph()
+
+        return wrapper
+
     def _load_graph(self,db,puzzle_num,puzzle_noise_level,
                     img_type="stable_diffusion",
                     geo_feature_extractors=["angle","length"],
@@ -101,17 +131,6 @@ class TestGraphDrawer(unittest.TestCase):
         drawer.draw_graph_filtered_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
         # self.pictorial_matcher_.plot_scores_histogram()
 
-
-    def test_draw_ground_truth(self):
-        db = "1"
-        puzzle_num = 19
-        ground_truth_graph = self._load_graph(db,puzzle_num,0)
-        drawer = MatchingGraphDrawer(ground_truth_graph)
-        drawer._draw_ground_truth_adjacency()
-        # drawer._draw_ground_truth_matching()
-        plt.show()
-    
-
     def test_draw_pictorial_matches(self):
         db = "1" 
         puzzle_num = 20 #13 #20
@@ -125,23 +144,31 @@ class TestGraphDrawer(unittest.TestCase):
        
         plt.show()
 
-    # def test_draw_Inv9084_with_noise(self):
-    #     db = "1" 
-    #     puzzle_num = 19 #13 #19
-    #     puzzle_noise_level = 1
-    #     pictorial_matcher = "naive" #"convV1"
-    #     self.extrapolation_width = 10#10 #1
 
-    #     ground_truth_wrapper = self._load_graph(db,puzzle_num,0,
-    #                                             pictorial_matcher=pictorial_matcher)
-    #     wrapper = self._load_graph(db,puzzle_num,puzzle_noise_level,
-    #                                pictorial_matcher=pictorial_matcher)
+    def test_apictorial_puzzle_with_missing_pieces(self):
+        db = "5" 
+        puzzle_num = 1 #13 #20
 
-    #     fig, axs = plt.subplots(1,2)
-    #     self._draw(wrapper,ground_truth_wrapper,axs[0],axs[1])
+        ground_truth_wrapper = self._load_apictorial_graph(db,puzzle_num,0)
+        wrapper = self._load_apictorial_graph(db,puzzle_num,1)
 
-    #     plt.show()
-        
+        self._draw_matching(wrapper,ground_truth_wrapper)
+        fig, axs = plt.subplots(1,2)
+        self._draw_adjacency(wrapper,ground_truth_wrapper,axs[0],axs[1])
+       
+        plt.show()
+
+
+
+    def test_draw_ground_truth(self):
+        db = "1"
+        puzzle_num = 19
+        ground_truth_graph = self._load_graph(db,puzzle_num,0)
+        drawer = MatchingGraphDrawer(ground_truth_graph)
+        drawer._draw_ground_truth_adjacency()
+        # drawer._draw_ground_truth_matching()
+        plt.show()
+    
     
 
         

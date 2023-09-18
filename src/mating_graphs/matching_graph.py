@@ -43,7 +43,11 @@ class MatchingGraphWrapper():
                         for mating in mat_edge:
                             first_node = self._name_node(piece_i_id,mating[0])
                             second_node = self._name_node(piece_j_id,mating[1])
-                            compatibility = self.pictorial_matcher.get_score(piece_i_id,mating[0],piece_j_id,mating[1]) #mating_edges_scores[k]
+                            
+                            if self.pictorial_matcher is None:
+                                compatibility = 1
+                            else:
+                                compatibility = self.pictorial_matcher.get_score(piece_i_id,mating[0],piece_j_id,mating[1]) #mating_edges_scores[k]
                             new_links.append((first_node,second_node,{"compatibility":compatibility}))
                         
                         self.potential_matings_graph.add_edges_from(new_links)
