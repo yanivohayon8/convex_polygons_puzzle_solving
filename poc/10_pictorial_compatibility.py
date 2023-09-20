@@ -36,6 +36,12 @@ for file in glob.glob(data_dir+"*.png"):
         PREPROCESSING
     *****************************
 '''
+''''
+    COLOR SPACE
+'''
+for edge in edge2original_image.keys():
+    edge2original_image[edge] = cv2.cvtColor(edge2original_image[edge],cv2.COLOR_BGR2LAB)
+    edge2extrpolated_image[edge] = cv2.cvtColor(edge2extrpolated_image[edge],cv2.COLOR_BGR2LAB)
 
 '''
     Normalizing
@@ -63,12 +69,10 @@ for edge in edge2original_image.keys():
 '''
     Cropping
 '''
-crop_size = 5 
+crop_size = 5
 for edge in edge2original_image.keys():
     edge2original_image[edge] = edge2original_image[edge][:crop_size]
     edge2extrpolated_image[edge] = edge2extrpolated_image[edge][:crop_size]
-
-
 
 
 '''
@@ -112,6 +116,10 @@ def compatibility_v1(img1,img2):
 
     return max(products)
 
+
+scores = []
+scores_differences = []
+
 for edge1,edge2 in groundtruth_matings:
     print(f"Comparing {edge1} <===> {edge2}")
     score_1 = compatibility_v1(edge2original_image[edge1],
@@ -121,3 +129,16 @@ for edge1,edge2 in groundtruth_matings:
     score_2 = compatibility_v1(edge2original_image[edge2],
                                 edge2extrpolated_image[edge1])
     print(f"\tscore of {edge2} (original) and {edge1} (extrapolated) is {score_2}")
+    
+    score =score_1/2+score_2/2
+    print(f"\tfinal score is {score}")
+    scores.append(score)
+    scores_differences.append(abs(score_1-score_2))
+
+print()
+print("Mean: ", np.mean(scores))
+print("Median: ", np.median(scores))
+print("Min: ", np.min(scores))
+print("Max |score_1-score_2|: ", np.max(scores_differences))
+
+
