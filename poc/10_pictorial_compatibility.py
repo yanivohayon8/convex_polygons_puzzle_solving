@@ -31,6 +31,11 @@ for file in glob.glob(data_dir+"*.png"):
 
 # plt.imshow(edge2original_image["P_9_E_2"])
 
+'''
+    *****************************
+        PREPROCESSING
+    *****************************
+'''
 
 '''
     Normalizing
@@ -65,6 +70,18 @@ for edge in edge2original_image.keys():
 
 
 
+
+'''
+    *****************************
+        COMPATIBILITY
+    *****************************
+'''
+
+def get_non_zero_pixels(img):
+    pixels_sum = np.sum(img,axis=2)
+    non_black = (pixels_sum!=0)
+    return np.where(non_black) 
+
 def compatibility_v1(img1,img2):
 
     assert img1.shape[0] == img2.shape[0]
@@ -76,22 +93,22 @@ def compatibility_v1(img1,img2):
         feature_map_img = img1
         kernel_img = img2
 
-    non_zero_kernel = np.argwhere(np.any(kernel_img!=[0,0,0],axis=2))
     products = []
 
     start_col = 0
     end_col = start_col + kernel_img.shape[1]
     receptive_field = feature_map_img[:,start_col:end_col]
 
-    non_zero_receptive_field = np.argwhere(np.any(receptive_field!=[0,0,0],axis=2))
-    non_zero_mutual = [ind for ind in non_zero_receptive_field if ind in non_zero_kernel]
+    x_non_zero_kernel,y_non_zero_kernel = get_non_zero_pixels(kernel_img)
+    x_non_zero_receptive_field,y_non_zero_receptive_field = get_non_zero_pixels(receptive_field)
+    x_non_zero_mutual = [ind for ind in x_non_zero_kernel if ind in x_non_zero_receptive_field]
+    y_non_zero_mutual = [ind for ind in y_non_zero_kernel if ind in y_non_zero_receptive_field]
+    pixels_receptive_field = receptive_field[x_non_zero_mutual,y_non_zero_mutual]
+    pixels_kernel = kernel_img[x_non_zero_mutual,y_non_zero_mutual]
+    receptive_field_norm = np.linalg.norm(pixels_receptive_field)
+    kernel_norm = np.linalg.norm(pixels_kernel)
 
-    # receptive_field_norm = np.linalg.norm(receptive_field[non_zero_mutual])
-    # kernel_norm = np.linalg.norm(kernel_img[non_zero_mutual])
-    receptive_field_norm = np.linalg.norm(receptive_field)
-    kernel_norm = np.linalg.norm(kernel_img)
-
-    products.append(np.sum(kernel_img*receptive_field)/receptive_field_norm/kernel_norm)
+    products.append(np.sum(pixels_kernel*pixels_receptive_field)/receptive_field_norm/kernel_norm)
 
     return max(products)
 
