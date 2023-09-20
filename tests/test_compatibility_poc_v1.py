@@ -126,7 +126,7 @@ def preprocess_v3(edge2extrpolated_image:dict,edge2original_image:dict,
     substract_by_channels_mean(edge2extrpolated_image,channels_mean)
 
 
-
+    
 
 
 
@@ -159,6 +159,8 @@ class TestSkeleton(unittest.TestCase):
         print("Median: ", np.median(scores))
         print("Min: ", np.min(scores))
         print("Max |score_1-score_2|: ", np.max(scores_differences))
+
+        return scores
 
     def _plot_two_edges(self,edge1_extra,edge1_original,edge1,edge2_extra,edge2_original,edge2):
         fig, axs = plt.subplots(2,2)
@@ -206,24 +208,37 @@ class TestCompV1(TestSkeleton):
     def test_ground_truth_noise_0(self):
         data_dir = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
         matings = [
-            ("P_9_E_2","P_6_E_1"),
-            ("P_9_E_0","P_7_E_1"),
-            ("P_0_E_3","P_1_E_0"),
             ("P_0_E_1","P_8_E_2"),
-            ("P_9_E_3","P_8_E_1"),
-            ("P_7_E_2","P_8_E_0"),
+            ("P_0_E_2","P_5_E_0"),
+            ("P_0_E_3","P_1_E_0"),
+            ("P_1_E_1","P_2_E_0"),
+            ("P_2_E_1","P_5_E_3"),
+            ("P_2_E_2","P_3_E_0"),
+            ("P_3_E_1","P_5_E_2"),
+            ("P_3_E_2","P_4_E_0"),
             ("P_4_E_1","P_6_E_2"),
-            ("P_5_E_3","P_2_E_1"),
-            ("P_5_E_1","P_6_E_0"),
-            ("P_2_E_0","P_1_E_1"),
-            ("P_3_E_2","P_4_E_0")
+            ("P_6_E_0","P_5_E_1"),
+            ("P_6_E_1","P_9_E_2"),
+            ("P_7_E_2","P_8_E_0"),
+            ("P_7_E_1","P_9_E_0"),
+            ("P_8_E_1","P_9_E_3")
         ]
 
         edge2extrpolated_image,edge2original_image,_,_ = load_data(data_dir)
         # preprocess_v1(edge2extrpolated_image,edge2original_image)
         # preprocess_v2(edge2extrpolated_image,edge2original_image)
         preprocess_v3(edge2extrpolated_image,edge2original_image)
-        self._evaluate_matings(matings,edge2extrpolated_image,edge2original_image)
+        scores = self._evaluate_matings(matings,edge2extrpolated_image,edge2original_image)
+        scores = np.array(scores)
+        print("AFTER MIN MAX SCALE")
+        max_score = np.max(scores)
+        min_score = np.min(scores)
+        scaled_scores = (scores-min_score)/(max_score-min_score)
+        print("\t Mean", np.mean(scaled_scores))
+        print("\t Median", np.median(scaled_scores))
+
+
+
 
     def test_plot_two_edges_noiseless(self,first_plot_edge = "P_7_E_2",second_plot_edge = "P_8_E_0"):
         data_dir = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
