@@ -9,11 +9,18 @@ groundtruth_matings = [
     ("P_9_E_0","P_7_E_1"),
     ("P_0_E_3","P_1_E_0"),
     ("P_0_E_1","P_8_E_2"),
+    ("P_9_E_3","P_8_E_1"),
+    ("P_4_E_1","P_6_E_2"),
+    ("P_5_E_3","P_2_E_1"),
     ("P_2_E_0","P_1_E_1")
 ]
 
+expected_fp_matings = [
+    ("P_9_E_1","P_7_E_0")
+]
 
-data_dir = "data/poc_10_pictorial_compatibility/" #"../data/poc_10_pictorial_compatibility/"
+
+data_dir = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/" #"../data/poc_10_pictorial_compatibility/"
 edge2original_image = {}
 edge2extrpolated_image = {}
 edge2extrapolated_file = {}
@@ -164,9 +171,12 @@ print("Min: ", np.min(scores))
 print("Max |score_1-score_2|: ", np.max(scores_differences))
 
 
+'''
+    PLOT FOR DEBUG
+'''
+
 first_plot_edge = "P_2_E_0"
 second_plot_edge = "P_1_E_1"
-
 edge2original_images_plot = {}
 edge2extrapolate_images_plot = {}
 
@@ -191,10 +201,12 @@ def plot_two_edges():
     plt.show()
 
 ''' for debugging the pixels filtering is ok'''
-mark_color = 255
-x_non_zero,y_non_zero = get_non_zero_pixels(edge2extrapolate_images_plot[second_plot_edge])
-edge2extrapolate_images_plot[second_plot_edge][x_non_zero,y_non_zero] = mark_color
-x_non_zero,y_non_zero = get_non_zero_pixels(edge2original_images_plot[first_plot_edge])
-edge2original_images_plot[first_plot_edge][x_non_zero,y_non_zero] = mark_color
+# mark_color = 255
+# x_non_zero,y_non_zero = get_non_zero_pixels(edge2extrapolate_images_plot[second_plot_edge])
+# edge2extrapolate_images_plot[second_plot_edge][x_non_zero,y_non_zero] = mark_color
+# x_non_zero,y_non_zero = get_non_zero_pixels(edge2original_images_plot[first_plot_edge])
+# edge2original_images_plot[first_plot_edge][x_non_zero,y_non_zero] = mark_color
 
 plot_two_edges()
+
+
