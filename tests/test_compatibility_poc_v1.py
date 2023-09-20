@@ -66,6 +66,10 @@ def crop_rows(edge2images:dict,num_rows=5):
     for edge in edge2images.keys():
         edge2images[edge] = edge2images[edge][:num_rows]
 
+def get_non_zero_pixels(img):
+    pixels_sum = np.sum(img,axis=2)
+    non_black = (pixels_sum!=0)
+    return np.where(non_black) 
 
 def preprocess_v1(edge2extrpolated_image:dict,edge2original_image:dict):
     to_lab_color_space(edge2extrpolated_image)
@@ -80,10 +84,50 @@ def preprocess_v1(edge2extrpolated_image:dict,edge2original_image:dict):
     crop_rows(edge2original_image,num_rows=num_rows_to_crop)
     crop_rows(edge2extrpolated_image,num_rows=num_rows_to_crop)
 
-def get_non_zero_pixels(img):
-    pixels_sum = np.sum(img,axis=2)
-    non_black = (pixels_sum!=0)
-    return np.where(non_black) 
+def preprocess_v2(edge2extrpolated_image:dict,edge2original_image:dict,
+                  axes_filpped = (0,1),num_rows_to_crop = 5 ):
+    # to_lab_color_space(edge2extrpolated_image)
+    # to_lab_color_space(edge2original_image)
+    
+    filp_images(edge2original_image,axes=axes_filpped)
+
+    crop_rows(edge2original_image,num_rows=num_rows_to_crop)
+    crop_rows(edge2extrpolated_image,num_rows=num_rows_to_crop)
+
+    images_meaned = [edge2original_image[edge] for edge in edge2original_image.keys()]
+    # [images_meaned.append(edge2extrpolated_image[edge]) for edge in edge2extrpolated_image.keys()]
+
+    channels_mean = compute_channels_mean(images_meaned) 
+    substract_by_channels_mean(edge2original_image,channels_mean)
+    substract_by_channels_mean(edge2extrpolated_image,channels_mean)
+    
+def preprocess_v3(edge2extrpolated_image:dict,edge2original_image:dict,
+                  axes_filpped = (0,1),num_rows_to_crop = 5):
+    filp_images(edge2original_image,axes=axes_filpped)
+
+    crop_rows(edge2original_image,num_rows=num_rows_to_crop)
+    crop_rows(edge2extrpolated_image,num_rows=num_rows_to_crop)
+
+    images_meaned = [edge2original_image[edge] for edge in edge2original_image.keys()]
+    # [images_meaned.append(edge2extrpolated_image[edge]) for edge in edge2extrpolated_image.keys()]
+
+    channels_sum = np.array([[0,0,0]])
+    pixels_count = 0
+
+    for img in images_meaned:
+        x_non_zero_ind,y_non_zero_ind = get_non_zero_pixels(img)
+        vector = img[x_non_zero_ind,y_non_zero_ind]#.reshape(3,-1)
+        channels_sum += np.sum(vector,axis=0)
+        pixels_count += vector.shape[0]
+
+    channels_mean = (channels_sum.astype(np.double)/pixels_count)
+        
+    substract_by_channels_mean(edge2original_image,channels_mean)
+    substract_by_channels_mean(edge2extrpolated_image,channels_mean)
+
+
+
+
 
 
 class TestSkeleton(unittest.TestCase):
@@ -176,7 +220,9 @@ class TestCompV1(TestSkeleton):
         ]
 
         edge2extrpolated_image,edge2original_image,_,_ = load_data(data_dir)
-        preprocess_v1(edge2extrpolated_image,edge2original_image)
+        # preprocess_v1(edge2extrpolated_image,edge2original_image)
+        # preprocess_v2(edge2extrpolated_image,edge2original_image)
+        preprocess_v3(edge2extrpolated_image,edge2original_image)
         self._evaluate_matings(matings,edge2extrpolated_image,edge2original_image)
 
     def test_plot_two_edges_noiseless(self,first_plot_edge = "P_7_E_2",second_plot_edge = "P_8_E_0"):
