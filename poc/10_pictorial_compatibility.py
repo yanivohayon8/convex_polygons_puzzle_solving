@@ -39,40 +39,56 @@ for file in glob.glob(data_dir+"*.png"):
 ''''
     COLOR SPACE
 '''
-for edge in edge2original_image.keys():
-    edge2original_image[edge] = cv2.cvtColor(edge2original_image[edge],cv2.COLOR_BGR2LAB)
-    edge2extrpolated_image[edge] = cv2.cvtColor(edge2extrpolated_image[edge],cv2.COLOR_BGR2LAB)
+
+def to_lab_color_space(edge2images:dict):
+    for edge in edge2images.keys():
+        edge2images[edge] = cv2.cvtColor(edge2images[edge],cv2.COLOR_BGR2LAB)
+        # edge2extrpolated_image[edge] = cv2.cvtColor(edge2extrpolated_image[edge],cv2.COLOR_BGR2LAB)
 
 '''
     Normalizing
 '''
-channels_sum = np.zeros((3,1))
-pixels_count = 0
+def substract_by_channels_mean(edge2images:dict,channels_mean=None):
 
-for edge in edge2original_image.keys():
-    img = edge2original_image[edge]
-    channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
-    pixels_count+= img.shape[0]*img.shape[1]
+    if channels_mean is None:
+        channels_sum = np.zeros((3,1))
+        pixels_count = 0
 
-channels_mean = (channels_sum/pixels_count).astype(np.double).T
+        for edge in edge2images.keys():
+            img = edge2images[edge]
+            channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
+            pixels_count+= img.shape[0]*img.shape[1]
 
-for edge in edge2original_image.keys():
-    edge2original_image[edge] = edge2original_image[edge].astype(np.double) - channels_mean
-    edge2extrpolated_image[edge] = edge2extrpolated_image[edge].astype(np.double) - channels_mean
+        channels_mean = (channels_sum/pixels_count).astype(np.double).T
+
+    for edge in edge2images.keys():
+        edge2images[edge] = edge2images[edge].astype(np.double) - channels_mean
+    
+    return channels_mean
     
 '''
     flipping
 '''
-for edge in edge2original_image.keys():
-    edge2original_image[edge] = np.flip(edge2original_image[edge],axis=(0,1))
+def filp_images(edge2images:dict,axes=(0,1)):
+    for edge in edge2images.keys():
+        edge2images[edge] = np.flip(edge2images[edge],axis=(0,1))
 
 '''
     Cropping
 '''
-crop_size = 5
-for edge in edge2original_image.keys():
-    edge2original_image[edge] = edge2original_image[edge][:crop_size]
-    edge2extrpolated_image[edge] = edge2extrpolated_image[edge][:crop_size]
+
+def crop_rows(edge2images:dict,num_rows=5):
+    for edge in edge2images.keys():
+        edge2images[edge] = edge2images[edge][:num_rows]
+
+to_lab_color_space(edge2extrpolated_image)
+to_lab_color_space(edge2original_image)
+channels_mean = substract_by_channels_mean(edge2original_image)
+substract_by_channels_mean(edge2extrpolated_image,channels_mean=channels_mean)
+filp_images(edge2original_image,axes=(0,1))
+crop_rows(edge2original_image,num_rows=5)
+crop_rows(edge2extrpolated_image,num_rows=5)
+
 
 
 '''
