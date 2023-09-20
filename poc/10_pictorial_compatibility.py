@@ -8,14 +8,16 @@ groundtruth_matings = [
     ("P_9_E_2","P_6_E_1"),
     ("P_9_E_0","P_7_E_1"),
     ("P_0_E_3","P_1_E_0"),
-    ("P_2_E_0","P_1_E_1"),
-    ("P_0_E_1","P_8_E_2")
+    ("P_0_E_1","P_8_E_2"),
+    ("P_2_E_0","P_1_E_1")
 ]
 
 
 data_dir = "data/poc_10_pictorial_compatibility/" #"../data/poc_10_pictorial_compatibility/"
 edge2original_image = {}
 edge2extrpolated_image = {}
+edge2extrapolated_file = {}
+edge2original_file = {}
 
 for file in glob.glob(data_dir+"*.png"):
     file_name = file.split("\\")[-1]
@@ -25,8 +27,10 @@ for file in glob.glob(data_dir+"*.png"):
 
     if "ext" in splitted[1]:
         edge2extrpolated_image[edge] = cv2.imread(file)
+        edge2extrapolated_file[edge] = file
     elif "original" in splitted[1]:
         edge2original_image[edge] = cv2.imread(file)
+        edge2original_file[edge] = file
 
 
 # plt.imshow(edge2original_image["P_9_E_2"])
@@ -85,9 +89,11 @@ to_lab_color_space(edge2extrpolated_image)
 to_lab_color_space(edge2original_image)
 channels_mean = substract_by_channels_mean(edge2original_image)
 substract_by_channels_mean(edge2extrpolated_image,channels_mean=channels_mean)
-filp_images(edge2original_image,axes=(0,1))
-crop_rows(edge2original_image,num_rows=5)
-crop_rows(edge2extrpolated_image,num_rows=5)
+axes_filpped = (0,1)
+filp_images(edge2original_image,axes=axes_filpped)
+num_rows_to_crop = 5 
+crop_rows(edge2original_image,num_rows=num_rows_to_crop)
+crop_rows(edge2extrpolated_image,num_rows=num_rows_to_crop)
 
 
 
@@ -158,3 +164,37 @@ print("Min: ", np.min(scores))
 print("Max |score_1-score_2|: ", np.max(scores_differences))
 
 
+first_plot_edge = "P_2_E_0"
+second_plot_edge = "P_1_E_1"
+
+edge2original_images_plot = {}
+edge2extrapolate_images_plot = {}
+
+for edge in [first_plot_edge,second_plot_edge]:
+    orig_image = cv2.imread(edge2original_file[edge])
+    edge2original_images_plot[edge] = cv2.cvtColor(orig_image,cv2.COLOR_BGR2RGB)
+    extra_image = cv2.imread(edge2extrapolated_file[edge])
+    edge2extrapolate_images_plot[edge] = cv2.cvtColor(extra_image,cv2.COLOR_BGR2RGB)
+
+
+def plot_two_edges():
+    fig, axs = plt.subplots(2,2)
+    axs[0,0].imshow(edge2extrapolate_images_plot[second_plot_edge])
+    axs[0,0].set_title(f"{second_plot_edge} EXTRAPOLATED")
+    axs[0,1].imshow(edge2extrapolate_images_plot[first_plot_edge])
+    axs[0,1].set_title(f"{first_plot_edge} EXTRAPOLATED")
+    axs[1,0].imshow(edge2original_images_plot[first_plot_edge])
+    axs[1,0].set_title(f"{first_plot_edge} ORIGINAL")
+    axs[1,1].imshow(edge2original_images_plot[second_plot_edge])
+    axs[1,1].set_title(f"{second_plot_edge} ORIGINAL")
+
+    plt.show()
+
+''' for debugging the pixels filtering is ok'''
+mark_color = 255
+x_non_zero,y_non_zero = get_non_zero_pixels(edge2extrapolate_images_plot[second_plot_edge])
+edge2extrapolate_images_plot[second_plot_edge][x_non_zero,y_non_zero] = mark_color
+x_non_zero,y_non_zero = get_non_zero_pixels(edge2original_images_plot[first_plot_edge])
+edge2original_images_plot[first_plot_edge][x_non_zero,y_non_zero] = mark_color
+
+plot_two_edges()
