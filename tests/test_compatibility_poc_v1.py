@@ -34,18 +34,18 @@ def to_lab_color_space(edge2images:dict):
 '''
     Normalizing
 '''
-def substract_by_channels_mean(edge2images:dict,channels_mean=None):
 
-    if channels_mean is None:
-        channels_sum = np.zeros((3,1))
-        pixels_count = 0
+def compute_channels_mean(images):
+    channels_sum = np.zeros((3,1))
+    pixels_count = 0
 
-        for edge in edge2images.keys():
-            img = edge2images[edge]
-            channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
-            pixels_count+= img.shape[0]*img.shape[1]
+    for img in images:
+        channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
+        pixels_count+= img.shape[0]*img.shape[1]
 
-        channels_mean = (channels_sum/pixels_count).astype(np.double).T
+    return (channels_sum/pixels_count).astype(np.double).T
+
+def substract_by_channels_mean(edge2images:dict,channels_mean):
 
     for edge in edge2images.keys():
         edge2images[edge] = edge2images[edge].astype(np.double) - channels_mean
@@ -67,11 +67,13 @@ def crop_rows(edge2images:dict,num_rows=5):
         edge2images[edge] = edge2images[edge][:num_rows]
 
 
-def preprocess_v1(edge2extrpolated_image,edge2original_image):
+def preprocess_v1(edge2extrpolated_image:dict,edge2original_image:dict):
     to_lab_color_space(edge2extrpolated_image)
     to_lab_color_space(edge2original_image)
-    channels_mean = substract_by_channels_mean(edge2original_image)
-    substract_by_channels_mean(edge2extrpolated_image,channels_mean=channels_mean)
+    images_meaned = [edge2original_image[edge] for edge in edge2original_image.keys()]
+    channels_mean = compute_channels_mean(images_meaned) # list(edge2original_image.items())
+    substract_by_channels_mean(edge2original_image,channels_mean)
+    substract_by_channels_mean(edge2extrpolated_image,channels_mean)
     axes_filpped = (0,1)
     filp_images(edge2original_image,axes=axes_filpped)
     num_rows_to_crop = 5 
