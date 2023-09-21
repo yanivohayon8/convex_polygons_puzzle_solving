@@ -203,6 +203,7 @@ class MatchingGraphDrawer():
                                     edge_vmin=min_edge_weight, edge_vmax=max_edge_weight,
                                     edgelist=matings_graph.edges(data=True))
 
+        
         cb = plt.colorbar(edges, ax=ax, label='Comptatibility')
 
         # Set the title for the plot
@@ -224,5 +225,5 @@ class MatchingGraphDrawer():
                                      ax=None,
                                      max_edge_weight = None,min_edge_weight = None):
         self._draw_graph_matching(graph_wrapper.filtered_potential_matings_graph,
-                                  layout=layout,title=title,ax=ax,
+                                  layout=layout,title=title+f"( >{graph_wrapper.compatibility_threshold})",ax=ax,
                                   max_edge_weight = max_edge_weight,min_edge_weight = min_edge_weight)
