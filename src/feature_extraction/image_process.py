@@ -23,7 +23,7 @@ def compute_non_zero_pixels_channels_mean(images:list):
 
     return (channels_sum.astype(np.double)/pixels_count)
 
-def compute_channels_mean(images):
+def compute_naive_channels_mean(images):
     channels_sum = np.zeros((3,1))
     pixels_count = 0
 
