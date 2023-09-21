@@ -74,24 +74,28 @@ class TestRecipeFlipCropSubMean(unittest.TestCase):
 
         plt.show()
     
-    # def test_SDOriginalExtractor_integration(self,piece_index = 5,edge_index = 2):
-    #     db = 1
-    #     puzzle_num = 19
-    #     puzzle_noise_level = 0
-    #     puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-    #     puzzle.load()
-    #     bag_of_pieces = puzzle.get_bag_of_pieces()
+    def test_SDOriginalExtractor_integration(self,piece_index = 5,edge_index = 2):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
 
-    #     chosen_piece = bag_of_pieces[piece_index]
-    #     chosen_piece.load_stable_diffusion_original_image()
-    #     feature_extractor_extrapolator = SDOriginalExtractor(bag_of_pieces)
-    #     feature_extractor_extrapolator.run()
-    #     feature_name = feature_extractor_extrapolator.__class__.__name__
-    #     images = [piece.features[feature_name] for piece in bag_of_pieces]
+        [piece.load_stable_diffusion_original_image() for piece in bag_of_pieces]
+        feature_extractor_extrapolator = SDOriginalExtractor(bag_of_pieces)
+        feature_extractor_extrapolator.run()
 
+        recipe = image_process.RecipeFlipCropSubMean()
+        feature_name = feature_extractor_extrapolator.__class__.__name__
+        images = [piece.features[feature_name][edge] for piece in bag_of_pieces for edge in range(piece.get_num_coords())]
+        channels_mean = recipe.compute_channels_mean(images)
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.features[feature_name][edge_index] = recipe.process(chosen_piece.features[feature_name][edge_index],channels_mean)
 
-    #     recipe = image_process.RecipeFlipCropSubMean()
-    #     processed_images = recipe.process(images)
+        plt.imshow(chosen_piece.features[feature_name][edge_index])
+        plt.show()
+
 
 
 
