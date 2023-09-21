@@ -4,6 +4,38 @@ from src.feature_extraction.pictorial import find_rotation_angle,trans_image
 from src.piece import Piece
 import numpy as np
 
+class SDEdgeImageExtractor(Extractor):
+    
+    def __init__(self, pieces,feature_name):
+        super().__init__(pieces)
+        self.feature_name = feature_name
+    
+    def _translate_edge(self,angle,edge_row,edge_col,next_edge_row,next_edge_col):
+        raise NotImplementedError("Implement me")
+
+    def extract_for_piece(self, piece: Piece):
+        piece.features[self.feature_name] = []
+        shifted_coords = piece.extrapolation_details.match_piece_to_img(piece.raw_coordinates)
+        
+        for edge_index_ in range(len(shifted_coords)):
+            edge_index = piece.get_origin_index(edge_index_)
+
+            next_edge_index = (edge_index+1)%len(shifted_coords)
+            angle = find_rotation_angle(shifted_coords,edge_index,next_edge_index)
+            edge_row = shifted_coords[edge_index][1]
+            edge_col = shifted_coords[edge_index][0]
+            next_edge_row = shifted_coords[next_edge_index][1]
+            next_edge_col = shifted_coords[next_edge_index][0]
+            translated_img = self._translate_edge(angle,
+                                                  edge_row,edge_col,
+                                                  next_edge_row,next_edge_col) 
+            edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
+            cropped_img = translated_img[:,:edge_width]
+            piece.features[self.feature_name].append(translated_img)
+
+
+
+
 class SDExtrapolatorExtractor(Extractor):
     
     def __init__(self, pieces,extrapolation_height=13):
