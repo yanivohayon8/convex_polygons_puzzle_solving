@@ -204,7 +204,7 @@ class TestSkeleton(unittest.TestCase):
         print("\t Mean", np.mean(scaled_scores))
         print("\t Median", np.median(scaled_scores))
 
-    def _test_ground_truth_noise_0(self):
+    def _test_gt_process_v3_noise_0(self):
         data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
         self._process_v3_and_evaluate(data_dir,self.ground_truth_matings)
 
@@ -271,7 +271,36 @@ class TestCompV1(TestSkeleton):
         return product
     
     def test_ground_truth_noise_0(self):
-        super()._test_ground_truth_noise_0()
+        super()._test_gt_process_v3_noise_0()
+
+    def test_fp_noise_0(self):
+        super()._test_fp_noise_0()
+
+    def test_tn_noise_0(self):
+        super()._test_tn_noise_0()
+
+    def test_ground_truth_noise_1(self):
+        super()._test_ground_truth_noise_1()
+
+
+class TestCompV2(TestSkeleton):
+    
+    def _compatibiilty(self,img1,img2):
+        assert img1.shape[0] == img2.shape[0]
+
+        feature_map_img = img2
+        kernel_img = img1
+
+        if img1.shape[1] > img2.shape[1]:
+            feature_map_img = img1
+            kernel_img = img2
+
+
+        return 1
+
+    
+    def test_ground_truth_noise_0(self):
+        super()._test_gt_process_v3_noise_0()
 
     def test_fp_noise_0(self):
         super()._test_fp_noise_0()
