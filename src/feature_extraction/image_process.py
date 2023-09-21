@@ -36,22 +36,21 @@ def compute_naive_channels_mean(images):
 
 class RecipeFlipCropSubMean():
 
-    def __init__(self) -> None:
-        self.channels_mean = None
+    def __init__(self,axes_flipped=(0,1),crop_num_rows=5) -> None:
+        self.axes_flipped = axes_flipped
+        self.crop_num_rows = crop_num_rows
 
-    def process(self,images,axes_flipped=(0,1),crop_num_rows=5,channels_mean=None):
+    def compute_channels_mean(self,images:list):
         processed_images = []
         for img in images:
-            img = filp_image(img,axes=axes_flipped)
-            img = crop_rows(img,num_rows=crop_num_rows)
-            processed_images.append(img)
+            img_tmp = filp_image(img,axes=self.axes_flipped)
+            img_tmp = crop_rows(img_tmp,num_rows=self.crop_num_rows)
+            processed_images.append(img_tmp)
 
-        if channels_mean is None:
-            self.channels_mean = compute_non_zero_pixels_channels_mean(processed_images)
-        else:
-            self.channels_mean = channels_mean
+        return compute_non_zero_pixels_channels_mean(processed_images)
 
-        return [img - self.channels_mean for img in processed_images]
+    def process(self,img:np.array,channels_mean:np.array):
+        img = filp_image(img,axes=self.axes_flipped)
+        img = crop_rows(img,num_rows=self.crop_num_rows)
+        return img - channels_mean 
     
-    def get_channels_mean(self):
-        return self.channels_mean

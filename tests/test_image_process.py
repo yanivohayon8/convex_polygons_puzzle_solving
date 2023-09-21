@@ -4,6 +4,9 @@ from src.feature_extraction import image_process
 import matplotlib.pyplot as plt
 import glob
 
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
+from src.puzzle import Puzzle
+
 images_folder = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0_v2/"
 
 class TestFunctions(unittest.TestCase):
@@ -60,15 +63,38 @@ class TestRecipeFlipCropSubMean(unittest.TestCase):
         images = [cv2.imread(file) for file in glob.glob(images_folder+"/*original.png")]
         before_img = images[plot_index]
         recipe = image_process.RecipeFlipCropSubMean()
-        processed_images = recipe.process(images)
+        channels_mean = recipe.compute_channels_mean(images)
+        processed_img = recipe.process(images[plot_index],channels_mean)
 
         fig, axs = plt.subplots(1,2)
         axs[0].imshow(before_img)
         axs[0].set_title("before processing")
-        axs[1].imshow(processed_images[plot_index])
+        axs[1].imshow(processed_img)
         axs[1].set_title("after processing")
 
         plt.show()
+    
+    # def test_SDOriginalExtractor_integration(self,piece_index = 5,edge_index = 2):
+    #     db = 1
+    #     puzzle_num = 19
+    #     puzzle_noise_level = 0
+    #     puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+    #     puzzle.load()
+    #     bag_of_pieces = puzzle.get_bag_of_pieces()
+
+    #     chosen_piece = bag_of_pieces[piece_index]
+    #     chosen_piece.load_stable_diffusion_original_image()
+    #     feature_extractor_extrapolator = SDOriginalExtractor(bag_of_pieces)
+    #     feature_extractor_extrapolator.run()
+    #     feature_name = feature_extractor_extrapolator.__class__.__name__
+    #     images = [piece.features[feature_name] for piece in bag_of_pieces]
+
+
+    #     recipe = image_process.RecipeFlipCropSubMean()
+    #     processed_images = recipe.process(images)
+
+
+
 
         
 
