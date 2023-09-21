@@ -16,7 +16,7 @@ from src.puzzle import Puzzle
 class TestStableDiffusionExtrapolators(unittest.TestCase):
 
 
-    def test_toy_example(self,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0,sample_height=10):
+    def test_toy_example(self,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -29,26 +29,28 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
             piece.load_extrapolated_image()
             piece.load_stable_diffusion_original_image()
 
-        extrapolation_extractor = SDExtrapolatorExtractor(chosen_pieces,extrapolation_height=sample_height)
+        extrapolation_extractor = SDExtrapolatorExtractor(chosen_pieces)
+        extrapolator_extractor_name = extrapolation_extractor.__class__.__name__
         extrapolation_extractor.run()
 
-        original_extractor = SDOriginalExtractor(chosen_pieces,sampling_height=sample_height)
+        original_extractor = SDOriginalExtractor(chosen_pieces)
+        original_extractor_name = original_extractor.__class__.__name__
         original_extractor.run()
 
         pictorial_matcher = DotProductExtraToOriginalMatcher(chosen_pieces,
-                                                             extrapolation_extractor.__class__.__name__,
-                                                             original_extractor.__class__.__name__)
+                                                             extrapolator_extractor_name,
+                                                             original_extractor_name)
 
-        edge_ii_extra_img = chosen_pieces[0].features[extrapolation_extractor.__class__.__name__][edge_ii]["same"]
-        edge_jj_original_img = chosen_pieces[1].features[original_extractor.__class__.__name__][edge_jj]["flipped"]
+        edge_ii_extra_img = chosen_pieces[0].features[extrapolator_extractor_name][edge_ii]
+        edge_jj_original_img = chosen_pieces[1].features[original_extractor_name][edge_jj]
         score = pictorial_matcher._score_pair(edge_ii_extra_img,edge_jj_original_img)
 
         fig, axs = plt.subplots(2,1)
         fig.suptitle(f"Score: {score}")
         
-        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original (SAME)")
+        axs[0].set_title(f"P_{piece_jj}_E_{edge_jj} Original")
         axs[0].imshow(edge_jj_original_img)
-        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated (FLIPPED)")
+        axs[1].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated")
         axs[1].imshow(edge_ii_extra_img) 
 
         plt.show()
