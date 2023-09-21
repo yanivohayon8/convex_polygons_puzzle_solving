@@ -223,8 +223,7 @@ class TestSkeleton(unittest.TestCase):
 
         self._process_v3_and_evaluate(data_dir,fp_matings)
 
-    def _test_tn_noise_0(self):
-        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
+    def _test_tn_noise_0(self,data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"):    
 
         print("Expecting here to get low scores")
         tn_matings = [
@@ -293,10 +292,18 @@ class TestCompV1(TestSkeleton):
 
     def test_tn_noise_0(self):
         super()._test_tn_noise_0()
+    
+    def test_tn_noise_0_v2(self):
+        super()._test_tn_noise_0(f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0_v2/")
 
     def test_ground_truth_noise_1(self):
         super()._test_ground_truth_noise_1()
+        print("test_ground_truth_noise_1")
 
+    def test_ground_truth_noise_1_v2(self):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-1_v2/"
+        self._process_v3_and_evaluate(data_dir,self.ground_truth_matings)
+        print("test_ground_truth_noise_1_v2")
 
 # class TestCompV2(TestSkeleton):
     

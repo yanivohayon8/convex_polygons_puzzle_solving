@@ -59,7 +59,7 @@ class SDOriginalExtractor(SDEdgeImageExtractor):
         # without it, the image is hidding above the left corner. See TestPocPictorial in test_old_feature_extraction.py
         # I am assuming the compatibility would crop this image to have smaller height than this...
         # this might cause troubles...
-        shiftdown_offset = 50 
+        shiftdown_offset = 13 
         return trans_image(img,edge_col,edge_row,angle,
                            edge_row-shiftdown_offset,edge_col)
 
