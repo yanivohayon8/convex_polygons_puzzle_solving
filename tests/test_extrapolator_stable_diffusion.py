@@ -1,5 +1,5 @@
 import unittest
-from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor,NormalizeSDExtrapolatorExtractor,NormalizeSDOriginalExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 import numpy as np
 from src.puzzle import Puzzle
@@ -84,51 +84,7 @@ class TestSDOriginalExtractor(unittest.TestCase):
     def test_P_2_E_0(self):
         self._test_edge_original(piece_index=2,edge_index=0)
     
-    def test_normalized_edge_extrapolated(self,piece_index = 0,edge_index = 3):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        chosen_piece = bag_of_pieces[piece_index]
-        chosen_piece.load_extrapolated_image()
-        # chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
-        extrapolation_height = chosen_piece.extrapolation_details.height#//2 # rule of thumb because there is a miss match between the extrapolated height to the json
-        feature_extractor_extrapolator = NormalizeSDExtrapolatorExtractor([chosen_piece],
-                                                                               extrapolation_height=extrapolation_height)
-        feature_extractor_extrapolator.run()
-        edge_extra_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
-
-        ax = plt.subplot()
-        ax.set_title("Extrapolated")
-        ax.imshow(edge_extra_image_.astype(np.int))
-
-        plt.show()
     
-    def test_normalized_edge_original(self,piece_index = 0,edge_index = 3):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        chosen_piece = bag_of_pieces[piece_index]
-        chosen_piece.load_stable_diffusion_original_image()
-        # chosen_piece.stable_diffusion_original_img = cv2.cvtColor(chosen_piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
-        extrapolation_height = chosen_piece.extrapolation_details.height//2# rule of thumb because there is a miss match between the extrapolated height to the json
-        feature_extractor_extrapolator = NormalizeSDOriginalExtractor([chosen_piece],sampling_height=extrapolation_height)
-        feature_extractor_extrapolator.run()
-        edge_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
-
-        ax = plt.subplot()
-        ax.set_title("Original")
-        ax.imshow(edge_image_.astype(np.int))
-
-        plt.show()
-
     def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=0,out_folder="data/poc_10_pictorial_compatibility"):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
@@ -165,7 +121,6 @@ class TestSDOriginalExtractor(unittest.TestCase):
         
         plt.imshow(original_img)
         plt.show()
-
 
 
 class TestPocStableDiffusion(unittest.TestCase):
