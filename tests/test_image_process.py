@@ -2,6 +2,7 @@ import unittest
 import cv2
 from src.feature_extraction import image_process 
 import matplotlib.pyplot as plt
+import glob
 
 images_folder = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0_v2/"
 
@@ -52,8 +53,24 @@ class TestFunctions(unittest.TestCase):
 
         plt.show()
 
-# edge2extrapolate_images_plot[second_plot_edge][x_non_zero,y_non_zero] = mark_color
 
+class TestRecipeFlipCropSubMean(unittest.TestCase):
+
+    def test_toy_example(self,plot_index = 4):
+        images = [cv2.imread(file) for file in glob.glob(images_folder+"/*original.png")]
+        before_img = images[plot_index]
+        recipe = image_process.RecipeFlipCropSubMean()
+        processed_images = recipe.process(images)
+
+        fig, axs = plt.subplots(1,2)
+        axs[0].imshow(before_img)
+        axs[0].set_title("before processing")
+        axs[1].imshow(processed_images[plot_index])
+        axs[1].set_title("after processing")
+
+        plt.show()
+
+        
 
 if __name__ == "__main__":
     unittest.main()
