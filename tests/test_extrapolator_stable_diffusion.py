@@ -19,8 +19,6 @@ class TestSDExtrapolatorExtractor(unittest.TestCase):
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_extrapolated_image()
-        # chosen_piece.extrapolated_img = cv2.cvtColor(chosen_piece.extrapolated_img,cv2.COLOR_BGR2RGB)
-        # extrapolation_height = chosen_piece.extrapolation_details.height#//2 # rule of thumb because there is a miss match between the extrapolated height to the json
         feature_extractor_extrapolator = SDExtrapolatorExtractor([chosen_piece])
         feature_extractor_extrapolator.run()
         feature_name = feature_extractor_extrapolator.__class__.__name__
@@ -29,7 +27,7 @@ class TestSDExtrapolatorExtractor(unittest.TestCase):
         fig,axs = plt.subplots(1,2)
         axs[0].set_title("extrapolated_img")
         axs[0].imshow(chosen_piece.extrapolated_img)
-        axs[1].set_title("Extrapolated")
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index} Extrapolated")
         axs[1].imshow(edge_extra_image_)
 
         plt.show()
@@ -52,7 +50,9 @@ class TestSDExtrapolatorExtractor(unittest.TestCase):
         print("There is no need for cropping to keep the edges aligned...")
         self._test_edge_extrapolated(piece_index=2,edge_index=0)
 
-    def test_edge_original(self,piece_index = 0,edge_index = 1):
+class TestSDOriginalExtractor(unittest.TestCase):
+    
+    def _test_edge_original(self,piece_index = 5,edge_index = 2):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
@@ -62,20 +62,27 @@ class TestSDExtrapolatorExtractor(unittest.TestCase):
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_stable_diffusion_original_image()
-        # chosen_piece.stable_diffusion_original_img = cv2.cvtColor(chosen_piece.stable_diffusion_original_img,cv2.COLOR_BGR2RGB)
-        extrapolation_height = chosen_piece.extrapolation_details.height//2# rule of thumb because there is a miss match between the extrapolated height to the json
-        feature_extractor_extrapolator = SDOriginalExtractor([chosen_piece],sampling_height=extrapolation_height)
+        feature_extractor_extrapolator = SDOriginalExtractor([chosen_piece])
         feature_extractor_extrapolator.run()
-        edge_image_ = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
-        edge_image_flipped = chosen_piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["flipped"]
+        feature_name = feature_extractor_extrapolator.__class__.__name__
+        edge_extra_image_ = chosen_piece.features[feature_name][edge_index]
 
         fig,axs = plt.subplots(1,2)
-        axs[0].set_title("same")
-        axs[0].imshow(edge_image_)
-        axs[1].set_title("flipped")
-        axs[1].imshow(edge_image_flipped)
+        axs[0].set_title("stable_diffusion_original_img")
+        axs[0].imshow(chosen_piece.stable_diffusion_original_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index}")
+        axs[1].imshow(edge_extra_image_)
 
         plt.show()
+
+    def test_edge_as_param(self,piece_index = 5,edge_index = 2):
+        self._test_edge_original(piece_index=piece_index,edge_index=edge_index)
+    
+    def test_P_2_E_2(self):
+        self._test_edge_original(piece_index=2,edge_index=2)
+    
+    def test_P_2_E_0(self):
+        self._test_edge_original(piece_index=2,edge_index=0)
     
     def test_normalized_edge_extrapolated(self,piece_index = 0,edge_index = 3):
         db = 1

@@ -48,41 +48,20 @@ class SDExtrapolatorExtractor(SDEdgeImageExtractor):
         return trans_image(getattr(piece,"extrapolated_img") ,edge_col,edge_row,angle,edge_row,edge_col)
 
 
-class SDOriginalExtractor(Extractor):
+class SDOriginalExtractor(SDEdgeImageExtractor):
     
-    def __init__(self, pieces,sampling_height=13):
-        super().__init__(pieces)
-        self.sampling_height = sampling_height
+    def __init__(self, pieces):
+        super().__init__(pieces,self.__class__.__name__)
 
-    def extract_for_piece(self, piece: Piece):
-        piece.features[self.__class__.__name__] = []
-    
-        raw_coords = piece.raw_coordinates
-        shifted_coords = piece.extrapolation_details.match_piece_to_img(raw_coords)
-        
-        for edge_index_ in range(len(shifted_coords)):
-            edge_index = piece.get_origin_index(edge_index_)
+    def _translate_edge(self, piece, angle, edge_row, edge_col, next_edge_row, next_edge_col):
+        img = getattr(piece,"stable_diffusion_original_img")
+        # without it, the image is hidding above the left corner. See TestPocPictorial in test_old_feature_extraction.py
+        # I am assuming the compatibility would crop this image to have smaller height than this...
+        # this might cause troubles...
+        shiftdown_offset = 15 
+        return trans_image(img,edge_col,edge_row,angle,
+                           edge_row-shiftdown_offset,edge_col)
 
-            next_edge_index = (edge_index+1)%len(shifted_coords)
-            angle = find_rotation_angle(shifted_coords,edge_index,next_edge_index)
-            edge_row = shifted_coords[edge_index][1]
-            edge_col = shifted_coords[edge_index][0]
-            next_edge_row = shifted_coords[next_edge_index][1]
-            next_edge_col = shifted_coords[next_edge_index][0]
-            edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
-            translated_img = trans_image(piece.stable_diffusion_original_img,
-                                         edge_col,edge_row,angle,edge_row-self.sampling_height,edge_col)
-
-            non_background_indices = np.argwhere(np.any(translated_img != [0,0,0],axis=2))
-            min_row,min_col = np.min(non_background_indices,axis=0)
-            img = translated_img[:self.sampling_height,min_col:min_col+edge_width]
-
-            piece.features[self.__class__.__name__].append(
-                {
-                    "same":img,
-                    "flipped":np.flip(img,axis=(0,1))#np.flip(img,axis=(0,1))
-                }
-            )
 
 class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
 
