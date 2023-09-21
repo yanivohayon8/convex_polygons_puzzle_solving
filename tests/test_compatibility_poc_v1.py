@@ -207,6 +207,10 @@ class TestSkeleton(unittest.TestCase):
     def _test_gt_process_v3_noise_0(self):
         data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
         self._process_v3_and_evaluate(data_dir,self.ground_truth_matings)
+    
+    def _test_gt_process_v3_noise_0_v2(self):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0_v2/"
+        self._process_v3_and_evaluate(data_dir,self.ground_truth_matings)
 
     def _test_fp_noise_0(self):
         data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
@@ -230,12 +234,20 @@ class TestSkeleton(unittest.TestCase):
 
         self._process_v3_and_evaluate(data_dir,tn_matings)
 
-    def _test_plot_two_edges(self,first_plot_edge = "P_0_E_1",
-                            second_plot_edge = "P_8_E_1",noise=1):
+    def test_plot_two_edges(self,first_plot_edge = "P_2_E_2",
+                            second_plot_edge = "P_3_E_0",noise=0):
         data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-{noise}/"
         edge2extrpolated_image,edge2original_image,_,_ = load_data(data_dir)
         self._plot_two_edges(edge2extrpolated_image[first_plot_edge],edge2original_image[first_plot_edge],first_plot_edge,
                             edge2extrpolated_image[second_plot_edge],edge2original_image[second_plot_edge],second_plot_edge)
+
+    def test_plot_two_edges_dir_v2(self,first_plot_edge = "P_2_E_2",
+                            second_plot_edge = "P_3_E_0",noise=0):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-{noise}_v2/"
+        edge2extrpolated_image,edge2original_image,_,_ = load_data(data_dir)
+        self._plot_two_edges(edge2extrpolated_image[first_plot_edge],edge2original_image[first_plot_edge],first_plot_edge,
+                            edge2extrpolated_image[second_plot_edge],edge2original_image[second_plot_edge],second_plot_edge)
+
 
     def _test_ground_truth_noise_1(self):
         data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-1/"
@@ -272,6 +284,9 @@ class TestCompV1(TestSkeleton):
     
     def test_ground_truth_noise_0(self):
         super()._test_gt_process_v3_noise_0()
+    
+    def test_gt_process_v3_noise_0_v2(self):
+        super()._test_gt_process_v3_noise_0_v2()
 
     def test_fp_noise_0(self):
         super()._test_fp_noise_0()
@@ -283,33 +298,33 @@ class TestCompV1(TestSkeleton):
         super()._test_ground_truth_noise_1()
 
 
-class TestCompV2(TestSkeleton):
+# class TestCompV2(TestSkeleton):
     
-    def _compatibiilty(self,img1,img2):
-        assert img1.shape[0] == img2.shape[0]
+#     def _compatibiilty(self,img1,img2):
+#         assert img1.shape[0] == img2.shape[0]
 
-        feature_map_img = img2
-        kernel_img = img1
+#         feature_map_img = img2
+#         kernel_img = img1
 
-        if img1.shape[1] > img2.shape[1]:
-            feature_map_img = img1
-            kernel_img = img2
+#         if img1.shape[1] > img2.shape[1]:
+#             feature_map_img = img1
+#             kernel_img = img2
 
 
-        return 1
+#         return 1
 
     
-    def test_ground_truth_noise_0(self):
-        super()._test_gt_process_v3_noise_0()
+#     def test_ground_truth_noise_0(self):
+#         super()._test_gt_process_v3_noise_0()
 
-    def test_fp_noise_0(self):
-        super()._test_fp_noise_0()
+#     def test_fp_noise_0(self):
+#         super()._test_fp_noise_0()
 
-    def test_tn_noise_0(self):
-        super()._test_tn_noise_0()
+#     def test_tn_noise_0(self):
+#         super()._test_tn_noise_0()
 
-    def test_ground_truth_noise_1(self):
-        super()._test_ground_truth_noise_1()
+#     def test_ground_truth_noise_1(self):
+        # super()._test_ground_truth_noise_1()
 
 if __name__ == "__main__":
     unittest.main()

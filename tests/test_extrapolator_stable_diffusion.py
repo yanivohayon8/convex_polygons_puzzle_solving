@@ -129,7 +129,7 @@ class TestSDOriginalExtractor(unittest.TestCase):
 
         plt.show()
 
-    def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=1,out_folder="data/poc_10_pictorial_compatibility"):
+    def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=0,out_folder="data/poc_10_pictorial_compatibility"):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -139,11 +139,10 @@ class TestSDOriginalExtractor(unittest.TestCase):
             piece.load_stable_diffusion_original_image()
 
         extrapolation_height = 13 
-        feature_extractor_extrapolator = SDExtrapolatorExtractor(bag_of_pieces,
-                                                                extrapolation_height=extrapolation_height)
+        feature_extractor_extrapolator = SDExtrapolatorExtractor(bag_of_pieces)
         feature_extractor_extrapolator.run()
         
-        feature_extractor_original = SDOriginalExtractor(bag_of_pieces,sampling_height=extrapolation_height)
+        feature_extractor_original = SDOriginalExtractor(bag_of_pieces)
         feature_extractor_original.run()
 
 
@@ -151,11 +150,11 @@ class TestSDOriginalExtractor(unittest.TestCase):
             for edge_index in range(piece.get_num_coords()):
                 file_path_prefix = f"{out_folder}/db-{db}-puzzle-{puzzle_num}-P-{piece.id}-E-{edge_index}" 
                 
-                extrapolated_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
+                extrapolated_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]
                 extra_file_path = f"{file_path_prefix}_ext.png"
                 cv2.imwrite(extra_file_path,extrapolated_img)
 
-                original_img = piece.features[feature_extractor_original.__class__.__name__][edge_index]["same"]
+                original_img = piece.features[feature_extractor_original.__class__.__name__][edge_index]
                 original_file_path = f"{file_path_prefix}_original.png"
                 cv2.imwrite(original_file_path,original_img)
         
