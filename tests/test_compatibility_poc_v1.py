@@ -132,6 +132,23 @@ def preprocess_v3(edge2extrpolated_image:dict,edge2original_image:dict,
 
 class TestSkeleton(unittest.TestCase):
 
+    ground_truth_matings = [
+            ("P_0_E_1","P_8_E_2"),
+            ("P_0_E_2","P_5_E_0"),
+            ("P_0_E_3","P_1_E_0"),
+            ("P_1_E_1","P_2_E_0"),
+            ("P_2_E_1","P_5_E_3"),
+            ("P_2_E_2","P_3_E_0"),
+            ("P_3_E_1","P_5_E_2"),
+            ("P_3_E_2","P_4_E_0"),
+            ("P_4_E_1","P_6_E_2"),
+            ("P_6_E_0","P_5_E_1"),
+            ("P_6_E_1","P_9_E_2"),
+            ("P_7_E_2","P_8_E_0"),
+            ("P_7_E_1","P_9_E_0"),
+            ("P_8_E_1","P_9_E_3")
+        ]
+
     def _compatibiilty(self,img1,img2):
         raise NotImplementedError("Implement me") 
 
@@ -175,8 +192,8 @@ class TestSkeleton(unittest.TestCase):
 
         plt.show()
 
-    def _process_v3_and_evaluate(self,matings):
-        edge2extrpolated_image,edge2original_image,_,_ = load_data(self.data_dir)
+    def _process_v3_and_evaluate(self,data_dir,matings):
+        edge2extrpolated_image,edge2original_image,_,_ = load_data(data_dir)
         preprocess_v3(edge2extrpolated_image,edge2original_image)
         scores = self._evaluate_matings(matings,edge2extrpolated_image,edge2original_image)
         scores = np.array(scores)
@@ -187,10 +204,45 @@ class TestSkeleton(unittest.TestCase):
         print("\t Mean", np.mean(scaled_scores))
         print("\t Median", np.median(scaled_scores))
 
+    def _test_ground_truth_noise_0(self):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
+        self._process_v3_and_evaluate(data_dir,self.ground_truth_matings)
+
+    def _test_fp_noise_0(self):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
+
+        fp_matings = [
+            ("P_0_E_3","P_7_E_2"),
+            ("P_5_E_2","P_4_E_0"),
+            ("P_7_E_1","P_9_E_1")
+        ]
+
+        self._process_v3_and_evaluate(data_dir,fp_matings)
+
+    def _test_tn_noise_0(self):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
+
+        print("Expecting here to get low scores")
+        tn_matings = [
+            ("P_3_E_0","P_9_E_0"),
+            ("P_1_E_1","P_5_E_2")
+        ]
+
+        self._process_v3_and_evaluate(data_dir,tn_matings)
+
+    def _test_plot_two_edges(self,first_plot_edge = "P_0_E_1",
+                            second_plot_edge = "P_8_E_1",noise=1):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-{noise}/"
+        edge2extrpolated_image,edge2original_image,_,_ = load_data(data_dir)
+        self._plot_two_edges(edge2extrpolated_image[first_plot_edge],edge2original_image[first_plot_edge],first_plot_edge,
+                            edge2extrpolated_image[second_plot_edge],edge2original_image[second_plot_edge],second_plot_edge)
+
+    def _test_ground_truth_noise_1(self):
+        data_dir = f"data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-1/"
+        self._process_v3_and_evaluate(data_dir,self.ground_truth_matings)
+
 class TestCompV1(TestSkeleton):
-
-    data_dir = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
-
+    
     def _compatibiilty(self,img1,img2):
         assert img1.shape[0] == img2.shape[0]
 
@@ -219,55 +271,16 @@ class TestCompV1(TestSkeleton):
         return product
     
     def test_ground_truth_noise_0(self):
-        ground_truth_matings = [
-            ("P_0_E_1","P_8_E_2"),
-            ("P_0_E_2","P_5_E_0"),
-            ("P_0_E_3","P_1_E_0"),
-            ("P_1_E_1","P_2_E_0"),
-            ("P_2_E_1","P_5_E_3"),
-            ("P_2_E_2","P_3_E_0"),
-            ("P_3_E_1","P_5_E_2"),
-            ("P_3_E_2","P_4_E_0"),
-            ("P_4_E_1","P_6_E_2"),
-            ("P_6_E_0","P_5_E_1"),
-            ("P_6_E_1","P_9_E_2"),
-            ("P_7_E_2","P_8_E_0"),
-            ("P_7_E_1","P_9_E_0"),
-            ("P_8_E_1","P_9_E_3")
-        ]
-
-    
-        self._process_v3_and_evaluate(ground_truth_matings)
+        super()._test_ground_truth_noise_0()
 
     def test_fp_noise_0(self):
-        fp_matings = [
-            ("P_0_E_3","P_7_E_2"),
-            ("P_5_E_2","P_4_E_0"),
-            ("P_7_E_1","P_9_E_1")
-        ]
-
-        self._process_v3_and_evaluate(fp_matings)
+        super()._test_fp_noise_0()
 
     def test_tn_noise_0(self):
-        print("Expecting here to get low scores")
-        tn_matings = [
-            ("P_3_E_0","P_9_E_0"),
-            ("P_1_E_1","P_5_E_2")
-        ]
+        super()._test_tn_noise_0()
 
-        self._process_v3_and_evaluate(tn_matings)
-
-
-    def test_plot_two_edges_noiseless(self,first_plot_edge = "P_7_E_2",second_plot_edge = "P_8_E_0"):
-        data_dir = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0/"
-        edge2extrpolated_image,edge2original_image,_,_ = load_data(data_dir)
-        self._plot_two_edges(edge2extrpolated_image[first_plot_edge],edge2original_image[first_plot_edge],first_plot_edge,
-                            edge2extrpolated_image[second_plot_edge],edge2original_image[second_plot_edge],second_plot_edge)
-
-
-
-
-
+    def test_ground_truth_noise_1(self):
+        super()._test_ground_truth_noise_1()
 
 if __name__ == "__main__":
     unittest.main()
