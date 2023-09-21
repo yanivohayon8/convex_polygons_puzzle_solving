@@ -15,11 +15,7 @@ from src.puzzle import Puzzle
 
 class TestStableDiffusionExtrapolators(unittest.TestCase):
 
-
-    def test_toy_example(self,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
+    def _load_chosen_pieces(self,piece_ii,piece_jj,db = 1,puzzle_num = 19,puzzle_noise_level = 0):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -28,6 +24,14 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         for piece in chosen_pieces:
             piece.load_extrapolated_image()
             piece.load_stable_diffusion_original_image()
+
+        return chosen_pieces
+    
+    def test_score_no_preprocessing(self,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        chosen_pieces = self._load_chosen_pieces(piece_ii,piece_jj,db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)    
 
         extrapolation_extractor = SDExtrapolatorExtractor(chosen_pieces)
         extrapolator_extractor_name = extrapolation_extractor.__class__.__name__
@@ -54,6 +58,10 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         axs[1].imshow(edge_ii_extra_img) 
 
         plt.show()
+
+    def test_score_no_preprocessing_P5E1_P6E0(self):
+        print("This should have a medium score (?)")
+        self.test_score_no_preprocessing(piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0)
 
     def test_normalized_image_score_a_pair(self,piece_ii = 5,edge_ii = 2,
                                            piece_jj = 3,edge_jj = 1,
