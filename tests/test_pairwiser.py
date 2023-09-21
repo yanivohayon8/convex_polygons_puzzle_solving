@@ -93,9 +93,9 @@ class TestStableDiffusionExtrapolators(unittest.TestCase):
         plt.show()
 
     
-    def test_normalized_image_pair_best_buddies(self,piece_ii = 3,edge_ii = 2,
-                                           piece_jj = 4,edge_jj = 0,
-                                           sample_height=10):
+    def test_normalized_image_pair_best_buddies(self,piece_ii = 1,edge_ii = 1,
+                                           piece_jj =5,edge_jj = 2,
+                                           sample_height=5):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0

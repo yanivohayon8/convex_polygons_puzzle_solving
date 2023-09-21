@@ -16,36 +16,6 @@ from src.feature_extraction.extrapolator.stable_diffusion import NormalizeSDExtr
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
 
 class TestGraphDrawer(unittest.TestCase):
-    
-    def _load_apictorial_graph(self,db,puzzle_num,puzzle_noise_level,
-                    img_type="stable_diffusion",
-                    geo_feature_extractors=["angle","length"]):
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        id2piece = {}
-
-        for piece in bag_of_pieces:
-            id2piece[piece.id] = piece
-        
-        if "length" in  geo_feature_extractors:
-            edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
-            edge_length_extractor.run()
-
-        if "angle" in geo_feature_extractors:
-            angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
-            angles_extractor.run()
-
-        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
-        edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
-
-        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
-                                                edge_length_pairwiser.match_edges,
-                                                edge_length_pairwiser.match_pieces_score)
-        wrapper.build_graph()
-
-        return wrapper
 
     def _load_graph(self,db,puzzle_num,puzzle_noise_level,
                     img_type="stable_diffusion",
@@ -133,10 +103,10 @@ class TestGraphDrawer(unittest.TestCase):
 
     def test_draw_pictorial_matches(self):
         db = "1" 
-        puzzle_num = 20 #13 #20
+        puzzle_num = 19 #13 #20
 
         ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
-        wrapper = self._load_graph(db,puzzle_num,2)
+        wrapper = self._load_graph(db,puzzle_num,0)
 
         self._draw_matching(wrapper,ground_truth_wrapper)
         # fig, axs = plt.subplots(1,2)
@@ -144,13 +114,12 @@ class TestGraphDrawer(unittest.TestCase):
        
         plt.show()
 
-
-    def test_apictorial_puzzle_with_missing_pieces(self):
+    def test_puzzle_with_missing_pieces(self):
         db = "5" 
         puzzle_num = 1 #13 #20
 
-        ground_truth_wrapper = self._load_apictorial_graph(db,puzzle_num,0)
-        wrapper = self._load_apictorial_graph(db,puzzle_num,1)
+        ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
+        wrapper = self._load_graph(db,puzzle_num,1)
 
         self._draw_matching(wrapper,ground_truth_wrapper)
         fig, axs = plt.subplots(1,2)
