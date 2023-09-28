@@ -5,17 +5,27 @@ from src.puzzle import Puzzle
 from src.feature_extraction import image_process 
 from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
+from src.feature_extraction import geometric as geo_extractor 
+from src.pairwise_matchers import geometric as geo_pairwiser
+from src.mating_graphs.matching_graph import MatchingGraphWrapper
+from src.mating_graphs.drawer import MatchingGraphDrawer
 
-def load_bag_of_pieces(db,puzzle_num,puzzle_noise_level):
+
+def load_puzzle(db,puzzle_num,puzzle_noise_level):
     puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
     puzzle.load()
+    return puzzle
+
+def load_bag_of_pieces_images(puzzle:Puzzle):
     bag_of_pieces = puzzle.get_bag_of_pieces()
+    id2piece = {}
 
     for piece in bag_of_pieces:
+        id2piece[piece.id] = piece
         piece.load_extrapolated_image()
         piece.load_stable_diffusion_original_image()
     
-    return bag_of_pieces
+    return bag_of_pieces,id2piece
 
 class TestFunction_score_pair(unittest.TestCase):
 
@@ -117,7 +127,8 @@ class TestFunction_score_pair(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        bag_of_pieces = load_bag_of_pieces(db,puzzle_num,puzzle_noise_level)
+        puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
+        bag_of_pieces,_ = load_bag_of_pieces_images(puzzle)
 
         chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
 
@@ -141,7 +152,7 @@ class TestFunction_score_pair(unittest.TestCase):
         extra_img_jj = recipe_extra.process(chosen_pieces[1].features[extra_extractor_name][edge_jj],
                                             original_channels_mean)
 
-        pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,extra_extractor_name,orig_extractor_name) # None because it does not matter.
+        pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,extra_extractor_name,orig_extractor_name) 
         score_left = pictorial_matcher._score_pair(extra_img_ii,original_img_jj)
         score_right = pictorial_matcher._score_pair(extra_img_jj,original_img_ii)
 
@@ -214,8 +225,74 @@ class TestFunction_score_pair(unittest.TestCase):
 
 class TestFunctionPairwise(unittest.TestCase):
     
-    def _pairwise_puzzle(self,db,puzzle_num,puzzle_noise_level):
-        bag_of_pieces = load_bag_of_pieces(db,puzzle_num,puzzle_noise_level)
+    def _pictorial_extract_v1(self,bag_of_pieces):
+        original_extractor = SDOriginalExtractor(bag_of_pieces)
+        original_extractor.run()
+        orig_extractor_name = original_extractor.__class__.__name__
+        recipe_original = image_process.RecipeFlipCropSubMean()
+        original_images = [piece.features[orig_extractor_name][edge] for piece in bag_of_pieces for edge in range(piece.get_num_coords())]
+        original_channels_mean = recipe_original.compute_channels_mean(original_images)
+
+        for piece in bag_of_pieces:
+            for edge in range(piece.get_num_coords()):
+                piece.features[orig_extractor_name][edge] = \
+                    recipe_original.process(piece.features[orig_extractor_name][edge],original_channels_mean)
+
+        extrapolation_extractor = SDExtrapolatorExtractor(bag_of_pieces)
+        extrapolation_extractor.run()
+        extra_extractor_name = extrapolation_extractor.__class__.__name__
+        recipe_extra = image_process.RecipeFlipCropSubMean(axes_flipped=())
+
+        for piece in bag_of_pieces:
+            for edge in range(piece.get_num_coords()):
+                piece.features[extra_extractor_name][edge] = \
+                    recipe_extra.process(piece.features[extra_extractor_name][edge],original_channels_mean)
+
+        return bag_of_pieces
+
+    def _load_graph(self,db,puzzle_num,puzzle_noise_level):
+        puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
+        bag_of_pieces,id2piece = load_bag_of_pieces_images(puzzle)
+
+        edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
+        edge_length_extractor.run()
+
+        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
+        edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
+
+        bag_of_pieces = self._pictorial_extract_v1(bag_of_pieces)
+
+        pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,"SDExtrapolatorExtractor","SDOriginalExtractor") 
+        pictorial_matcher.pairwise()
+
+        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
+                                                edge_length_pairwiser.match_edges,
+                                                edge_length_pairwiser.match_pieces_score,
+                                                pictorial_matcher=pictorial_matcher)
+        wrapper.build_graph()
+
+        return wrapper
+    
+    def test_refactor_me(self):
+        db = "1" 
+        puzzle_num = 19 #13 #20
+
+        ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
+        wrapper = self._load_graph(db,puzzle_num,1)
+
+        drawer = MatchingGraphDrawer(ground_truth_wrapper)
+        drawer.init()
+
+        # Because we you use the normalized dot product
+        min_edge_weight = -1
+        max_edge_weight = 1
+        drawer.draw_graph_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+        drawer.draw_graph_filtered_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+
+        plt.show()
+    
+
+
 
 
 
