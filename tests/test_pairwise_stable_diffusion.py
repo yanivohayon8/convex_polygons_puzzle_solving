@@ -29,7 +29,7 @@ def load_bag_of_pieces_images(puzzle:Puzzle):
 
 class TestFunction_score_pair(unittest.TestCase):
 
-    def _load_chosen_pieces_pair(self,piece_ii,piece_jj,db = 1,puzzle_num = 19,puzzle_noise_level = 0):
+    def _load_chosen_pieces_pair(self,piece_ii,piece_jj,db = 1,puzzle_num = 19,puzzle_noise_level = 1):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -43,11 +43,11 @@ class TestFunction_score_pair(unittest.TestCase):
     
     ''' WITHOUT preprocessing '''
 
-    def test_score_no_preprocessing(self,piece_ii = 5,edge_ii = 2,
+    def test_score_no_preprocessing(self,puzzle_noise_level = 0,piece_ii = 5,edge_ii = 2,
                                      piece_jj = 3,edge_jj = 1,is_plot=True):
         db = 1
         puzzle_num = 19
-        puzzle_noise_level = 0
+        
         chosen_pieces = self._load_chosen_pieces_pair(piece_ii,piece_jj,
                                                  db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)    
 
@@ -103,30 +103,32 @@ class TestFunction_score_pair(unittest.TestCase):
 
         return score_left,score_right
 
-    def test_score_no_preprocessing_expected_high(self):
+    def test_score_no_preprocessing_expected_high(self,puzzle_noise_level = 0):
         min_excpected_score = 0.5
-        score = self.test_score_no_preprocessing(piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0)
+        score = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0)
         assert score > min_excpected_score
-        score = self.test_score_no_preprocessing(piece_ii = 5,edge_ii = 2,piece_jj = 3,edge_jj = 1)
+        score = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,piece_ii = 5,edge_ii = 2,piece_jj = 3,edge_jj = 1)
         assert score > min_excpected_score
 
-    def test_score_no_preprocessing_expected_low(self,max_excpected_score = 0.25):
-        score1,score2  = self.test_score_no_preprocessing(piece_ii = 5,edge_ii = 0, piece_jj = 9,edge_jj = 1,is_plot=False)
+    def test_score_no_preprocessing_expected_low(self,puzzle_noise_level=0,
+                                                 max_excpected_score = 0.25):
+        score1,score2  = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                          piece_ii = 5,edge_ii = 0, piece_jj = 9,edge_jj = 1,is_plot=False)
         score = (score1+score2)/2
         assert score < max_excpected_score
 
-        score1,score2 = self.test_score_no_preprocessing(piece_ii = 7,edge_ii = 0,piece_jj = 6,edge_jj = 1,is_plot=False)
+        score1,score2 = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                         piece_ii = 7,edge_ii = 0,piece_jj = 6,edge_jj = 1,is_plot=False)
         score = (score1+score2)/2
         assert score < max_excpected_score
 
     ''' WITH preprocessing '''
 
-    def test_score_preprocessing(self,piece_ii = 5,edge_ii = 2,
-                                        piece_jj = 3,edge_jj = 1,is_plot=True):
+    def test_score_preprocessing(self,puzzle_noise_level = 1,piece_ii = 5,edge_ii = 1,
+                                        piece_jj = 6,edge_jj = 0,is_plot=True):
         
         db = 1
         puzzle_num = 19
-        puzzle_noise_level = 0
         puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
         bag_of_pieces,_ = load_bag_of_pieces_images(puzzle)
 
@@ -173,32 +175,41 @@ class TestFunction_score_pair(unittest.TestCase):
 
         return score_left,score_left
     
-    def test_score_preprocessing_expected_high(self,min_excpected_score = 0.2):
-        score1,score2 = self.test_score_preprocessing(piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0,is_plot=False)
+    def test_score_preprocessing_expected_high(self,puzzle_noise_level=0,
+                                               min_excpected_score = 0.2):
+        score1,score2 = self.test_score_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                      piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0,is_plot=False)
         score = (score1+score2)/2
         assert score > min_excpected_score
 
-        score1,score2 = self.test_score_preprocessing(piece_ii = 5,edge_ii = 2,piece_jj = 3,edge_jj = 1,is_plot=False)
+        score1,score2 = self.test_score_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                      piece_ii = 5,edge_ii = 2,piece_jj = 3,edge_jj = 1,is_plot=False)
         score = (score1+score2)/2
         assert score > min_excpected_score
 
-    def test_score_preprocessing_expected_low(self,max_excpected_score = 0.25):
-        score1,score2 = self.test_score_preprocessing(piece_ii = 5,edge_ii = 0, piece_jj = 9,edge_jj = 1,is_plot=False)
+    def test_score_preprocessing_expected_low(self,puzzle_noise_level=0,
+                                              max_excpected_score = 0.25):
+        score1,score2 = self.test_score_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                      piece_ii = 5,edge_ii = 0, piece_jj = 9,edge_jj = 1,is_plot=False)
         score = (score1+score2)/2
         assert score < max_excpected_score
 
-        score1,score2 = self.test_score_preprocessing(piece_ii = 7,edge_ii = 0,piece_jj = 6,edge_jj = 1,is_plot=False)
+        score1,score2 = self.test_score_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                      piece_ii = 7,edge_ii = 0,piece_jj = 6,edge_jj = 1,is_plot=False)
         score = (score1+score2)/2
         assert score < max_excpected_score
 
     ''' preprocessing_vs_preprocessing '''
 
-    def test_no_preprocessing_vs_preprocessing(self,piece_ii = 5,edge_ii = 2,
+    def test_no_preprocessing_vs_preprocessing(self,puzzle_noise_level=1,
+                                               piece_ii = 5,edge_ii =1,
                                                     piece_jj = 6,edge_jj = 0):
         
-        preproc_score_left,preproc_score_right = self.test_score_preprocessing(piece_ii=piece_ii,piece_jj=piece_jj,edge_ii=edge_ii,edge_jj=edge_jj,is_plot=False)
+        preproc_score_left,preproc_score_right = self.test_score_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                                               piece_ii=piece_ii,piece_jj=piece_jj,edge_ii=edge_ii,edge_jj=edge_jj,is_plot=False)
         avg_preproc = (preproc_score_left+preproc_score_right)/2
-        no_preproc_score_left,no_preproc_score_right = self.test_score_no_preprocessing(piece_ii=piece_ii,piece_jj=piece_jj,edge_ii=edge_ii,edge_jj=edge_jj,is_plot=False)
+        no_preproc_score_left,no_preproc_score_right = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,
+                                                                                        piece_ii=piece_ii,piece_jj=piece_jj,edge_ii=edge_ii,edge_jj=edge_jj,is_plot=False)
         avg_no_preproc = (no_preproc_score_left+no_preproc_score_right)/2
 
         print("Left Column:")
