@@ -255,6 +255,10 @@ class TestEdgeMatcher(unittest.TestCase):
         print("The scores")
         print(matcher.match_pieces_score)
 
+        matings = matcher.get_pairwise_as_list()
+        
+        assert len(matings) == 4
+
 
 '''
 Old# Todo: write unit test for EdgeMatcher class
