@@ -35,6 +35,7 @@ class SDEdgeImageExtractor(Extractor):
             max_row,max_col = np.max(non_background_indices,axis=0)
             min_row,min_col = np.min(non_background_indices,axis=0)
             cropped_img = translated_img[min_row:max_row,:edge_width]
+            
             piece.features[self.feature_name].append(cropped_img)
 
 
