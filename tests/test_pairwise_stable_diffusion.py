@@ -261,46 +261,77 @@ class TestFunctionPairwise(unittest.TestCase):
 
         return bag_of_pieces
 
-    def _load_graph(self,db,puzzle_num,puzzle_noise_level):
+        
+    def test_comp_distribution(self,db=1,puzzle_num=19,puzzle_noise_level=1):
         puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
         bag_of_pieces,id2piece = load_bag_of_pieces_images(puzzle)
-
+        
         edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
         edge_length_extractor.run()
 
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
 
-        bag_of_pieces = self._pictorial_extract_v1(bag_of_pieces)
+        potential_matings = edge_length_pairwiser.get_pairwise_as_list()
+        tn_matings = []
+        fp_matings = []
 
+        for mating in potential_matings:
+            if puzzle.is_ground_truth_mating(mating):
+                tn_matings.append(mating)
+            else:
+                fp_matings.append(mating)
+
+        bag_of_pieces = self._pictorial_extract_v1(bag_of_pieces)        
         pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,"SDExtrapolatorExtractor","SDOriginalExtractor") 
         pictorial_matcher.pairwise()
 
-        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
-                                                edge_length_pairwiser.match_edges,
-                                                edge_length_pairwiser.match_pieces_score,
-                                                pictorial_matcher=pictorial_matcher)
-        wrapper.build_graph()
+        tn_scores = [pictorial_matcher.get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in tn_matings]
+        fp_scores = [pictorial_matcher.get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in fp_matings]
 
-        return wrapper
-    
-    def test_refactor_me(self):
-        db = "1" 
-        puzzle_num = 19 #13 #20
-
-        ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
-        wrapper = self._load_graph(db,puzzle_num,1)
-
-        drawer = MatchingGraphDrawer(ground_truth_wrapper)
-        drawer.init()
-
-        # Because we you use the normalized dot product
-        min_edge_weight = -1
-        max_edge_weight = 1
-        drawer.draw_graph_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
-        drawer.draw_graph_filtered_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+        ax = plt.subplot()
+        ax.scatter(fp_scores,[0]*len(fp_scores),color="red")
+        ax.scatter(tn_scores,[0]*len(tn_scores),color="blue")
+        # ax.set_xlim(-1,1)
 
         plt.show()
+
+
+
+
+
+
+
+
+
+    # def _load_graph(self):
+    #     wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
+    #                                             edge_length_pairwiser.match_edges,
+    #                                             edge_length_pairwiser.match_pieces_score,
+    #                                             pictorial_matcher=pictorial_matcher,
+    #                                             compatibility_threshold=0.7)
+    #     wrapper.build_graph()
+
+    # def _draw_graph(self):
+        
+    #     ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
+    #     wrapper = self._load_graph(db,puzzle_num,1)
+
+    #     drawer = MatchingGraphDrawer(ground_truth_wrapper)
+    #     drawer.init()
+
+    #     # Because we you use the normalized dot product
+    #     min_edge_weight = -1
+    #     max_edge_weight = 1
+    #     drawer.draw_graph_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+    #     drawer.draw_graph_filtered_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+
+    #     plt.show()
+
+
+   
+        
+
     
 
 

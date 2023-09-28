@@ -26,6 +26,7 @@ class Puzzle():
         self.noise = None
         self.matings_max_difference = None
         self.df_raw_pieces = None
+        self.ground_truth_matings = None
 
 
         # Because we give new edge numbers in ccw order for efficient code and debug, 
@@ -286,4 +287,14 @@ class Puzzle():
         
         return count_correct/len(ground_truth_matings)
 
+    def is_ground_truth_mating(self,mating):
+        
+        if self.ground_truth_matings is None:
+            self.ground_truth_matings = self.get_final_rels()
+        
+        new_mate = Mating(piece_1=mating.piece_1,piece_2=mating.piece_2,
+                              edge_1=self.pieces2original_edges[mating.piece_1][int(mating.edge_1)],
+                              edge_2=self.pieces2original_edges[mating.piece_2][int(mating.edge_2)])
+        
+        return new_mate in self.ground_truth_matings
 
