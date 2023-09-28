@@ -3,6 +3,7 @@ import cv2
 from src.feature_extraction import image_process 
 import matplotlib.pyplot as plt
 import glob
+import numpy as np
 
 from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
 from src.puzzle import Puzzle
@@ -65,6 +66,20 @@ class TestRecipeFlipCropSubMean(unittest.TestCase):
         recipe = image_process.RecipeFlipCropSubMean()
         channels_mean = recipe.compute_channels_mean(images)
         processed_img = recipe.process(images[plot_index],channels_mean)
+
+        fig, axs = plt.subplots(1,2)
+        axs[0].imshow(before_img)
+        axs[0].set_title("before processing")
+        axs[1].imshow(processed_img)
+        axs[1].set_title("after processing")
+
+        plt.show()
+
+    def test_toy_example_crop_flip_only(self,plot_index = 4):
+        images = [cv2.imread(file) for file in glob.glob(images_folder+"/*original.png")]
+        before_img = images[plot_index]
+        recipe = image_process.RecipeFlipCropSubMean()
+        processed_img = recipe.process(images[plot_index],np.array([0,0,0]))
 
         fig, axs = plt.subplots(1,2)
         axs[0].imshow(before_img)
