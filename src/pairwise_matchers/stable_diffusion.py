@@ -26,8 +26,12 @@ class DotProductExtraToOriginalMatcher(PictorialMatcher):
                 edge2_local_j = self.global_index2local_index[edge2_j]
                 edge2_original_pixels = self.pieces[piece2_j].features[self.feature_original][edge2_local_j]
                 
-                self.matching_edges_scores[edge1_i,edge2_j] = self._score_pair(edge1_extrapolated_pixels["same"],
-                                                                               edge2_original_pixels["flipped"])
+                self.matching_edges_scores[edge1_i,edge2_j] = self._score_pair(edge1_extrapolated_pixels,edge2_original_pixels)
+        
+        BIG_NUM = 999999
+        min_comp = np.where(np.isneginf(self.matching_edges_scores),BIG_NUM,self.matching_edges_scores).min()
+        max_comp = self.matching_edges_scores.max()
+        self.matching_edges_scores = (self.matching_edges_scores - min_comp)/(max_comp-min_comp)
     
     def _score_pair(self, edge1_img:np.array, edge2_img:np.array):
         feature_map_img = edge1_img.copy()
