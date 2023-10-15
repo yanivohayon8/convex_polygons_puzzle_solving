@@ -34,7 +34,7 @@ class Puzzle():
         # we have here implicit assumption that the edges ids are indexes..
         self.pieces2original_edges ={} # for example {P_0:[2,0,1]}
         self.bag_of_pieces = []
-        self.id2pieces = {}
+        self.id2piece = {}
 
     
     def load(self):
@@ -140,10 +140,10 @@ class Puzzle():
         self._get_raw_coordinates(self.bag_of_pieces)
         self._get_extrapolation_details(self.bag_of_pieces)
 
-        self.id2pieces = {}
+        self.id2piece = {}
 
         for piece in self.bag_of_pieces:
-            self.id2pieces[piece.id] = piece
+            self.id2piece[piece.id] = piece
 
         return self.bag_of_pieces
 
