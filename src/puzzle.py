@@ -33,6 +33,8 @@ class Puzzle():
         # we maintain the original "messed order" of the indexing of the ground truth, for evaluation.
         # we have here implicit assumption that the edges ids are indexes..
         self.pieces2original_edges ={} # for example {P_0:[2,0,1]}
+        self.bag_of_pieces = []
+        self.id2pieces = {}
 
     
     def load(self):
@@ -130,15 +132,20 @@ class Puzzle():
      
 
     def get_bag_of_pieces(self,csv_conv="Ofir"):
-        pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
-        self._preprocess(pieces)
-        self._get_pieces2img_path(pieces)
-        self._get_stabe_diffusion_extrapolation_img_path(pieces)# self._get_pieces2extrapolated_img_path_old(pieces)
-        self._get_stabe_diffusion_original_img_path(pieces)
-        self._get_raw_coordinates(pieces)
-        self._get_extrapolation_details(pieces)
+        self.bag_of_pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
+        self._preprocess(self.bag_of_pieces)
+        self._get_pieces2img_path(self.bag_of_pieces)
+        self._get_stabe_diffusion_extrapolation_img_path(self.bag_of_pieces)# self._get_pieces2extrapolated_img_path_old(pieces)
+        self._get_stabe_diffusion_original_img_path(self.bag_of_pieces)
+        self._get_raw_coordinates(self.bag_of_pieces)
+        self._get_extrapolation_details(self.bag_of_pieces)
 
-        return pieces
+        self.id2pieces = {}
+
+        for piece in self.bag_of_pieces:
+            self.id2pieces[piece.id] = piece
+
+        return self.bag_of_pieces
 
     def get_ground_truth_puzzle(self,csv_conv="Ofir"):
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
