@@ -14,3 +14,8 @@ class Extractor():
 
 
 factory = Factory()
+
+def extract_features(pieces,features,**kwargs):
+    for feature in features:
+        extractor = factory.create(feature,pieces=pieces,**kwargs)
+        extractor.run()
