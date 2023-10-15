@@ -147,6 +147,17 @@ class Puzzle():
 
         return self.bag_of_pieces
 
+    def load_images(self,img_type="stable_diffusion"):
+        for piece in self.bag_of_pieces:
+
+            if img_type == "original":
+                piece.load_image()
+            elif img_type == "extrapolated":
+                piece.load_extrapolated_image()
+            elif img_type == "stable_diffusion":
+                piece.load_extrapolated_image()
+                piece.load_stable_diffusion_original_image()
+
     def get_ground_truth_puzzle(self,csv_conv="Ofir"):
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
         pieces = self._pieces_pd2list(self.df_solution_locations,csv_conv=csv_conv)
