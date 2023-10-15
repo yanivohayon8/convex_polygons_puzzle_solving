@@ -1,5 +1,5 @@
 from src.piece import Piece
-
+from src.factory import Factory
 
 class Extractor():
     def __init__(self, pieces):
@@ -12,4 +12,5 @@ class Extractor():
         for piece in self.pieces:
             self.extract_for_piece(piece)
 
-    
+
+factory = Factory()
