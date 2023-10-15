@@ -292,15 +292,10 @@ class TestFunctionPairwise(unittest.TestCase):
         ax = plt.subplot()
         ax.scatter(fp_scores,[0]*len(fp_scores),color="red")
         ax.scatter(tn_scores,[0]*len(tn_scores),color="blue")
+        ax.set_title("Find the right threshold for comp filter")
         # ax.set_xlim(-1,1)
 
         plt.show()
-
-
-
-
-
-
 
 
 
