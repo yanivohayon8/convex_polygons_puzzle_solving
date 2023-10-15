@@ -31,7 +31,7 @@ class TestLoader(unittest.TestCase):
         puzzle = Puzzle(puzzle_directory)
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
-        puzzle.load_images()
+        # puzzle.load_images()
 
         plt.imshow(bag_of_pieces[0].extrapolated_img)
         plt.show()

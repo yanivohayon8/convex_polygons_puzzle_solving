@@ -1,5 +1,6 @@
 # from src.feature_extraction.pictorial import  image_edge,EdgePictorialExtractor
-from src.feature_extraction import Extractor
+from typing import Any
+from src.feature_extraction import Extractor,factory
 from src.feature_extraction.pictorial import find_rotation_angle,trans_image
 from src.piece import Piece
 import numpy as np
@@ -115,3 +116,48 @@ class NormalizeSDOriginalExtractor(SDOriginalExtractor):
                     # img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.int)
                     img_correct_type = piece.features[self.__class__.__name__][edge][key_].astype(np.double)
                     piece.features[self.__class__.__name__][edge][key_] = img_correct_type - channels_mean
+
+
+'''
+
+    REGISTERING BUILDERS
+
+'''
+class extraBuilder():
+    def __call__(self, pieces, **_ignored) -> Any:
+        for piece in pieces:
+            piece.load_extrapolated_image()
+
+class SDExtrapolatorBuilder(extraBuilder):
+    def __call__(self, pieces, **_ignored) -> Any:        
+        super().__call__(pieces,**_ignored)
+        return SDExtrapolatorExtractor(pieces)
+
+class NormalizeSDExtrapolatorBuilder(extraBuilder):
+    def __call__(self, pieces, **_ignored) -> Any:        
+        super().__call__(pieces,**_ignored)
+        return NormalizeSDExtrapolatorExtractor(pieces)
+
+class OriginalBuilder():
+    def __call__(self, pieces, **_ignored) -> Any:
+        for piece in pieces:
+            piece.load_stable_diffusion_original_image()
+
+class SDOriginalBuilder(OriginalBuilder):
+    def __call__(self, pieces, **_ignored) -> Any:        
+        super().__call__(pieces,**_ignored)
+        return SDOriginalExtractor(pieces)
+
+class NormalizeSDOriginalBuilder(OriginalBuilder):
+    def __call__(self, pieces, **_ignored) -> Any:        
+        super().__call__(pieces,**_ignored)
+        return NormalizeSDOriginalExtractor(pieces)
+
+factory.register_builder(SDExtrapolatorExtractor.__name__,
+                         SDExtrapolatorBuilder())
+factory.register_builder(NormalizeSDExtrapolatorExtractor.__name__,
+                         NormalizeSDExtrapolatorBuilder())
+factory.register_builder(SDOriginalExtractor.__name__,
+                         SDOriginalBuilder())
+factory.register_builder(NormalizeSDOriginalExtractor.__name__,
+                         NormalizeSDOriginalBuilder())

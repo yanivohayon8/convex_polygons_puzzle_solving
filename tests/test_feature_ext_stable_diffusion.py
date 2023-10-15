@@ -5,6 +5,7 @@ import numpy as np
 from src.puzzle import Puzzle
 import matplotlib.pyplot as plt
 import cv2
+from src.feature_extraction import factory
 
 
 class TestSDExtrapolatorExtractor(unittest.TestCase):
@@ -50,6 +51,28 @@ class TestSDExtrapolatorExtractor(unittest.TestCase):
         print("There is no need for cropping to keep the edges aligned...")
         self._test_edge_extrapolated(piece_index=2,edge_index=0)
 
+    def test_from_factory(self,piece_index = 5,edge_index = 2):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        feature_extractor_extrapolator = factory.create("SDExtrapolatorExtractor",pieces=[chosen_piece])
+        feature_extractor_extrapolator.run()
+        feature_name = feature_extractor_extrapolator.__class__.__name__
+        edge_extra_image_ = chosen_piece.features[feature_name][edge_index]
+
+        fig,axs = plt.subplots(1,2)
+        axs[0].set_title("extrapolated_img")
+        axs[0].imshow(chosen_piece.extrapolated_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index} Extrapolated")
+        axs[1].imshow(edge_extra_image_)
+
+        plt.show()
+
 class TestSDOriginalExtractor(unittest.TestCase):
     
     def _test_edge_original(self,piece_index = 5,edge_index = 2):
@@ -84,6 +107,27 @@ class TestSDOriginalExtractor(unittest.TestCase):
     def test_P_2_E_0(self):
         self._test_edge_original(piece_index=2,edge_index=0)
     
+    def test_from_factory(self,piece_index = 5,edge_index = 2):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        feature_extractor_extrapolator = factory.create("SDOriginalExtractor",pieces=[chosen_piece])
+        feature_extractor_extrapolator.run()
+        feature_name = feature_extractor_extrapolator.__class__.__name__
+        edge_extra_image_ = chosen_piece.features[feature_name][edge_index]
+
+        fig,axs = plt.subplots(1,2)
+        axs[0].set_title("SDOriginalExtractor")
+        axs[0].imshow(chosen_piece.stable_diffusion_original_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index} Extrapolated")
+        axs[1].imshow(edge_extra_image_)
+
+        plt.show()
     
     def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=0,out_folder="data/poc_10_pictorial_compatibility"):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
