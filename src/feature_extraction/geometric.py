@@ -1,7 +1,8 @@
-from shapely import Polygon
 import numpy as np
 from src.feature_extraction import Extractor
+from src.feature_extraction import factory
 from src.piece import Piece
+
 
 class EdgeLengthExtractor(Extractor):
 
@@ -39,6 +40,10 @@ class AngleLengthExtractor(Extractor):
         piece.features["angles"] = self._get_polygon_angles(np.array(piece.get_coords()))
 
 
+factory.register_builder(EdgeLengthExtractor.__name__,
+                         lambda pieces: EdgeLengthExtractor(pieces))
+factory.register_builder(AngleLengthExtractor.__name__,
+                         lambda pieces: AngleLengthExtractor(pieces))
 
 '''
 
