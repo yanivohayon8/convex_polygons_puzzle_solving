@@ -1,6 +1,15 @@
-class FeatureExtractor():
+from src.piece import Piece
 
-    def __init__(self) -> None:
-        pass
+
+class Extractor():
+    def __init__(self, pieces):
+        self.pieces = pieces
+
+    def extract_for_piece(self,piece:Piece):
+        raise ("Implement Me")
+
+    def run(self):
+        for piece in self.pieces:
+            self.extract_for_piece(piece)
 
     

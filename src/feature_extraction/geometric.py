@@ -1,17 +1,7 @@
 from shapely import Polygon
 import numpy as np
+from src.feature_extraction import Extractor
 from src.piece import Piece
-
-class Extractor():
-    def __init__(self, pieces):
-        self.pieces = pieces
-    
-    def extract_for_piece(self,piece:Piece):
-        raise ("Implement Me")
-
-    def run(self):
-        for piece in self.pieces:
-            self.extract_for_piece(piece)
 
 class EdgeLengthExtractor(Extractor):
 

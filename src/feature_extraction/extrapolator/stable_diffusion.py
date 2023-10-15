@@ -1,5 +1,5 @@
 # from src.feature_extraction.pictorial import  image_edge,EdgePictorialExtractor
-from src.feature_extraction.geometric import Extractor
+from src.feature_extraction import Extractor
 from src.feature_extraction.pictorial import find_rotation_angle,trans_image
 from src.piece import Piece
 import numpy as np
