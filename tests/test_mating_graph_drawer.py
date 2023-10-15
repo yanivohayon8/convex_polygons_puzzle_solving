@@ -26,19 +26,7 @@ class TestGraphDrawer(unittest.TestCase):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        id2piece = {}
-
-        for piece in bag_of_pieces:
-            id2piece[piece.id] = piece
-
-            if img_type == "original":
-                piece.load_image()
-            elif img_type == "extrapolated":
-                piece.load_extrapolated_image()
-            elif img_type == "stable_diffusion":
-                piece.load_extrapolated_image()
-                piece.load_stable_diffusion_original_image()
+        puzzle.load_images()
 
         if "length" in  geo_feature_extractors:
             edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)

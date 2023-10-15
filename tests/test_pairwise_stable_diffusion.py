@@ -18,14 +18,9 @@ def load_puzzle(db,puzzle_num,puzzle_noise_level):
 
 def load_bag_of_pieces_images(puzzle:Puzzle):
     bag_of_pieces = puzzle.get_bag_of_pieces()
-    id2piece = {}
-
-    for piece in bag_of_pieces:
-        id2piece[piece.id] = piece
-        piece.load_extrapolated_image()
-        piece.load_stable_diffusion_original_image()
+    puzzle.load_images()
     
-    return bag_of_pieces,id2piece
+    return bag_of_pieces,puzzle.id2piece
 
 class TestFunction_score_pair(unittest.TestCase):
 
@@ -33,12 +28,9 @@ class TestFunction_score_pair(unittest.TestCase):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
+        puzzle.load_images()
         chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
-        
-        for piece in chosen_pieces:
-            piece.load_extrapolated_image()
-            piece.load_stable_diffusion_original_image()
-
+    
         return chosen_pieces
     
     ''' WITHOUT preprocessing '''
