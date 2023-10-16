@@ -164,3 +164,18 @@ factory.register_builder(SDOriginalExtractor.__name__,
                          SDOriginalBuilder())
 factory.register_builder(NormalizeSDOriginalExtractor.__name__,
                          NormalizeSDOriginalBuilder())
+
+def extract_and_normalize_original_mean(pieces,crop_num_rows=DEFAULT_NUM_ROWS_CROP):
+    original_extractor = factory.create("NormalizeSDOriginalExtractor",
+                                       pieces=pieces,
+                                       crop_num_rows=crop_num_rows)
+    original_extractor.run()
+
+    channel_mean = original_extractor.channels_mean
+    extrapolation_extractor = factory.create("NormalizeSDExtrapolatorExtractor",
+                                             pieces=pieces,
+                                             channels_mean=channel_mean,
+                                             crop_num_rows=crop_num_rows)
+    extrapolation_extractor.run()
+
+

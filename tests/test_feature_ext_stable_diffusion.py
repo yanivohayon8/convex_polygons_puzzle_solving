@@ -1,5 +1,6 @@
 import unittest
 from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor,NormalizeSDOriginalExtractor,NormalizeSDExtrapolatorExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 import numpy as np
 from src.puzzle import Puzzle
@@ -295,7 +296,8 @@ class TestNormalizeSDExtrapolatorExtractor(unittest.TestCase):
             piece.load_extrapolated_image()
 
         chosen_piece = bag_of_pieces[piece_index]
-        preprocessing_feature = NormalizeSDExtrapolatorExtractor(bag_of_pieces,channels_mean=db_1_num_19_noise_0_channels_means)
+        preprocessing_feature = NormalizeSDExtrapolatorExtractor(bag_of_pieces,
+                                                                 channels_mean=db_1_num_19_noise_0_channels_means)
         preprocessing_feature.run()
         feature_name = preprocessing_feature.__class__.__name__
         preprocess_image = chosen_piece.features[feature_name][edge_index]
@@ -399,6 +401,28 @@ class TestLoadFromFactory(unittest.TestCase):
         self._load_feature("NormalizeSDExtrapolatorExtractor",
                            piece_index=piece_index,edge_index=edge_index,
                            channels_mean=db_1_num_19_noise_0_channels_means)
+    
+    def test_load_common_channel(self,piece_index=0,edge_index =0):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+        extract_and_normalize_original_mean(bag_of_pieces)
+        
+        origin_image = bag_of_pieces[piece_index].features["NormalizeSDOriginalExtractor"][edge_index]
+        extra_image = bag_of_pieces[piece_index].features["NormalizeSDExtrapolatorExtractor"][edge_index]
+
+        fig,axs = plt.subplots(1,2)
+        axs[0].set_title("NormalizeSDOriginalExtractor")
+        axs[0].imshow(origin_image)
+        axs[1].set_title("NormalizeSDExtrapolatorExtractor")
+        axs[1].imshow(extra_image)
+
+        plt.show()
+        
+
         
 if __name__ == "__main__":
     unittest.main()
