@@ -11,244 +11,6 @@ from src.feature_extraction import factory
 db_1_num_19_noise_0_channels_means = np.array([[154.42034955, 145.18238508, 138.50948254]],dtype=np.double)
 
 
-class TestSDExtrapolatorExtractor(unittest.TestCase):
-
-    def _test_edge_extrapolated(self,piece_index = 5,edge_index = 2):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        chosen_piece = bag_of_pieces[piece_index]
-        chosen_piece.load_extrapolated_image()
-        feature_extractor_extrapolator = SDExtrapolatorExtractor([chosen_piece])
-        feature_extractor_extrapolator.run()
-        feature_name = feature_extractor_extrapolator.__class__.__name__
-        edge_extra_image_ = chosen_piece.features[feature_name][edge_index]
-
-        fig,axs = plt.subplots(1,2)
-        axs[0].set_title("extrapolated_img")
-        axs[0].imshow(chosen_piece.extrapolated_img)
-        axs[1].set_title(f"P_{piece_index}_E_{edge_index} Extrapolated")
-        axs[1].imshow(edge_extra_image_)
-
-        plt.show()
-    
-    def test_edge_as_param(self,piece_index = 5,edge_index = 2):
-        '''
-            Change the parameter values according to your wishes
-        '''
-        self._test_edge_extrapolated(piece_index=piece_index,edge_index=edge_index)
-
-    def test_P_2_E_2(self):
-        print("An example where the extrapolation is not good, so there are background holes")
-        print("The extrapolation eroded the left side")
-        print("There is no need for cropping to keep the edges aligned...")
-        self._test_edge_extrapolated(piece_index=2,edge_index=2)
-    
-    def test_P_2_E_0(self):
-        print("An example where the extrapolation is not good, so there are background holes")
-        print("The extrapolation eroded the right side")
-        print("There is no need for cropping to keep the edges aligned...")
-        self._test_edge_extrapolated(piece_index=2,edge_index=0)
-
-
-class TestSDOriginalExtractor(unittest.TestCase):
-    
-    def _test_edge_original(self,piece_index = 5,edge_index = 2):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        chosen_piece = bag_of_pieces[piece_index]
-        chosen_piece.load_stable_diffusion_original_image()
-        feature_extractor_extrapolator = SDOriginalExtractor([chosen_piece])
-        feature_extractor_extrapolator.run()
-        feature_name = feature_extractor_extrapolator.__class__.__name__
-        edge_extra_image_ = chosen_piece.features[feature_name][edge_index]
-
-        fig,axs = plt.subplots(1,2)
-        axs[0].set_title("stable_diffusion_original_img")
-        axs[0].imshow(chosen_piece.stable_diffusion_original_img)
-        axs[1].set_title(f"P_{piece_index}_E_{edge_index}")
-        axs[1].imshow(edge_extra_image_)
-
-        plt.show()
-
-    def test_edge_as_param(self,piece_index = 5,edge_index = 2):
-        self._test_edge_original(piece_index=piece_index,edge_index=edge_index)
-    
-    def test_P_2_E_2(self):
-        self._test_edge_original(piece_index=2,edge_index=2)
-    
-    def test_P_2_E_0(self):
-        self._test_edge_original(piece_index=2,edge_index=0)
-    
-    def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=0,out_folder="data/poc_10_pictorial_compatibility"):
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        for piece in bag_of_pieces:
-            piece.load_extrapolated_image()
-            piece.load_stable_diffusion_original_image()
-
-        extrapolation_height = 13 
-        feature_extractor_extrapolator = SDExtrapolatorExtractor(bag_of_pieces)
-        feature_extractor_extrapolator.run()
-        
-        feature_extractor_original = SDOriginalExtractor(bag_of_pieces)
-        feature_extractor_original.run()
-
-
-        for piece in bag_of_pieces:
-            for edge_index in range(piece.get_num_coords()):
-                file_path_prefix = f"{out_folder}/db-{db}-puzzle-{puzzle_num}-P-{piece.id}-E-{edge_index}" 
-                
-                extrapolated_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]
-                extra_file_path = f"{file_path_prefix}_ext.png"
-                cv2.imwrite(extra_file_path,extrapolated_img)
-
-                original_img = piece.features[feature_extractor_original.__class__.__name__][edge_index]
-                original_file_path = f"{file_path_prefix}_original.png"
-                cv2.imwrite(original_file_path,original_img)
-        
-        # piece = bag_of_pieces[0]
-        # edge_index = 0 
-        # extrapolated_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
-        # original_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
-        
-        plt.imshow(original_img)
-        plt.show()
-
-
-class TestNormalizeSDOriginalExtractor(unittest.TestCase):
-
-    def _plot_before_after_preprocessing(self,piece_index = 5,edge_index = 2):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        for piece in bag_of_pieces:
-            piece.load_stable_diffusion_original_image()
-
-        chosen_piece = bag_of_pieces[piece_index]
-        preprocessing_feature = NormalizeSDOriginalExtractor(bag_of_pieces)
-        preprocessing_feature.run()
-        feature_name = preprocessing_feature.__class__.__name__
-        preprocess_image = chosen_piece.features[feature_name][edge_index]
-
-        non_preprocessing_feature = SDOriginalExtractor(bag_of_pieces)
-        non_preprocessing_feature.run()
-        non_preprocess_image = chosen_piece.features[non_preprocessing_feature.__class__.__name__][edge_index]
-
-
-        fig,axs = plt.subplots(1,3)
-        axs[0].set_title("stable_diffusion_original_img")
-        axs[0].imshow(chosen_piece.stable_diffusion_original_img)
-        axs[1].set_title(f"P_{piece_index}_E_{edge_index} (NON preprocessed)")
-        axs[1].imshow(non_preprocess_image)
-        axs[2].set_title(f"P_{piece_index}_E_{edge_index} (preprocessed)")
-        axs[2].imshow(preprocess_image)
-
-        plt.show()
-
-    def test_P_2_E_2(self):
-        self._plot_before_after_preprocessing(piece_index=2,edge_index=2)
-    
-    def test_P_0_E_1(self):
-        self._plot_before_after_preprocessing(piece_index=0,edge_index=1)
-
-
-class TestNormalizeSDExtrapolatorExtractor(unittest.TestCase):
-
-    def _plot_before_after_preprocessing(self,piece_index = 5,edge_index = 2):
-        db = 1 # DONT'T CHANGE THIS (computed hardcoded channels mean)
-        puzzle_num = 19 # DONT'T CHANGE THIS
-        puzzle_noise_level = 0 # DONT'T CHANGE THIS
-
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        for piece in bag_of_pieces:
-            piece.load_extrapolated_image()
-
-        chosen_piece = bag_of_pieces[piece_index]
-        preprocessing_feature = NormalizeSDExtrapolatorExtractor(bag_of_pieces,channels_mean=db_1_num_19_noise_0_channels_means)
-        preprocessing_feature.run()
-        feature_name = preprocessing_feature.__class__.__name__
-        preprocess_image = chosen_piece.features[feature_name][edge_index]
-
-        non_preprocessing_feature = SDExtrapolatorExtractor(bag_of_pieces)
-        non_preprocessing_feature.run()
-        non_preprocess_image = chosen_piece.features[non_preprocessing_feature.__class__.__name__][edge_index]
-
-        fig,axs = plt.subplots(1,3)
-        axs[0].set_title("extrapolated_img")
-        axs[0].imshow(chosen_piece.extrapolated_img)
-        axs[1].set_title(f"P_{piece_index}_E_{edge_index} (NON preprocessed)")
-        axs[1].imshow(non_preprocess_image)
-        axs[2].set_title(f"P_{piece_index}_E_{edge_index} (preprocessed)")
-        axs[2].imshow(preprocess_image)
-
-        plt.show()
-
-    def test_P_2_E_2(self):
-        self._plot_before_after_preprocessing(piece_index=2,edge_index=2)
-    
-    def test_P_0_E_1(self):
-        self._plot_before_after_preprocessing(piece_index=0,edge_index=1)
-
-
-class TestLoadFromFactory(unittest.TestCase):
-
-    def _load_feature(self,feature,piece_index=0,edge_index=0,**kwargs):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        extractor = factory.create(feature,pieces=bag_of_pieces,**kwargs)
-        extractor.run()
-        feature_name = extractor.__class__.__name__
-        chosen_piece = bag_of_pieces[piece_index]
-        edge_image = chosen_piece.features[feature_name][edge_index]
-
-        ax = plt.subplot()
-        ax.set_title(feature_name)
-        ax.imshow(edge_image)
-
-        plt.show()
-
-    def test_SDExtrapolatorExtractor(self,piece_index=0,edge_index=0):
-        self._load_feature("SDExtrapolatorExtractor",
-                           piece_index=piece_index,edge_index=edge_index)
-
-    def test_SDOriginalExtractor(self,piece_index=0,edge_index=0):
-        self._load_feature("SDOriginalExtractor",
-                           piece_index=piece_index,edge_index=edge_index)
-        
-    def test_NormalizeSDOriginalExtractor(self,piece_index=0,edge_index=0):
-        self._load_feature("NormalizeSDOriginalExtractor",
-                           piece_index=piece_index,edge_index=edge_index)
-    
-    def test_NormalizeSDExtrapolatorExtractor(self,piece_index=0,edge_index=0):
-        self._load_feature("NormalizeSDExtrapolatorExtractor",
-                           piece_index=piece_index,edge_index=edge_index,
-                           channels_mean=db_1_num_19_noise_0_channels_means)
-        
-
 class TestPocStableDiffusion(unittest.TestCase):
 
     def test_load_extrapolation_image(self,piece_index=6):
@@ -401,5 +163,242 @@ class TestPocStableDiffusion(unittest.TestCase):
 
         plt.show()
 
+
+class TestSDExtrapolatorExtractor(unittest.TestCase):
+
+    def _test_edge_extrapolated(self,piece_index = 5,edge_index = 2):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_extrapolated_image()
+        feature_extractor_extrapolator = SDExtrapolatorExtractor([chosen_piece])
+        feature_extractor_extrapolator.run()
+        feature_name = feature_extractor_extrapolator.__class__.__name__
+        edge_extra_image_ = chosen_piece.features[feature_name][edge_index]
+
+        fig,axs = plt.subplots(1,2)
+        axs[0].set_title("extrapolated_img")
+        axs[0].imshow(chosen_piece.extrapolated_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index} Extrapolated")
+        axs[1].imshow(edge_extra_image_)
+
+        plt.show()
+    
+    def test_edge_as_param(self,piece_index = 5,edge_index = 2):
+        '''
+            Change the parameter values according to your wishes
+        '''
+        self._test_edge_extrapolated(piece_index=piece_index,edge_index=edge_index)
+
+    def test_P_2_E_2(self):
+        print("An example where the extrapolation is not good, so there are background holes")
+        print("The extrapolation eroded the left side")
+        print("There is no need for cropping to keep the edges aligned...")
+        self._test_edge_extrapolated(piece_index=2,edge_index=2)
+    
+    def test_P_2_E_0(self):
+        print("An example where the extrapolation is not good, so there are background holes")
+        print("The extrapolation eroded the right side")
+        print("There is no need for cropping to keep the edges aligned...")
+        self._test_edge_extrapolated(piece_index=2,edge_index=0)
+
+
+class TestSDOriginalExtractor(unittest.TestCase):
+    
+    def _test_edge_original(self,piece_index = 5,edge_index = 2):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        chosen_piece.load_stable_diffusion_original_image()
+        feature_extractor_extrapolator = SDOriginalExtractor([chosen_piece])
+        feature_extractor_extrapolator.run()
+        feature_name = feature_extractor_extrapolator.__class__.__name__
+        edge_extra_image_ = chosen_piece.features[feature_name][edge_index]
+
+        fig,axs = plt.subplots(1,2)
+        axs[0].set_title("stable_diffusion_original_img")
+        axs[0].imshow(chosen_piece.stable_diffusion_original_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index}")
+        axs[1].imshow(edge_extra_image_)
+
+        plt.show()
+
+    def test_edge_as_param(self,piece_index = 5,edge_index = 2):
+        self._test_edge_original(piece_index=piece_index,edge_index=edge_index)
+    
+    def test_P_2_E_2(self):
+        self._test_edge_original(piece_index=2,edge_index=2)
+    
+    def test_P_2_E_0(self):
+        self._test_edge_original(piece_index=2,edge_index=0)
+    
+    def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=0,out_folder="data/poc_10_pictorial_compatibility"):
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        for piece in bag_of_pieces:
+            piece.load_extrapolated_image()
+            piece.load_stable_diffusion_original_image()
+
+        extrapolation_height = 13 
+        feature_extractor_extrapolator = SDExtrapolatorExtractor(bag_of_pieces)
+        feature_extractor_extrapolator.run()
+        
+        feature_extractor_original = SDOriginalExtractor(bag_of_pieces)
+        feature_extractor_original.run()
+
+
+        for piece in bag_of_pieces:
+            for edge_index in range(piece.get_num_coords()):
+                file_path_prefix = f"{out_folder}/db-{db}-puzzle-{puzzle_num}-P-{piece.id}-E-{edge_index}" 
+                
+                extrapolated_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]
+                extra_file_path = f"{file_path_prefix}_ext.png"
+                cv2.imwrite(extra_file_path,extrapolated_img)
+
+                original_img = piece.features[feature_extractor_original.__class__.__name__][edge_index]
+                original_file_path = f"{file_path_prefix}_original.png"
+                cv2.imwrite(original_file_path,original_img)
+        
+        # piece = bag_of_pieces[0]
+        # edge_index = 0 
+        # extrapolated_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
+        # original_img = piece.features[feature_extractor_extrapolator.__class__.__name__][edge_index]["same"]
+        
+        plt.imshow(original_img)
+        plt.show()
+
+
+class TestNormalizeSDExtrapolatorExtractor(unittest.TestCase):
+
+    def _plot_before_after_preprocessing(self,piece_index = 5,edge_index = 2):
+        db = 1 # DONT'T CHANGE THIS (computed hardcoded channels mean)
+        puzzle_num = 19 # DONT'T CHANGE THIS
+        puzzle_noise_level = 0 # DONT'T CHANGE THIS
+
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        for piece in bag_of_pieces:
+            piece.load_extrapolated_image()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        preprocessing_feature = NormalizeSDExtrapolatorExtractor(bag_of_pieces,channels_mean=db_1_num_19_noise_0_channels_means)
+        preprocessing_feature.run()
+        feature_name = preprocessing_feature.__class__.__name__
+        preprocess_image = chosen_piece.features[feature_name][edge_index]
+
+        non_preprocessing_feature = SDExtrapolatorExtractor(bag_of_pieces)
+        non_preprocessing_feature.run()
+        non_preprocess_image = chosen_piece.features[non_preprocessing_feature.__class__.__name__][edge_index]
+
+        fig,axs = plt.subplots(1,3)
+        axs[0].set_title("extrapolated_img")
+        axs[0].imshow(chosen_piece.extrapolated_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index} (NON preprocessed)")
+        axs[1].imshow(non_preprocess_image)
+        axs[2].set_title(f"P_{piece_index}_E_{edge_index} (preprocessed)")
+        axs[2].imshow(preprocess_image)
+
+        plt.show()
+
+    def test_P_2_E_2(self):
+        self._plot_before_after_preprocessing(piece_index=2,edge_index=2)
+    
+    def test_P_0_E_1(self):
+        self._plot_before_after_preprocessing(piece_index=0,edge_index=1)
+
+class TestNormalizeSDOriginalExtractor(unittest.TestCase):
+
+    def _plot_before_after_preprocessing(self,piece_index = 5,edge_index = 2):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        for piece in bag_of_pieces:
+            piece.load_stable_diffusion_original_image()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        preprocessing_feature = NormalizeSDOriginalExtractor(bag_of_pieces)
+        preprocessing_feature.run()
+        feature_name = preprocessing_feature.__class__.__name__
+        preprocess_image = chosen_piece.features[feature_name][edge_index]
+
+        non_preprocessing_feature = SDOriginalExtractor(bag_of_pieces)
+        non_preprocessing_feature.run()
+        non_preprocess_image = chosen_piece.features[non_preprocessing_feature.__class__.__name__][edge_index]
+
+
+        fig,axs = plt.subplots(1,3)
+        axs[0].set_title("stable_diffusion_original_img")
+        axs[0].imshow(chosen_piece.stable_diffusion_original_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index} (NON preprocessed)")
+        axs[1].imshow(non_preprocess_image)
+        axs[2].set_title(f"P_{piece_index}_E_{edge_index} (preprocessed)")
+        axs[2].imshow(preprocess_image)
+
+        plt.show()
+
+    def test_P_2_E_2(self):
+        self._plot_before_after_preprocessing(piece_index=2,edge_index=2)
+    
+    def test_P_0_E_1(self):
+        self._plot_before_after_preprocessing(piece_index=0,edge_index=1)
+
+
+class TestLoadFromFactory(unittest.TestCase):
+
+    def _load_feature(self,feature,piece_index=0,edge_index=0,**kwargs):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        extractor = factory.create(feature,pieces=bag_of_pieces,**kwargs)
+        extractor.run()
+        feature_name = extractor.__class__.__name__
+        chosen_piece = bag_of_pieces[piece_index]
+        edge_image = chosen_piece.features[feature_name][edge_index]
+
+        ax = plt.subplot()
+        ax.set_title(feature_name)
+        ax.imshow(edge_image)
+
+        plt.show()
+
+    def test_SDExtrapolatorExtractor(self,piece_index=0,edge_index=0):
+        self._load_feature("SDExtrapolatorExtractor",
+                           piece_index=piece_index,edge_index=edge_index)
+
+    def test_SDOriginalExtractor(self,piece_index=0,edge_index=0):
+        self._load_feature("SDOriginalExtractor",
+                           piece_index=piece_index,edge_index=edge_index)
+        
+    def test_NormalizeSDOriginalExtractor(self,piece_index=0,edge_index=0):
+        self._load_feature("NormalizeSDOriginalExtractor",
+                           piece_index=piece_index,edge_index=edge_index)
+    
+    def test_NormalizeSDExtrapolatorExtractor(self,piece_index=0,edge_index=0):
+        self._load_feature("NormalizeSDExtrapolatorExtractor",
+                           piece_index=piece_index,edge_index=edge_index,
+                           channels_mean=db_1_num_19_noise_0_channels_means)
+        
 if __name__ == "__main__":
     unittest.main()
