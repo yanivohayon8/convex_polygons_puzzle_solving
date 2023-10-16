@@ -13,7 +13,7 @@ def get_non_zero_pixels(img:np.array):
     return np.where(non_black) 
 
 def compute_non_zero_pixels_channels_mean(images:list):
-    channels_sum = np.array([[0,0,0]])
+    channels_sum = np.array([[0,0,0]],dtype=np.double)
     pixels_count = 0
 
     for img in images:
@@ -22,7 +22,7 @@ def compute_non_zero_pixels_channels_mean(images:list):
         channels_sum += np.sum(vector,axis=0)
         pixels_count += vector.shape[0]
 
-    return (channels_sum.astype(np.double)/pixels_count)
+    return (channels_sum.astype(np.double)/pixels_count).astype(np.double)
 
 def compute_naive_channels_mean(images):
     channels_sum = np.zeros((3,1))
