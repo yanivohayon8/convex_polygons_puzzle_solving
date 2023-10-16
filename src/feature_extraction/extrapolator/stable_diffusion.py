@@ -6,6 +6,9 @@ from src.piece import Piece
 import numpy as np
 from src.feature_extraction import image_process
 
+
+DEFAULT_NUM_ROWS_CROP = 5
+
 class SDEdgeImageExtractor(Extractor):
     
     def __init__(self, pieces,feature_name):
@@ -65,9 +68,30 @@ class SDOriginalExtractor(SDEdgeImageExtractor):
                            edge_row-shiftdown_offset,edge_col)
 
 
+class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
+
+    def __init__(self, pieces,channels_mean,crop_num_rows=DEFAULT_NUM_ROWS_CROP):
+        super().__init__(pieces)
+        self.channels_mean=channels_mean
+        self.crop_num_rows = crop_num_rows
+
+    def run(self):
+        super().run()
+
+        name = self.__class__.__name__
+
+        for piece in self.pieces:
+            for edge in range(piece.get_num_coords()):
+                piece.features[name][edge] = image_process.crop_rows(piece.features[name][edge],
+                                                                     num_rows=self.crop_num_rows)
+
+                as_double = piece.features[name][edge].astype(np.double)
+                piece.features[name][edge] = as_double -  self.channels_mean
+
+
 class NormalizeSDOriginalExtractor(SDOriginalExtractor):
 
-    def __init__(self, pieces,crop_num_rows=5):
+    def __init__(self, pieces,crop_num_rows=DEFAULT_NUM_ROWS_CROP):
         super().__init__(pieces)
         self.axes_flipped = (0,1)
         self.crop_num_rows = crop_num_rows
@@ -94,25 +118,7 @@ class NormalizeSDOriginalExtractor(SDOriginalExtractor):
                 piece.features[name][edge] = as_double -  self.channels_mean
 
 
-class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
 
-    def __init__(self, pieces,channels_mean=None,crop_num_rows=5):
-        super().__init__(pieces)
-        self.channels_mean=channels_mean
-        self.crop_num_rows = crop_num_rows
-
-    def run(self):
-        super().run()
-
-        name = self.__class__.__name__
-
-        for piece in self.pieces:
-            for edge in range(piece.get_num_coords()):
-                piece.features[name][edge] = image_process.crop_rows(piece.features[name][edge],
-                                                                     num_rows=self.crop_num_rows)
-
-                as_double = piece.features[name][edge].astype(np.double)
-                piece.features[name][edge] = as_double -  self.channels_mean
 
 
 '''
@@ -131,9 +137,9 @@ class SDExtrapolatorBuilder(extraBuilder):
         return SDExtrapolatorExtractor(pieces)
 
 class NormalizeSDExtrapolatorBuilder(extraBuilder):
-    def __call__(self, pieces, **_ignored) -> Any:        
-        super().__call__(pieces,**_ignored)
-        return NormalizeSDExtrapolatorExtractor(pieces)
+    def __call__(self, pieces,channels_mean,crop_num_rows=DEFAULT_NUM_ROWS_CROP, **_ignored) -> Any:        
+        super().__call__(pieces)
+        return NormalizeSDExtrapolatorExtractor(pieces,channels_mean,crop_num_rows,**_ignored)
 
 class OriginalBuilder():
     def __call__(self, pieces, **_ignored) -> Any:
@@ -146,9 +152,9 @@ class SDOriginalBuilder(OriginalBuilder):
         return SDOriginalExtractor(pieces)
 
 class NormalizeSDOriginalBuilder(OriginalBuilder):
-    def __call__(self, pieces, **_ignored) -> Any:        
-        super().__call__(pieces,**_ignored)
-        return NormalizeSDOriginalExtractor(pieces)
+    def __call__(self, pieces,crop_num_rows=DEFAULT_NUM_ROWS_CROP, **_ignored) -> Any:        
+        super().__call__(pieces)
+        return NormalizeSDOriginalExtractor(pieces,crop_num_rows,**_ignored)
 
 factory.register_builder(SDExtrapolatorExtractor.__name__,
                          SDExtrapolatorBuilder())
