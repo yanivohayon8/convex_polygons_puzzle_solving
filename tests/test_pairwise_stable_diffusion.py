@@ -2,15 +2,13 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 from src.puzzle import Puzzle
-from src.feature_extraction import image_process 
-from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
 from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.feature_extraction import extract_features
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
-from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.mating_graphs.drawer import MatchingGraphDrawer
+from src.pairwise_matchers import pairwise_pieces
 
 
 def load_puzzle(db,puzzle_num,puzzle_noise_level):
@@ -217,14 +215,15 @@ class TestFunctionPairwise(unittest.TestCase):
         extract_features(bag_of_pieces,["EdgeLengthExtractor"])
         extract_and_normalize_original_mean(bag_of_pieces)
 
-        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
-        edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
-        pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,
-                                                             "NormalizeSDExtrapolatorExtractor",
-                                                             "NormalizeSDOriginalExtractor") 
-        pictorial_matcher.pairwise()
+        geometric_matcher = "EdgeMatcher"
+        pictorial_matcher = "DotProductExtraToOriginalMatcher"
+        matchers_keys = [geometric_matcher,pictorial_matcher]
+        matchers = pairwise_pieces(bag_of_pieces,matchers_keys,
+                        feature_extrapolator="NormalizeSDExtrapolatorExtractor",
+                        feature_original="NormalizeSDOriginalExtractor",
+                        confidence_interval=puzzle.matings_max_difference+1e-3)
 
-        potential_matings = edge_length_pairwiser.get_pairwise_as_list()
+        potential_matings = matchers[geometric_matcher].get_pairwise_as_list()
         tn_matings = []
         fp_matings = []
 
@@ -234,8 +233,8 @@ class TestFunctionPairwise(unittest.TestCase):
             else:
                 fp_matings.append(mating)
 
-        tn_scores = [pictorial_matcher.get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in tn_matings]
-        fp_scores = [pictorial_matcher.get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in fp_matings]
+        tn_scores = [matchers[pictorial_matcher].get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in tn_matings]
+        fp_scores = [matchers[pictorial_matcher].get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in fp_matings]
 
         ax = plt.subplot()
         ax.scatter(fp_scores,[0]*len(fp_scores),color="red")
