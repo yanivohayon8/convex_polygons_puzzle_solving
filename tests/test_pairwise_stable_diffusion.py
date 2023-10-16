@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from src.puzzle import Puzzle
 from src.feature_extraction import image_process 
 from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.feature_extraction import extract_features
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
 from src.feature_extraction import geometric as geo_extractor 
@@ -107,35 +108,30 @@ class TestFunction_score_pair(unittest.TestCase):
 
     ''' WITH preprocessing '''
 
-    def test_score_preprocessing(self,puzzle_noise_level = 1,piece_ii = 5,edge_ii = 1,
+    def test_score_preprocessing(self,puzzle_noise_level = 0,piece_ii = 5,edge_ii = 1,
                                         piece_jj = 6,edge_jj = 0,is_plot=True):
         
         db = 1
         puzzle_num = 19
         puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
-        bag_of_pieces,_ = load_bag_of_pieces_images(puzzle)
+        bag_of_pieces = puzzle.get_bag_of_pieces()
 
-        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
+        orig_extractor_name = "NormalizeSDOriginalExtractor"
+        extra_extractor_name = "NormalizeSDExtrapolatorExtractor"
+        non_normed_origin_feature = "SDOriginalExtractor"
+        non_normed_extra_feature = "SDExtrapolatorExtractor"
 
-        original_extractor = SDOriginalExtractor(bag_of_pieces)
-        original_extractor.run()
-        orig_extractor_name = original_extractor.__class__.__name__
-        recipe_original = image_process.RecipeFlipCropSubMean()
-        original_images = [piece.features[orig_extractor_name][edge] for piece in bag_of_pieces for edge in range(piece.get_num_coords())]
-        original_channels_mean = recipe_original.compute_channels_mean(original_images)
-        original_img_ii = recipe_original.process(chosen_pieces[0].features[orig_extractor_name][edge_ii],
-                                                  original_channels_mean)
-        original_img_jj = recipe_original.process(chosen_pieces[1].features[orig_extractor_name][edge_jj],
-                                                  original_channels_mean)
-
-        extrapolation_extractor = SDExtrapolatorExtractor(bag_of_pieces)
-        extrapolation_extractor.run()
-        extra_extractor_name = extrapolation_extractor.__class__.__name__
-        recipe_extra = image_process.RecipeFlipCropSubMean(axes_flipped=())
-        extra_img_ii = recipe_extra.process(chosen_pieces[0].features[extra_extractor_name][edge_ii],
-                                            original_channels_mean)
-        extra_img_jj = recipe_extra.process(chosen_pieces[1].features[extra_extractor_name][edge_jj],
-                                            original_channels_mean)
+        extract_features(bag_of_pieces,[non_normed_origin_feature,non_normed_extra_feature])
+        extract_and_normalize_original_mean(bag_of_pieces)
+        
+        original_img_ii = bag_of_pieces[piece_ii].features[orig_extractor_name][edge_ii]
+        original_img_jj = bag_of_pieces[piece_jj].features[orig_extractor_name][edge_jj]
+        extra_img_ii = bag_of_pieces[piece_ii].features[extra_extractor_name][edge_ii]
+        extra_img_jj = bag_of_pieces[piece_jj].features[extra_extractor_name][edge_jj]
+        non_normed_original_img_ii = bag_of_pieces[piece_ii].features[non_normed_origin_feature][edge_ii]
+        non_normed_original_img_jj = bag_of_pieces[piece_jj].features[non_normed_origin_feature][edge_jj]
+        non_normed_extra_img_ii = bag_of_pieces[piece_ii].features[non_normed_extra_feature][edge_ii]
+        non_normed_extra_img_jj = bag_of_pieces[piece_jj].features[non_normed_extra_feature][edge_jj]
 
         pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,extra_extractor_name,orig_extractor_name) 
         score_left = pictorial_matcher._score_pair(extra_img_ii,original_img_jj)
@@ -146,13 +142,13 @@ class TestFunction_score_pair(unittest.TestCase):
             fig.suptitle(f"Left col score: {score_left}; Right col score: {score_right}\nThe images plotted before the processing")
             
             axs[0,0].set_title(f"P_{piece_jj}_E_{edge_jj} Original")
-            axs[0,0].imshow(chosen_pieces[1].features[orig_extractor_name][edge_jj].astype(np.int))
+            axs[0,0].imshow(non_normed_original_img_jj.astype(np.int))
             axs[1,0].set_title(f"P_{piece_ii}_E_{edge_ii} Extrapolated")
-            axs[1,0].imshow(chosen_pieces[0].features[extra_extractor_name][edge_ii].astype(np.int)) 
+            axs[1,0].imshow(non_normed_extra_img_ii.astype(np.int)) 
             axs[0,1].set_title(f"P_{piece_ii}_E_{edge_ii} Original")
-            axs[0,1].imshow(chosen_pieces[0].features[orig_extractor_name][edge_ii].astype(np.int))
+            axs[0,1].imshow(non_normed_original_img_ii.astype(np.int))
             axs[1,1].set_title(f"P_{piece_jj}_E_{edge_jj} Extrapolated")
-            axs[1,1].imshow(chosen_pieces[1].features[extra_extractor_name][edge_jj].astype(np.int)) 
+            axs[1,1].imshow(non_normed_extra_img_jj.astype(np.int)) 
 
             plt.show()
 
