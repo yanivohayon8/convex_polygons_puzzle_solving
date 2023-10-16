@@ -15,7 +15,7 @@ class Extractor():
 
 factory = Factory()
 
-def extract_features(pieces,features,**kwargs):
+def extract_features(bag_of_pieces:list,features:list,**kwargs):
     for feature in features:
-        extractor = factory.create(feature,pieces=pieces,**kwargs)
+        extractor = factory.create(feature,pieces=bag_of_pieces,**kwargs)
         extractor.run()

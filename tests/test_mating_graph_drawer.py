@@ -1,42 +1,38 @@
 import unittest
 from src.puzzle import Puzzle
 from src.mating_graphs.matching_graph import MatchingGraphWrapper
-from src.feature_extraction import geometric as geo_extractor 
-from src.pairwise_matchers import geometric as geo_pairwiser
 from src.mating_graphs.drawer import MatchingGraphDrawer
 import matplotlib.pyplot as plt
-import numpy as np
-from src.piece import Piece
-from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
-from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,ConvolutionV1MatcherToDELETE
-from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
-from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
-
-from src.feature_extraction.extrapolator.stable_diffusion import NormalizeSDExtrapolatorExtractor,NormalizeSDOriginalExtractor
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
+from src.pairwise_matchers.geometric import EdgeMatcher
+from src.feature_extraction import extract_features
+# from src.feature_extraction.extrapolator.stable_diffusion import NormalizeSDExtrapolatorExtractor,NormalizeSDOriginalExtractor
+# from src.feature_extraction import geometric as geo_extractor 
+# from src.pairwise_matchers import geometric as geo_pairwiser
 
 class TestGraphDrawer(unittest.TestCase):
 
     def _load_graph(self,db,puzzle_num,puzzle_noise_level,
-                    img_type="stable_diffusion",
-                    geo_feature_extractors=["angle","length"],
-                    pictorial_feature_extractor=["EdgePictorialExtractor"],
+                    features,
                     pictorial_matcher="DotProductNoisslessMatcher"):
         
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
-        puzzle.load_images()
+        extract_features(bag_of_pieces,features)
 
-        if "length" in  geo_feature_extractors:
-            edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
-            edge_length_extractor.run()
 
-        if "angle" in geo_feature_extractors:
-            angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
-            angles_extractor.run()
 
-        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
+
+        # if "length" in  geo_feature_extractors:
+        #     edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
+        #     edge_length_extractor.run()
+
+        # if "angle" in geo_feature_extractors:
+        #     angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
+        #     angles_extractor.run()
+
+        edge_length_pairwiser = EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
 
         # pic_extractor = EdgePictorialExtractor(bag_of_pieces,sampling_height=10)
@@ -47,27 +43,26 @@ class TestGraphDrawer(unittest.TestCase):
         # self.pictorial_matcher_.pairwise()
 
 
-        sampling_height = 4
-        extrapolator_extractor = NormalizeSDExtrapolatorExtractor(bag_of_pieces,extrapolation_height=sampling_height)
-        extrapolator_extractor.run()
+        # sampling_height = 4
+        # extrapolator_extractor = NormalizeSDExtrapolatorExtractor(bag_of_pieces,extrapolation_height=sampling_height)
+        # extrapolator_extractor.run()
 
-        original_extractor = NormalizeSDOriginalExtractor(bag_of_pieces,sampling_height=sampling_height)
-        original_extractor.run()
+        # original_extractor = NormalizeSDOriginalExtractor(bag_of_pieces,sampling_height=sampling_height)
+        # original_extractor.run()
 
-        self.pictorial_matcher_ = DotProductExtraToOriginalMatcher(bag_of_pieces,
-                                                                   extrapolator_extractor.__class__.__name__,
-                                                                   original_extractor.__class__.__name__,
-                                                                   step_size=50)
-        self.pictorial_matcher_.pairwise()
+        # self.pictorial_matcher_ = DotProductExtraToOriginalMatcher(bag_of_pieces,
+        #                                                            extrapolator_extractor.__class__.__name__,
+        #                                                            original_extractor.__class__.__name__,
+        #                                                            step_size=50)
+        # self.pictorial_matcher_.pairwise()
 
-        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
-                                                edge_length_pairwiser.match_edges,
-                                                edge_length_pairwiser.match_pieces_score,
-                                                pictorial_matcher=self.pictorial_matcher_)
-        wrapper.build_graph()
-        # wrapper.find_matching()
+        # wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
+        #                                         edge_length_pairwiser.match_edges,
+        #                                         edge_length_pairwiser.match_pieces_score,
+        #                                         pictorial_matcher=self.pictorial_matcher_)
+        # wrapper.build_graph()
 
-        return wrapper
+        # return wrapper
 
     def _draw_adjacency(self,wrapper:MatchingGraphWrapper,ground_truth_wrapper:MatchingGraphWrapper,ax1,ax2):
         drawer = MatchingGraphDrawer(ground_truth_wrapper)
@@ -92,9 +87,11 @@ class TestGraphDrawer(unittest.TestCase):
     def test_draw_pictorial_matches(self):
         db = "1" 
         puzzle_num = 19 #13 #20
+        features = ["AngleLengthExtractor","EdgeLengthExtractor",
+                    "NormalizeSDExtrapolatorExtractor","NormalizeSDOriginalExtractor"]
 
-        ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
-        wrapper = self._load_graph(db,puzzle_num,0)
+        ground_truth_wrapper = self._load_graph(db,puzzle_num,0,features)
+        wrapper = self._load_graph(db,puzzle_num,0,features)
 
         self._draw_matching(wrapper,ground_truth_wrapper)
         # fig, axs = plt.subplots(1,2)
