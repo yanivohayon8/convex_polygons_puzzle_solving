@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 from src.pairwise_matchers.pictorial import PictorialMatcher
 from src.pairwise_matchers import factory
 
+DEFAULT_STEP_SIZE=50
+
 class DotProductExtraToOriginalMatcher(PictorialMatcher):
 
     def __init__(self, pieces, 
                  feature_extrapolator:str,feature_original:str,
-                 step_size=50) -> None:
+                 step_size=DEFAULT_STEP_SIZE) -> None:
         super().__init__(pieces, "")
         self.feature_extrapolator = feature_extrapolator
         self.feature_original = feature_original
@@ -91,7 +93,7 @@ class DotProductExtraToOriginalBuilder():
 
     def __call__(self,pieces, 
                  feature_extrapolator:str,feature_original:str,
-                 step_size, **ignored) -> Any:
+                 step_size=DEFAULT_STEP_SIZE, **ignored) -> Any:
         return DotProductExtraToOriginalMatcher(pieces,
                                                 feature_extrapolator,
                                                 feature_original,
