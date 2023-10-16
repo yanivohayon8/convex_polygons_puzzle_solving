@@ -1,7 +1,7 @@
 import unittest
 from src.puzzle import Puzzle
 from src.feature_extraction import extract_features,factory
-
+from src.pairwise_matchers import factory as pairwisers_factory
 
 class TestFeatureFactory(unittest.TestCase):
 
@@ -24,6 +24,9 @@ class TestFeatureFactory(unittest.TestCase):
         assert "angles" in features
 
 
+class TestPairwiseMatchersFactory(unittest.TestCase):
+    def test_print_builders(self):
+        print(pairwisers_factory._builders.keys())
 
 if __name__ == "__main__":
     unittest.main()

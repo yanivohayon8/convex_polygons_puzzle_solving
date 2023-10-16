@@ -1,10 +1,14 @@
+from typing import Any
 import numpy as np
 import matplotlib.pyplot as plt
 from src.pairwise_matchers.pictorial import PictorialMatcher
+from src.pairwise_matchers import factory
 
 class DotProductExtraToOriginalMatcher(PictorialMatcher):
 
-    def __init__(self, pieces, feature_extrapolator:str,feature_original:str,step_size=50) -> None:
+    def __init__(self, pieces, 
+                 feature_extrapolator:str,feature_original:str,
+                 step_size=50) -> None:
         super().__init__(pieces, "")
         self.feature_extrapolator = feature_extrapolator
         self.feature_original = feature_original
@@ -80,3 +84,18 @@ class DotProductExtraToOriginalMatcher(PictorialMatcher):
         score1 = super().get_score(piece1, edge1, piece2, edge2)
         score2 = super().get_score(piece2,edge2, piece1,edge1)
         return (score1 + score2)/2
+    
+
+
+class DotProductExtraToOriginalBuilder():
+
+    def __call__(self,pieces, 
+                 feature_extrapolator:str,feature_original:str,
+                 step_size, **ignored) -> Any:
+        return DotProductExtraToOriginalMatcher(pieces,
+                                                feature_extrapolator,
+                                                feature_original,
+                                                step_size=step_size)
+
+factory.register_builder(DotProductExtraToOriginalMatcher.__name__,
+                         DotProductExtraToOriginalBuilder())
