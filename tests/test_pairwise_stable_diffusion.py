@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from src.puzzle import Puzzle
 from src.feature_extraction import image_process 
 from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
+from src.feature_extraction import extract_features
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
@@ -24,14 +25,6 @@ def load_bag_of_pieces_images(puzzle:Puzzle):
 
 class TestFunction_score_pair(unittest.TestCase):
 
-    def _load_chosen_pieces_pair(self,piece_ii,piece_jj,db = 1,puzzle_num = 19,puzzle_noise_level = 1):
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-        puzzle.load_images()
-        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
-    
-        return chosen_pieces
     
     ''' WITHOUT preprocessing '''
 
@@ -39,26 +32,24 @@ class TestFunction_score_pair(unittest.TestCase):
                                      piece_jj = 3,edge_jj = 1,is_plot=True):
         db = 1
         puzzle_num = 19
-        
-        chosen_pieces = self._load_chosen_pieces_pair(piece_ii,piece_jj,
-                                                 db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)    
+        puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+        extra_feature = "SDExtrapolatorExtractor"
+        original_feature = "SDOriginalExtractor"
 
-        extrapolation_extractor = SDExtrapolatorExtractor(chosen_pieces)
-        extrapolator_extractor_name = extrapolation_extractor.__class__.__name__
-        extrapolation_extractor.run()
+        features = [original_feature,extra_feature]
+        extract_features(bag_of_pieces,features)
 
-        original_extractor = SDOriginalExtractor(chosen_pieces)
-        original_extractor_name = original_extractor.__class__.__name__
-        original_extractor.run()
+        chosen_pieces = [bag_of_pieces[piece_ii],bag_of_pieces[piece_jj]]
 
-        pictorial_matcher = DotProductExtraToOriginalMatcher(chosen_pieces,
-                                                             extrapolator_extractor_name,
-                                                             original_extractor_name)
+        pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,
+                                                             extra_feature,
+                                                             original_feature)
 
-        edge_ii_extra_img = chosen_pieces[0].features[extrapolator_extractor_name][edge_ii]
-        edge_ii_original_img = chosen_pieces[0].features[original_extractor_name][edge_ii]
-        edge_jj_extra_img = chosen_pieces[1].features[extrapolator_extractor_name][edge_jj]
-        edge_jj_original_img = chosen_pieces[1].features[original_extractor_name][edge_jj]
+        edge_ii_extra_img = chosen_pieces[0].features[extra_feature][edge_ii]
+        edge_ii_original_img = chosen_pieces[0].features[original_feature][edge_ii]
+        edge_jj_extra_img = chosen_pieces[1].features[extra_feature][edge_jj]
+        edge_jj_original_img = chosen_pieces[1].features[original_feature][edge_jj]
 
         ''' Becaues of the background based cropping the feature extraction the images height might not be unified'''
 
@@ -97,10 +88,10 @@ class TestFunction_score_pair(unittest.TestCase):
 
     def test_score_no_preprocessing_expected_high(self,puzzle_noise_level = 0):
         min_excpected_score = 0.5
-        score = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0)
-        assert score > min_excpected_score
-        score = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,piece_ii = 5,edge_ii = 2,piece_jj = 3,edge_jj = 1)
-        assert score > min_excpected_score
+        score_left,score_right = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,piece_ii = 5,edge_ii = 1, piece_jj = 6,edge_jj = 0)
+        assert (score_left+score_right)/2 > min_excpected_score
+        score_left,score_right = self.test_score_no_preprocessing(puzzle_noise_level=puzzle_noise_level,piece_ii = 5,edge_ii = 2,piece_jj = 3,edge_jj = 1)
+        assert (score_left+score_right)/2 > min_excpected_score
 
     def test_score_no_preprocessing_expected_low(self,puzzle_noise_level=0,
                                                  max_excpected_score = 0.25):
