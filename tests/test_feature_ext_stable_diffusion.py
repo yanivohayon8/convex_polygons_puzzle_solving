@@ -1,5 +1,5 @@
 import unittest
-from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor,NormalizeSDOriginalExtractor#,NormalizeSDExtrapolatorExtractor
+from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor,NormalizeSDOriginalExtractor,NormalizeSDExtrapolatorExtractor
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 import numpy as np
 from src.puzzle import Puzzle
@@ -206,6 +206,50 @@ class TestNormalizeSDOriginalExtractor(unittest.TestCase):
     
     def test_P_0_E_1(self):
         self._plot_before_after_preprocessing(piece_index=0,edge_index=1)
+
+
+class TestNormalizeSDExtrapolatorExtractor(unittest.TestCase):
+
+    def _plot_before_after_preprocessing(self,piece_index = 5,edge_index = 2):
+        db = 1 # DONT'T CHANGE THIS (computed hardcoded channels mean)
+        puzzle_num = 19 # DONT'T CHANGE THIS
+        puzzle_noise_level = 0 # DONT'T CHANGE THIS
+
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        for piece in bag_of_pieces:
+            piece.load_extrapolated_image()
+
+        chosen_piece = bag_of_pieces[piece_index]
+        channels_means = np.array([[154.42034955, 145.18238508, 138.50948254]],dtype=np.double)
+        preprocessing_feature = NormalizeSDExtrapolatorExtractor(bag_of_pieces,channels_mean=channels_means)
+        preprocessing_feature.run()
+        feature_name = preprocessing_feature.__class__.__name__
+        preprocess_image = chosen_piece.features[feature_name][edge_index]
+
+        non_preprocessing_feature = SDExtrapolatorExtractor(bag_of_pieces)
+        non_preprocessing_feature.run()
+        non_preprocess_image = chosen_piece.features[non_preprocessing_feature.__class__.__name__][edge_index]
+
+        fig,axs = plt.subplots(1,3)
+        axs[0].set_title("extrapolated_img")
+        axs[0].imshow(chosen_piece.extrapolated_img)
+        axs[1].set_title(f"P_{piece_index}_E_{edge_index} (NON preprocessed)")
+        axs[1].imshow(non_preprocess_image)
+        axs[2].set_title(f"P_{piece_index}_E_{edge_index} (preprocessed)")
+        axs[2].imshow(preprocess_image)
+
+        plt.show()
+
+    def test_P_2_E_2(self):
+        self._plot_before_after_preprocessing(piece_index=2,edge_index=2)
+    
+    def test_P_0_E_1(self):
+        self._plot_before_after_preprocessing(piece_index=0,edge_index=1)
+
+
 
 
 class TestPocStableDiffusion(unittest.TestCase):

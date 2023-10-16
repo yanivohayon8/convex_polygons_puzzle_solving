@@ -71,6 +71,7 @@ class NormalizeSDOriginalExtractor(SDOriginalExtractor):
         super().__init__(pieces)
         self.axes_flipped = (0,1)
         self.crop_num_rows = crop_num_rows
+        self.channels_mean = None
 
     def run(self):
         super().run()
@@ -85,36 +86,33 @@ class NormalizeSDOriginalExtractor(SDOriginalExtractor):
                                                                      num_rows=self.crop_num_rows)
                 images_as_list.append(piece.features[name][edge])
 
-        channels_mean = image_process.compute_non_zero_pixels_channels_mean(images_as_list)
+        self.channels_mean = image_process.compute_non_zero_pixels_channels_mean(images_as_list)
 
         for piece in self.pieces:
             for edge in range(piece.get_num_coords()):
                 as_double = piece.features[name][edge].astype(np.double)
-                piece.features[name][edge] = as_double -  channels_mean
+                piece.features[name][edge] = as_double -  self.channels_mean
 
 
-# class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
+class NormalizeSDExtrapolatorExtractor(SDExtrapolatorExtractor):
 
-#     def run(self):
-#         super().run()
-#         channels_sum = np.zeros((3,1))
-#         pixels_count = 0
+    def __init__(self, pieces,channels_mean=None,crop_num_rows=5):
+        super().__init__(pieces)
+        self.channels_mean=channels_mean
+        self.crop_num_rows = crop_num_rows
 
-#         # Do we have a RISK for numerical instability here?
+    def run(self):
+        super().run()
 
-#         for piece in self.pieces:
-#             for edge  in range(piece.get_num_coords()):
-#                 img = piece.features[self.__class__.__name__][edge]
-#                 channels_sum += np.sum(img,axis=(0,1)).reshape(3,1) 
-#                 pixels_count+= img.shape[0]*img.shape[1]
+        name = self.__class__.__name__
 
-#         # channels_mean = (channels_sum/pixels_count).astype(np.int).T
-#         channels_mean = (channels_sum/pixels_count).astype(np.double).T
-        
-#         for piece in self.pieces:
-#             for edge  in range(piece.get_num_coords()):
-#                 img_correct_type = piece.features[self.__class__.__name__][edge].astype(np.double)
-#                 piece.features[self.__class__.__name__][edge] = img_correct_type - channels_mean
+        for piece in self.pieces:
+            for edge in range(piece.get_num_coords()):
+                piece.features[name][edge] = image_process.crop_rows(piece.features[name][edge],
+                                                                     num_rows=self.crop_num_rows)
+
+                as_double = piece.features[name][edge].astype(np.double)
+                piece.features[name][edge] = as_double -  self.channels_mean
 
 
 '''
@@ -132,10 +130,10 @@ class SDExtrapolatorBuilder(extraBuilder):
         super().__call__(pieces,**_ignored)
         return SDExtrapolatorExtractor(pieces)
 
-# class NormalizeSDExtrapolatorBuilder(extraBuilder):
-#     def __call__(self, pieces, **_ignored) -> Any:        
-#         super().__call__(pieces,**_ignored)
-#         return NormalizeSDExtrapolatorExtractor(pieces)
+class NormalizeSDExtrapolatorBuilder(extraBuilder):
+    def __call__(self, pieces, **_ignored) -> Any:        
+        super().__call__(pieces,**_ignored)
+        return NormalizeSDExtrapolatorExtractor(pieces)
 
 class OriginalBuilder():
     def __call__(self, pieces, **_ignored) -> Any:
@@ -154,8 +152,8 @@ class NormalizeSDOriginalBuilder(OriginalBuilder):
 
 factory.register_builder(SDExtrapolatorExtractor.__name__,
                          SDExtrapolatorBuilder())
-# factory.register_builder(NormalizeSDExtrapolatorExtractor.__name__,
-#                          NormalizeSDExtrapolatorBuilder())
+factory.register_builder(NormalizeSDExtrapolatorExtractor.__name__,
+                         NormalizeSDExtrapolatorBuilder())
 factory.register_builder(SDOriginalExtractor.__name__,
                          SDOriginalBuilder())
 factory.register_builder(NormalizeSDOriginalExtractor.__name__,
