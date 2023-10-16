@@ -7,7 +7,6 @@ from src.pairwise_matchers.geometric import EdgeMatcher
 from src.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
 from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
-from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor,NormalizeSDOriginalExtractor,NormalizeSDExtrapolatorExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
 from src.puzzle import Puzzle
