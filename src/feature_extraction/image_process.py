@@ -34,23 +34,3 @@ def compute_naive_channels_mean(images):
 
     return (channels_sum/pixels_count).astype(np.double).T
 
-class RecipeFlipCropSubMean():
-
-    def __init__(self,axes_flipped=(0,1),crop_num_rows=5) -> None:
-        self.axes_flipped = axes_flipped
-        self.crop_num_rows = crop_num_rows
-
-    def compute_channels_mean(self,images:list):
-        processed_images = []
-        for img in images:
-            img_tmp = filp_image(img,axes=self.axes_flipped)
-            img_tmp = crop_rows(img_tmp,num_rows=self.crop_num_rows)
-            processed_images.append(img_tmp)
-
-        return compute_non_zero_pixels_channels_mean(processed_images)
-
-    def process(self,img:np.array,channels_mean:np.array):
-        img = filp_image(img,axes=self.axes_flipped)
-        img = crop_rows(img,num_rows=self.crop_num_rows)
-        return img - channels_mean 
-    

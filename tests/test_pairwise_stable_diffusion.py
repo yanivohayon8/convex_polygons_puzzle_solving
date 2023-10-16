@@ -18,12 +18,6 @@ def load_puzzle(db,puzzle_num,puzzle_noise_level):
     puzzle.load()
     return puzzle
 
-def load_bag_of_pieces_images(puzzle:Puzzle):
-    bag_of_pieces = puzzle.get_bag_of_pieces()
-    puzzle.load_images()
-    
-    return bag_of_pieces,puzzle.id2piece
-
 class TestFunction_score_pair(unittest.TestCase):
 
     
@@ -215,41 +209,20 @@ class TestFunction_score_pair(unittest.TestCase):
 
 class TestFunctionPairwise(unittest.TestCase):
     
-    def _pictorial_extract_v1(self,bag_of_pieces):
-        original_extractor = SDOriginalExtractor(bag_of_pieces)
-        original_extractor.run()
-        orig_extractor_name = original_extractor.__class__.__name__
-        recipe_original = image_process.RecipeFlipCropSubMean()
-        original_images = [piece.features[orig_extractor_name][edge] for piece in bag_of_pieces for edge in range(piece.get_num_coords())]
-        original_channels_mean = recipe_original.compute_channels_mean(original_images)
-
-        for piece in bag_of_pieces:
-            for edge in range(piece.get_num_coords()):
-                piece.features[orig_extractor_name][edge] = \
-                    recipe_original.process(piece.features[orig_extractor_name][edge],original_channels_mean)
-
-        extrapolation_extractor = SDExtrapolatorExtractor(bag_of_pieces)
-        extrapolation_extractor.run()
-        extra_extractor_name = extrapolation_extractor.__class__.__name__
-        recipe_extra = image_process.RecipeFlipCropSubMean(axes_flipped=())
-
-        for piece in bag_of_pieces:
-            for edge in range(piece.get_num_coords()):
-                piece.features[extra_extractor_name][edge] = \
-                    recipe_extra.process(piece.features[extra_extractor_name][edge],original_channels_mean)
-
-        return bag_of_pieces
-
         
     def test_comp_distribution(self,db=1,puzzle_num=19,puzzle_noise_level=1):
         puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
-        bag_of_pieces,id2piece = load_bag_of_pieces_images(puzzle)
+        bag_of_pieces = puzzle.get_bag_of_pieces()
         
-        edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
-        edge_length_extractor.run()
+        extract_features(bag_of_pieces,["EdgeLengthExtractor"])
+        extract_and_normalize_original_mean(bag_of_pieces)
 
         edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
+        pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,
+                                                             "NormalizeSDExtrapolatorExtractor",
+                                                             "NormalizeSDOriginalExtractor") 
+        pictorial_matcher.pairwise()
 
         potential_matings = edge_length_pairwiser.get_pairwise_as_list()
         tn_matings = []
@@ -260,10 +233,6 @@ class TestFunctionPairwise(unittest.TestCase):
                 tn_matings.append(mating)
             else:
                 fp_matings.append(mating)
-
-        bag_of_pieces = self._pictorial_extract_v1(bag_of_pieces)        
-        pictorial_matcher = DotProductExtraToOriginalMatcher(bag_of_pieces,"SDExtrapolatorExtractor","SDOriginalExtractor") 
-        pictorial_matcher.pairwise()
 
         tn_scores = [pictorial_matcher.get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in tn_matings]
         fp_scores = [pictorial_matcher.get_score(mating.piece_1,mating.edge_1,mating.piece_2,mating.edge_2) for mating in fp_matings]
@@ -301,14 +270,6 @@ class TestFunctionPairwise(unittest.TestCase):
     #     drawer.draw_graph_filtered_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
 
     #     plt.show()
-
-
-   
-        
-
-    
-
-
 
 
 
