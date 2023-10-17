@@ -4,6 +4,7 @@ from src.feature_extraction import extract_features
 from src.pairwise_matchers import pairwise_pieces
 from src.recipes import Recipe,factory as recipes_factory
 from src.feature_extraction import factory as features_factory
+from src.mating_graphs import factory as graphs_factory
 
 DEFAULT_NUM_ROWS_CROP = 5
 
@@ -15,6 +16,7 @@ class GeometricPairwise(Recipe):
         self.geo_features = ["EdgeLengthExtractor"] + add_geo_features
         self.matchers_keys = ["EdgeMatcher"]
         self.matchers = {}
+        self.graph_wrapper = None
 
     def cook(self, **kwargs):
         bag_of_pieces = self.puzzle.bag_of_pieces
@@ -22,7 +24,11 @@ class GeometricPairwise(Recipe):
         self.matchers = pairwise_pieces(bag_of_pieces,self.matchers_keys,
                                    confidence_interval=self.puzzle.matings_max_difference+1e-3,**kwargs)
 
-        return self.matchers
+        self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
+                                                   pieces=self.puzzle.bag_of_pieces,id2piece=self.puzzle.id2piece,
+                                                   geometric_match_edges=self.matchers["EdgeMatcher"].match_edges)
+
+        return self.graph_wrapper
 
 class GeometricPairwiseBuilder():
 

@@ -12,8 +12,9 @@ class TestGeometricPairwise(unittest.TestCase):
         puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
                                                 db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level)
         puzzle_recipe.cook()
-        matchers = pairwise_recipes.GeometricPairwise(puzzle_recipe.puzzle).cook()
-        matings =  matchers["EdgeMatcher"].get_pairwise_as_list()
+        recipe = pairwise_recipes.GeometricPairwise(puzzle_recipe.puzzle)
+        recipe.cook()
+        matings = recipe.matchers["EdgeMatcher"].get_pairwise_as_list()
 
         assert len(matings) == 14
 
@@ -24,8 +25,9 @@ class TestGeometricPairwise(unittest.TestCase):
         puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
                                                 db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level)
         puzzle_recipe.cook()
-        matchers = recipes_factory.create("GeometricPairwise",puzzle=puzzle_recipe.puzzle).cook()
-        matings =  matchers["EdgeMatcher"].get_pairwise_as_list()
+        recipe = recipes_factory.create("GeometricPairwise",puzzle=puzzle_recipe.puzzle)
+        recipe.cook()
+        matings = recipe.matchers["EdgeMatcher"].get_pairwise_as_list()
 
         assert len(matings) == 14
 
