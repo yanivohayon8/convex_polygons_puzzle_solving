@@ -189,32 +189,10 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         print("All compiled")
 
-    def _bulid_wrapper_deprecated(self,db,puzzle_num,puzzle_noise_level):
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
-        id2piece = {}
-
-        for piece in bag_of_pieces:
-            id2piece[piece.id] = piece
-
-        edge_length_extractor = geo_extractor.EdgeLengthExtractor(bag_of_pieces)
-        edge_length_extractor.run()
-
-        angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
-        angles_extractor.run()
-
-        edge_length_pairwiser = geo_pairwiser.EdgeMatcher(bag_of_pieces)
-        edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
-        
-        wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
-                                                edge_length_pairwiser.match_edges)
-        wrapper._build_matching_graph()
-        wrapper._bulid_only_pieces_graph()
-        wrapper._build_adjacency_graph()
-        # matching = mating_graph.find_matching()
-
-        return wrapper
+    def _bulid_graph_wrapper(self,db,puzzle_num,puzzle_noise_level):       
+        gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0,add_geo_features=["AngleLengthExtractor"])
+        return gd_puzzle_recipe.cook()
 
     def _compute_cycles(self,wrapper:MatchingGraphWrapper):
         raw_cycles = wrapper.compute_cycles(max_length=10)
@@ -224,7 +202,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper_deprecated(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(image,puzzle_num,puzzle_noise_level)
         # self._compute_cycles(wrapper)
 
         cycles = []
@@ -236,7 +214,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         db = "1"
         puzzle_num = 19
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
         # self._compute_cycles(wrapper)
 
         cycles = []
@@ -285,7 +263,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         puzzle_num = 2
         puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
@@ -299,7 +277,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         puzzle_num = 2
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
@@ -311,12 +289,12 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         db="1"
         puzzle_num = 19
         puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
         graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops()
         assert len(graph_cycles_noise_0) == 5
 
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
         graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
         graph_cycles_noise_1_sets = [set(cycle) for cycle in graph_cycles_noise_1]
 
