@@ -4,6 +4,8 @@ from src.piece import Piece
 from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.recipes.puzzle import loadRegularPuzzle
+from src.recipes import factory as recipes_factory
+
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
 
@@ -168,8 +170,10 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         puzzle_num = 19
         puzzle_noise_level = 0
 
-        puzzle_recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level)
+        puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level)
         bag_of_pieces = puzzle_recipe.cook()
+
 
         extract_features(bag_of_pieces,["EdgeLengthExtractor"])
         matchers = pairwise_pieces(bag_of_pieces,["EdgeMatcher"],

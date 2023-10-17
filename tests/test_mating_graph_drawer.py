@@ -1,5 +1,6 @@
 import unittest
 from src.recipes.puzzle import loadRegularPuzzle
+from src.recipes import factory as recipes_factory
 from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.mating_graphs.drawer import MatchingGraphDrawer
 import matplotlib.pyplot as plt
@@ -16,7 +17,8 @@ class TestGraphDrawer(unittest.TestCase):
                     features,
                     pictorial_matcher="DotProductNoisslessMatcher"):
         
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
         extract_features(bag_of_pieces,features)
 
 

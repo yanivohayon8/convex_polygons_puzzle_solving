@@ -7,6 +7,7 @@ from src.recipes.puzzle import loadRegularPuzzle
 import matplotlib.pyplot as plt
 import cv2
 from src.feature_extraction import factory
+from src.recipes import factory as recipes_factory
 
 
 db_1_num_19_noise_0_channels_means = np.array([[154.42034955, 145.18238508, 138.50948254]],dtype=np.double)
@@ -18,7 +19,9 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 2
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         piece = bag_of_pieces[piece_index]
         coords = piece.raw_coordinates
@@ -36,7 +39,8 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
 
         piece = bag_of_pieces[piece_index]
@@ -59,7 +63,8 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
 
         piece = bag_of_pieces[piece_index]
@@ -119,7 +124,8 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         piece = bag_of_pieces[piece_index]
         coords = piece.raw_coordinates
@@ -161,7 +167,8 @@ class TestSDExtrapolatorExtractor(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_extrapolated_image()
@@ -203,7 +210,8 @@ class TestSDOriginalExtractor(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_stable_diffusion_original_image()
@@ -230,7 +238,8 @@ class TestSDOriginalExtractor(unittest.TestCase):
         self._test_edge_original(piece_index=2,edge_index=0)
     
     def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=0,out_folder="data/poc_10_pictorial_compatibility"):
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         for piece in bag_of_pieces:
             piece.load_extrapolated_image()
@@ -272,7 +281,8 @@ class TestNormalizeSDExtrapolatorExtractor(unittest.TestCase):
         puzzle_num = 19 # DONT'T CHANGE THIS
         puzzle_noise_level = 0 # DONT'T CHANGE THIS
 
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         for piece in bag_of_pieces:
             piece.load_extrapolated_image()
@@ -310,7 +320,8 @@ class TestNormalizeSDOriginalExtractor(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         for piece in bag_of_pieces:
             piece.load_stable_diffusion_original_image()
@@ -349,7 +360,8 @@ class TestLoadFromFactory(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
 
         extractor = factory.create(feature,pieces=bag_of_pieces,**kwargs)
         extractor.run()
@@ -384,7 +396,8 @@ class TestLoadFromFactory(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+        bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
         extract_and_normalize_original_mean(bag_of_pieces)
         
         origin_image = bag_of_pieces[piece_index].features["NormalizeSDOriginalExtractor"][edge_index]

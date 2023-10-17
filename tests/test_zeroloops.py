@@ -1,6 +1,7 @@
 import unittest
 from src.solvers.apictorial import FirstSolver
 from src.recipes.puzzle import loadRegularPuzzle
+from src.recipes import factory as recipes_factory
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.feature_extraction import geometric as geo_extractor 
@@ -41,7 +42,9 @@ class TestAngleSum(unittest.TestCase):
 
         for puzzle_noise_level in range(4):
             print(f"Running on noise {puzzle_noise_level}")
-            bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+            bag_of_pieces = recipes_factory.create("loadRegularPuzzle",
+                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level).cook()
+
             
             angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
             angles_extractor.run()
