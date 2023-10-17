@@ -2,7 +2,6 @@ import unittest
 from src.recipes.puzzle import loadRegularPuzzle
 from src.recipes import factory as recipes_factory
 from src.recipes import pairwise as pairwise_recipes
-import numpy as np
 
 class TestGeometricPairwise(unittest.TestCase):
 
