@@ -1,5 +1,7 @@
 import unittest
 from src.recipes.puzzle import loadRegularPuzzle
+from src.recipes import factory as recipes_factory
+
 from src.feature_extraction import extract_features,factory
 from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.pairwise_matchers import factory as pairwisers_factory
@@ -50,6 +52,10 @@ class TestPairwiseMatchersFactory(unittest.TestCase):
 class TestMatchingGraphWrapperFactory(unittest.TestCase):
     def test_print_builders(self):
         print(graph_factory._builders.keys())
+
+class TestRecipesFactory(unittest.TestCase):
+    def test_print_builders(self):
+        print(recipes_factory._builders.keys())
 
 
 if __name__ == "__main__":
