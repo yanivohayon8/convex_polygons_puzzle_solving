@@ -1,4 +1,4 @@
-from src.recipes import Recipe
+from src.recipes import Recipe,factory
 from src.puzzle import Puzzle
 
 class loadRegularPuzzle(Recipe):
@@ -16,5 +16,7 @@ class loadRegularPuzzle(Recipe):
         return self.puzzle.get_bag_of_pieces()
 
 
+factory.register_builder(loadRegularPuzzle.__name__,
+                         lambda db,puzzle_num,noise_level:loadRegularPuzzle(db,puzzle_num,noise_level))
 
 # TODO: a recipe for puzzles with missing pieces?
