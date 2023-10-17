@@ -10,12 +10,11 @@ from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
 class MatchingGraphWrapper():
 
     def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
-                 geometric_match_pieces_score=None,pictorial_matcher:NaiveExtrapolatorMatcher=None,
+                 pictorial_matcher:NaiveExtrapolatorMatcher=None,
                  compatibility_threshold=0.1) -> None:
         self.pieces = pieces
         self.id2piece = id2piece
         self.geometric_match_edges = geometric_match_edges
-        self.geometric_match_pieces_score = geometric_match_pieces_score # deprecated
         self.pictorial_matcher = pictorial_matcher
         self.potential_matings_graph = None#nx.Graph()
         self.filtered_potential_matings_graph = None
