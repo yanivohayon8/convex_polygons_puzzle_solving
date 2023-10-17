@@ -3,7 +3,7 @@ from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorE
 from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 import numpy as np
-from src.puzzle import Puzzle
+from src.recipes.puzzle import loadRegularPuzzle
 import matplotlib.pyplot as plt
 import cv2
 from src.feature_extraction import factory
@@ -18,11 +18,8 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 2
-        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
-        puzzle = Puzzle(puzzle_directory)
-        puzzle.load()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
-        bag_of_pieces = puzzle.get_bag_of_pieces()
         piece = bag_of_pieces[piece_index]
         coords = piece.raw_coordinates
         shifted_coords = piece.extrapolation_details.match_piece_to_img(coords)
@@ -39,10 +36,8 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
-        puzzle = Puzzle(puzzle_directory)
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+
 
         piece = bag_of_pieces[piece_index]
         coords = piece.raw_coordinates
@@ -64,10 +59,8 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
-        puzzle = Puzzle(puzzle_directory)
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+
 
         piece = bag_of_pieces[piece_index]
         coords = piece.raw_coordinates
@@ -126,10 +119,7 @@ class TestPocStableDiffusion(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
-        puzzle = Puzzle(puzzle_directory)
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         piece = bag_of_pieces[piece_index]
         coords = piece.raw_coordinates
@@ -171,9 +161,7 @@ class TestSDExtrapolatorExtractor(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_extrapolated_image()
@@ -215,9 +203,7 @@ class TestSDOriginalExtractor(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         chosen_piece = bag_of_pieces[piece_index]
         chosen_piece.load_stable_diffusion_original_image()
@@ -244,9 +230,7 @@ class TestSDOriginalExtractor(unittest.TestCase):
         self._test_edge_original(piece_index=2,edge_index=0)
     
     def test_save_images(self, db=1,puzzle_num=19,puzzle_noise_level=0,out_folder="data/poc_10_pictorial_compatibility"):
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         for piece in bag_of_pieces:
             piece.load_extrapolated_image()
@@ -288,9 +272,7 @@ class TestNormalizeSDExtrapolatorExtractor(unittest.TestCase):
         puzzle_num = 19 # DONT'T CHANGE THIS
         puzzle_noise_level = 0 # DONT'T CHANGE THIS
 
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         for piece in bag_of_pieces:
             piece.load_extrapolated_image()
@@ -328,9 +310,7 @@ class TestNormalizeSDOriginalExtractor(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         for piece in bag_of_pieces:
             piece.load_stable_diffusion_original_image()
@@ -369,9 +349,7 @@ class TestLoadFromFactory(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         extractor = factory.create(feature,pieces=bag_of_pieces,**kwargs)
         extractor.run()
@@ -406,9 +384,7 @@ class TestLoadFromFactory(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
         extract_and_normalize_original_mean(bag_of_pieces)
         
         origin_image = bag_of_pieces[piece_index].features["NormalizeSDOriginalExtractor"][edge_index]

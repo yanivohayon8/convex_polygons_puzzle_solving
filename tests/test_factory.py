@@ -1,5 +1,4 @@
 import unittest
-from src.puzzle import Puzzle
 from src.recipes.puzzle import loadRegularPuzzle
 from src.feature_extraction import extract_features,factory
 from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
