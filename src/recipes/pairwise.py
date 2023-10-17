@@ -27,6 +27,7 @@ class GeometricPairwise(Recipe):
         self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
                                                    pieces=self.puzzle.bag_of_pieces,id2piece=self.puzzle.id2piece,
                                                    geometric_match_edges=self.matchers["EdgeMatcher"].match_edges)
+        self.graph_wrapper.build_graph()
 
         return self.graph_wrapper
 
@@ -65,7 +66,8 @@ class SD1Pairwise(GeometricPairwise):
                                                    pieces=self.puzzle.bag_of_pieces,id2piece=self.puzzle.id2piece,
                                                    geometric_match_edges=self.matchers["EdgeMatcher"].match_edges,
                                                    pictorial_matcher = self.matchers[self.pictorial_pairwisers[0]])
-        
+        self.graph_wrapper.build_graph()
+
         return self.graph_wrapper
     
 

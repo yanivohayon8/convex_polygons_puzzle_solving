@@ -5,7 +5,7 @@ from src.mating_graphs import factory
 class MatchingGraphWrapper():
 
     def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
-                 pictorial_matcher=None) -> None:
+                 pictorial_matcher=None,compatibility_threshold = 0.4) -> None:
         self.pieces = pieces
         self.id2piece = id2piece
         self.geometric_match_edges = geometric_match_edges
@@ -14,7 +14,7 @@ class MatchingGraphWrapper():
         self.filtered_potential_matings_graph = None
         self.pieces_only_graph = None#nx.Graph()
         self.adjacency_graph = None
-        self.compatibility_threshold = None # put me as a parameter in _build_filtered_matching_graph
+        self.compatibility_threshold = compatibility_threshold
 
     def _name_node(self,piece_name,edge_name):
         return f"P_{piece_name}_E_{edge_name}"
