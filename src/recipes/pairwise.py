@@ -2,7 +2,10 @@ from typing import Any
 from src.puzzle import Puzzle
 from src.feature_extraction import extract_features
 from src.pairwise_matchers import pairwise_pieces
-from src.recipes import Recipe,factory
+from src.recipes import Recipe,factory as recipes_factory
+from src.feature_extraction import factory as features_factory
+
+DEFAULT_NUM_ROWS_CROP = 5
 
 
 class GeometricPairwise(Recipe):
@@ -27,4 +30,40 @@ class GeometricPairwiseBuilder():
         return GeometricPairwise(puzzle,add_geo_features=add_geo_features)
 
 
-factory.register_builder(GeometricPairwise.__name__,GeometricPairwiseBuilder())
+
+class SD1Pairwise(GeometricPairwise):
+
+    def __init__(self, puzzle: Puzzle,crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[]) -> None:
+        super().__init__(puzzle, add_geo_features)
+        self.crop_num_rows = crop_num_rows
+        self.extrap = "NormalizeSDExtrapolatorExtractor"
+        self.origin = "NormalizeSDOriginalExtractor"
+        self.pictorial_pairwisers = ["DotProductExtraToOriginalMatcher"]
+    
+    def cook(self, **kwargs):
+        self.matchers =  super().cook(**kwargs)
+        pieces = self.puzzle.bag_of_pieces
+
+        original_extractor = features_factory.create(self.origin,pieces = pieces,crop_num_rows = self.crop_num_rows)
+        original_extractor.run()
+        extrapolation_extractor = features_factory.create(self.extrap,pieces=pieces,
+                                                 channels_mean = original_extractor.channels_mean,crop_num_rows = self.crop_num_rows)
+        extrapolation_extractor.run()
+
+        pictorial_matchers = pairwise_pieces(pieces,self.pictorial_pairwisers,
+                                            feature_extrapolator=self.extrap,
+                                            feature_original=self.origin)
+        self.matchers.update(pictorial_matchers)
+
+        return self.matchers
+    
+
+class SD1PairwiseBuilder():
+
+    def __call__(self, puzzle: Puzzle,crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[], **_ignored) -> Any:
+        return SD1Pairwise(puzzle,crop_num_rows=crop_num_rows,add_geo_features=add_geo_features)
+
+
+
+recipes_factory.register_builder(GeometricPairwise.__name__,GeometricPairwiseBuilder())
+recipes_factory.register_builder(SD1Pairwise.__name__,SD1PairwiseBuilder())
