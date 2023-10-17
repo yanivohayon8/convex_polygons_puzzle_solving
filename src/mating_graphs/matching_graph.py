@@ -1,17 +1,11 @@
 import networkx as nx
 from src.mating import Mating
-import matplotlib.pyplot as plt
-import matplotlib.collections as mpc
-from  matplotlib.cm import ScalarMappable
-import numpy as np
-import math
-from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher
+from src.mating_graphs import factory
 
 class MatchingGraphWrapper():
 
     def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
-                 pictorial_matcher:NaiveExtrapolatorMatcher=None,
-                 compatibility_threshold=0.1) -> None:
+                 pictorial_matcher=None) -> None:
         self.pieces = pieces
         self.id2piece = id2piece
         self.geometric_match_edges = geometric_match_edges
@@ -20,7 +14,7 @@ class MatchingGraphWrapper():
         self.filtered_potential_matings_graph = None
         self.pieces_only_graph = None#nx.Graph()
         self.adjacency_graph = None
-        self.compatibility_threshold = compatibility_threshold
+        self.compatibility_threshold = None # put me as a parameter in _build_filtered_matching_graph
 
     def _name_node(self,piece_name,edge_name):
         return f"P_{piece_name}_E_{edge_name}"
@@ -296,3 +290,10 @@ def _link_to_mating(link):
     edge2 = int(get_edge_name(link[1]))
     
     return Mating(piece_1=piece1,edge_1=edge1,piece_2=piece2,edge_2=edge2)
+
+
+
+def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None):
+    return MatchingGraphWrapper(pieces,id2piece,geometric_match_edges=geometric_match_edges,pictorial_matcher=pictorial_matcher)
+
+factory.register_builder(MatchingGraphWrapper.__name__,_construct_wrapper)

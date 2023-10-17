@@ -7,10 +7,14 @@ from src.puzzle import Puzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
 
+from src.feature_extraction import extract_features
+from src.pairwise_matchers import pairwise_pieces
+
 import networkx as nx
 import matplotlib.pyplot as plt
 
 from src.mating_graphs.cycle import map_edge_to_contain_cycles,Cycle
+from src.mating_graphs import factory as graph_factory
 
 
 class TestNXPloting(unittest.TestCase):
@@ -121,7 +125,7 @@ class TestInterEnvGraph(unittest.TestCase):
 
 class TestMatchingGraphAndSpanTree(unittest.TestCase):
     
-    def test_toy_example(self):
+    def test_toy_example_deprecated(self):
         # puzzle = Puzzle(f"data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0")
         # puzzle.load()
         # bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -159,8 +163,29 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         plt.show()
 
-    
-    def _bulid_wrapper(self,db,puzzle_num,puzzle_noise_level):
+    def test_build_apictorial_graph(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
+        puzzle.load()
+        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        extract_features(bag_of_pieces,["EdgeLengthExtractor"])
+        matchers = pairwise_pieces(bag_of_pieces,["EdgeMatcher"],
+                                   confidence_interval=puzzle.matings_max_difference+1e-3)
+
+        wrapper = graph_factory.create(MatchingGraphWrapper.__name__,
+                                       pieces=bag_of_pieces,id2piece=puzzle.id2piece,
+                                       geometric_match_edges=matchers["EdgeMatcher"].match_edges)
+        
+        wrapper._build_matching_graph()
+        wrapper._bulid_only_pieces_graph()
+        wrapper._build_adjacency_graph()
+
+        print("All compiled")
+
+    def _bulid_wrapper_deprecated(self,db,puzzle_num,puzzle_noise_level):
         puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
         puzzle.load()
         bag_of_pieces = puzzle.get_bag_of_pieces()
@@ -179,8 +204,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         edge_length_pairwiser.pairwise(puzzle.matings_max_difference+1e-3)
         
         wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
-                                                edge_length_pairwiser.match_edges,
-                                                edge_length_pairwiser.match_pieces_score)
+                                                edge_length_pairwiser.match_edges)
         wrapper._build_matching_graph()
         wrapper._bulid_only_pieces_graph()
         wrapper._build_adjacency_graph()
@@ -196,7 +220,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper_deprecated(image,puzzle_num,puzzle_noise_level)
         # self._compute_cycles(wrapper)
 
         cycles = []
@@ -208,7 +232,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         db = "1"
         puzzle_num = 19
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
         # self._compute_cycles(wrapper)
 
         cycles = []
@@ -257,7 +281,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         puzzle_num = 2
         puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
@@ -271,7 +295,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         puzzle_num = 2
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
         cycles = []
         visited = ["P_0_E_0"]
         visited.append("P_0_E_2")
@@ -283,12 +307,12 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         db="1"
         puzzle_num = 19
         puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
         graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops()
         assert len(graph_cycles_noise_0) == 5
 
         puzzle_noise_level = 1
-        wrapper = self._bulid_wrapper(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_wrapper_deprecated(db,puzzle_num,puzzle_noise_level)
         graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
         graph_cycles_noise_1_sets = [set(cycle) for cycle in graph_cycles_noise_1]
 
@@ -314,17 +338,6 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         for cycle in graph_cycles_noise_0:
             assert set(cycle) in graph_cycles_noise_1_sets
 
-    def test_VilladeiMisteri_puzzle_1(self,puzzle_noise_level = 0):
-        image = "Roman_fresco_Villa_dei_Misteri_Pompeii_009"
-        puzzle_num = 1
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
-
-
-    def test_len_pair_p5_puzzle_1(self):
-        image = "p5"
-        puzzle_num = 1
-        puzzle_noise_level = 0
-        wrapper = self._bulid_wrapper(image,puzzle_num,puzzle_noise_level)
 
 if __name__ == "__main__":
     unittest.main()

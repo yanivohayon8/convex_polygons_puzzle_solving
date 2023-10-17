@@ -4,6 +4,7 @@ from src.feature_extraction import extract_features,factory
 from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.pairwise_matchers import factory as pairwisers_factory
 from src.pairwise_matchers import pairwise_pieces
+from src.mating_graphs import factory as graph_factory
 
 class TestFeatureFactory(unittest.TestCase):
 
@@ -49,6 +50,12 @@ class TestPairwiseMatchersFactory(unittest.TestCase):
                         feature_original="NormalizeSDOriginalExtractor",
                         confidence_interval=1e-3)
         
+        print("all compiled")
+        
+
+class TestMatchingGraphWrapperFactory(unittest.TestCase):
+    def test_print_builders(self):
+        print(graph_factory._builders.keys())
 
 
 if __name__ == "__main__":
