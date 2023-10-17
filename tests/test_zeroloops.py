@@ -1,13 +1,13 @@
 import unittest
 from src.solvers.apictorial import FirstSolver
-from src.puzzle import Puzzle
+from src.recipes.puzzle import loadRegularPuzzle
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.feature_extraction import geometric as geo_extractor 
 
 class TestZeroLoopKeepCycleAsIs(unittest.TestCase):
     
-    def test_Inv9084_puzzle_1_noise_0(self):
+    def test_Inv9084_puzzle_1_noise_0_deprecated(self):
         db = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         puzzle_num = 1
         puzzle_noise_level = 2#0
@@ -41,9 +41,8 @@ class TestAngleSum(unittest.TestCase):
 
         for puzzle_noise_level in range(4):
             print(f"Running on noise {puzzle_noise_level}")
-            puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-            puzzle.load()
-            bag_of_pieces = puzzle.get_bag_of_pieces()
+            bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+            
             angles_extractor = geo_extractor.AngleLengthExtractor(bag_of_pieces)
             angles_extractor.run()
             piece_edge_loop = [(3,1), (3,0), (2,2), (2,1), (5,3), (5,2)]

@@ -1,7 +1,7 @@
 import unittest 
 import numpy as np
 import matplotlib.pyplot as plt
-from src.puzzle import Puzzle
+from src.recipes.puzzle import loadRegularPuzzle
 from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.feature_extraction import extract_features
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
@@ -11,10 +11,6 @@ from src.mating_graphs.drawer import MatchingGraphDrawer
 from src.pairwise_matchers import pairwise_pieces
 
 
-def load_puzzle(db,puzzle_num,puzzle_noise_level):
-    puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-    puzzle.load()
-    return puzzle
 
 class TestFunction_score_pair(unittest.TestCase):
 
@@ -25,8 +21,8 @@ class TestFunction_score_pair(unittest.TestCase):
                                      piece_jj = 3,edge_jj = 1,is_plot=True):
         db = 1
         puzzle_num = 19
-        puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
+
         extra_feature = "SDExtrapolatorExtractor"
         original_feature = "SDOriginalExtractor"
 
@@ -105,8 +101,7 @@ class TestFunction_score_pair(unittest.TestCase):
         
         db = 1
         puzzle_num = 19
-        puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
 
         orig_extractor_name = "NormalizeSDOriginalExtractor"
         extra_extractor_name = "NormalizeSDExtrapolatorExtractor"
@@ -209,8 +204,8 @@ class TestFunctionPairwise(unittest.TestCase):
     
         
     def test_comp_distribution(self,db=1,puzzle_num=19,puzzle_noise_level=1):
-        puzzle = load_puzzle(db,puzzle_num,puzzle_noise_level)
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        puzzle_recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level)
+        bag_of_pieces = puzzle_recipe.cook()
         
         extract_features(bag_of_pieces,["EdgeLengthExtractor"])
         extract_and_normalize_original_mean(bag_of_pieces)
@@ -221,14 +216,14 @@ class TestFunctionPairwise(unittest.TestCase):
         matchers = pairwise_pieces(bag_of_pieces,matchers_keys,
                         feature_extrapolator="NormalizeSDExtrapolatorExtractor",
                         feature_original="NormalizeSDOriginalExtractor",
-                        confidence_interval=puzzle.matings_max_difference+1e-3)
+                        confidence_interval=puzzle_recipe.puzzle.matings_max_difference+1e-3)
 
         potential_matings = matchers[geometric_matcher].get_pairwise_as_list()
         tn_matings = []
         fp_matings = []
 
         for mating in potential_matings:
-            if puzzle.is_ground_truth_mating(mating):
+            if puzzle_recipe.puzzle.is_ground_truth_mating(mating):
                 tn_matings.append(mating)
             else:
                 fp_matings.append(mating)

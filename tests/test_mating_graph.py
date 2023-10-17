@@ -3,7 +3,7 @@ import numpy as np
 from src.piece import Piece
 from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.mating_graphs.matching_graph import MatchingGraphWrapper
-from src.puzzle import Puzzle
+from src.recipes.puzzle import loadRegularPuzzle
 from src.feature_extraction import geometric as geo_extractor 
 from src.pairwise_matchers import geometric as geo_pairwiser
 
@@ -167,16 +167,16 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        puzzle = Puzzle(f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}")
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+
+        puzzle_recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level)
+        bag_of_pieces = puzzle_recipe.cook()
 
         extract_features(bag_of_pieces,["EdgeLengthExtractor"])
         matchers = pairwise_pieces(bag_of_pieces,["EdgeMatcher"],
-                                   confidence_interval=puzzle.matings_max_difference+1e-3)
+                                   confidence_interval=puzzle_recipe.puzzle.matings_max_difference+1e-3)
 
         wrapper = graph_factory.create(MatchingGraphWrapper.__name__,
-                                       pieces=bag_of_pieces,id2piece=puzzle.id2piece,
+                                       pieces=bag_of_pieces,id2piece=puzzle_recipe.puzzle.id2piece,
                                        geometric_match_edges=matchers["EdgeMatcher"].match_edges)
         
         wrapper._build_matching_graph()

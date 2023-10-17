@@ -9,11 +9,6 @@ import unittest
 class TestEdgeMatcher(unittest.TestCase):
 
     def test_toy_example(self):
-        # puzzle = Puzzle(f"data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0")
-        # puzzle.load()
-        # bag_of_pieces = puzzle.get_bag_of_pieces()
-
-        # piece 3,4,5,6 from data/ofir/Pseudo-Sappho_MAN_Napoli_Inv9084/Puzzle1/0
         bag_of_pieces = [
             Piece("3",[(0.0, 850.612398532945), (896.2748322309999, 0.0), (160.42144514933895, 177.15118274973247)]),
             Piece("4",[(1359.7642214436985, 1755.909454053577), (0.0, 0.0), (448.8169164864121, 921.029227021798)]),
