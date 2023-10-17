@@ -41,15 +41,16 @@ class TestSD1Pairwise(unittest.TestCase):
         puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
                                                 db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level)
         puzzle_recipe.cook()
-        matchers = recipes_factory.create("SD1Pairwise",puzzle=puzzle_recipe.puzzle).cook()
+        recipe = recipes_factory.create("SD1Pairwise",puzzle=puzzle_recipe.puzzle)
+        recipe.cook()
 
-        assert len(matchers.keys()) == 2
+        assert len(recipe.matchers.keys()) == 2
 
         piece = 0
         edge =0
         non_match_piece = 6
         non_match_edge = 1
-        score = matchers["DotProductExtraToOriginalMatcher"].get_score(piece,edge,non_match_piece,non_match_edge)
+        score = recipe.matchers["DotProductExtraToOriginalMatcher"].get_score(piece,edge,non_match_piece,non_match_edge)
         print(score)
         
         print("All compiled")

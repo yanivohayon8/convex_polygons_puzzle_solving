@@ -47,7 +47,7 @@ class SD1Pairwise(GeometricPairwise):
         self.pictorial_pairwisers = ["DotProductExtraToOriginalMatcher"]
     
     def cook(self, **kwargs):
-        self.matchers =  super().cook(**kwargs)
+        super().cook(**kwargs)
         pieces = self.puzzle.bag_of_pieces
 
         original_extractor = features_factory.create(self.origin,pieces = pieces,crop_num_rows = self.crop_num_rows)
@@ -61,7 +61,12 @@ class SD1Pairwise(GeometricPairwise):
                                             feature_original=self.origin)
         self.matchers.update(pictorial_matchers)
 
-        return self.matchers
+        self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
+                                                   pieces=self.puzzle.bag_of_pieces,id2piece=self.puzzle.id2piece,
+                                                   geometric_match_edges=self.matchers["EdgeMatcher"].match_edges,
+                                                   pictorial_matcher = self.matchers[self.pictorial_pairwisers[0]])
+        
+        return self.graph_wrapper
     
 
 class SD1PairwiseBuilder():
