@@ -11,21 +11,28 @@ DEFAULT_NUM_ROWS_CROP = 5
 
 class GeometricPairwise(Recipe):
 
-    def __init__(self,puzzle:Puzzle,add_geo_features=[]) -> None:
-        self.puzzle = puzzle
+    def __init__(self,db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",add_geo_features=[]) -> None:
+        self.db = db
+        self.puzzle_num = puzzle_num
+        self.puzzle_noise_level = puzzle_noise_level
+        self.puzzle_recipe_name = puzzle_recipe_name
         self.geo_features = ["EdgeLengthExtractor"] + add_geo_features
         self.matchers_keys = ["EdgeMatcher"]
         self.matchers = {}
         self.graph_wrapper = None
 
     def cook(self, **kwargs):
-        bag_of_pieces = self.puzzle.bag_of_pieces
+        puzzle_recipe = recipes_factory.create(self.puzzle_recipe_name,db=self.db,
+                                               puzzle_num=self.puzzle_num,noise_level=self.puzzle_noise_level)
+        puzzle_recipe.cook()
+        puzzle = puzzle_recipe.puzzle
+        bag_of_pieces = puzzle.bag_of_pieces
         extract_features(bag_of_pieces,self.geo_features,**kwargs)
         self.matchers = pairwise_pieces(bag_of_pieces,self.matchers_keys,
-                                   confidence_interval=self.puzzle.matings_max_difference+1e-3,**kwargs)
+                                   confidence_interval=puzzle.matings_max_difference+1e-3,**kwargs)
 
         self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
-                                                   pieces=self.puzzle.bag_of_pieces,id2piece=self.puzzle.id2piece,
+                                                   pieces=bag_of_pieces,id2piece=puzzle.id2piece,
                                                    geometric_match_edges=self.matchers["EdgeMatcher"].match_edges)
         self.graph_wrapper.build_graph()
 
@@ -33,8 +40,9 @@ class GeometricPairwise(Recipe):
 
 class GeometricPairwiseBuilder():
 
-    def __call__(self, puzzle:Puzzle,add_geo_features=[],**_ignored) -> Any:
-        return GeometricPairwise(puzzle,add_geo_features=add_geo_features)
+    def __call__(self, db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",add_geo_features=[],**_ignored) -> Any:
+        return GeometricPairwise(db,puzzle_num,puzzle_noise_level,
+                                 puzzle_recipe_name=puzzle_recipe_name,add_geo_features=add_geo_features)
 
 
 

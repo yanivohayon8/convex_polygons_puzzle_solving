@@ -22,10 +22,9 @@ class TestGeometricPairwise(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
-                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level)
-        puzzle_recipe.cook()
-        recipe = recipes_factory.create("GeometricPairwise",puzzle=puzzle_recipe.puzzle)
+        
+        recipe = recipes_factory.create("GeometricPairwise",
+                                        db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
         recipe.cook()
         matings = recipe.matchers["EdgeMatcher"].get_pairwise_as_list()
 
