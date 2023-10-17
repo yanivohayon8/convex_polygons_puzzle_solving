@@ -191,7 +191,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
     def _bulid_graph_wrapper(self,db,puzzle_num,puzzle_noise_level):       
         gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
-                                                  puzzle_noise_level=0,add_geo_features=["AngleLengthExtractor"])
+                                                  puzzle_noise_level=puzzle_noise_level,add_geo_features=["AngleLengthExtractor"])
         return gd_puzzle_recipe.cook()
 
     def _compute_cycles(self,wrapper:MatchingGraphWrapper):
@@ -288,13 +288,11 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
     def test_360_loops_Inv9084(self):
         db="1"
         puzzle_num = 19
-        puzzle_noise_level = 0
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,0)
         graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops()
         assert len(graph_cycles_noise_0) == 5
 
-        puzzle_noise_level = 1
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,1)
         graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
         graph_cycles_noise_1_sets = [set(cycle) for cycle in graph_cycles_noise_1]
 

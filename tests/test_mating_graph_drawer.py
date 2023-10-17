@@ -43,8 +43,7 @@ class TestGraphDrawer(unittest.TestCase):
     def test_draw_ground_truth(self):
         db = "1"
         puzzle_num = 19
-        gd_noise_level = 0
-        
+                
         gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
                                                   puzzle_noise_level=0)
         gd_graph_wrapper = gd_puzzle_recipe.cook()
