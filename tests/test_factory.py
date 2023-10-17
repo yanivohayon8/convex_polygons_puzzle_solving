@@ -1,5 +1,6 @@
 import unittest
 from src.puzzle import Puzzle
+from src.recipes.puzzle import loadRegularPuzzle
 from src.feature_extraction import extract_features,factory
 from src.feature_extraction.extrapolator.stable_diffusion import extract_and_normalize_original_mean
 from src.pairwise_matchers import factory as pairwisers_factory
@@ -15,10 +16,7 @@ class TestFeatureFactory(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
-        puzzle = Puzzle(puzzle_directory)
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
         extractors = ["AngleLengthExtractor","EdgeLengthExtractor"]
         extract_features(bag_of_pieces,extractors)
 
@@ -36,10 +34,7 @@ class TestPairwiseMatchersFactory(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
-        puzzle = Puzzle(puzzle_directory)
-        puzzle.load()
-        bag_of_pieces = puzzle.get_bag_of_pieces()
+        bag_of_pieces = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level).cook()
         extractors = ["EdgeLengthExtractor"]
         extract_features(bag_of_pieces,extractors)
         extract_and_normalize_original_mean(bag_of_pieces)
