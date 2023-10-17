@@ -14,22 +14,19 @@ from src.feature_extraction import extract_features
 class TestGraphDrawer(unittest.TestCase):
 
 
-    def test_draw_adjacency(self):
+    def test_draw_adjacency(self,noise_level = 1):
         db = "1"
         puzzle_num = "19"
         
-        gd_puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
-                                                db=db,puzzle_num=puzzle_num,noise_level=0)
-        gd_puzzle_recipe.cook()
-        gd_recipe = recipes_factory.create("SD1Pairwise",puzzle=gd_puzzle_recipe.puzzle)
-        gd_graph_wrapper = gd_recipe.cook()
+        gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_puzzle_recipe.cook()
 
-        noise_level = 1
-        noisy_puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
-                                                db=db,puzzle_num=puzzle_num,noise_level=noise_level)
-        noisy_puzzle_recipe.cook()
-        noisy_recipe = recipes_factory.create("SD1Pairwise",puzzle=noisy_puzzle_recipe.puzzle)
-        noisy_graph_wrapper = noisy_recipe.cook()
+    
+        
+        noisy_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                     puzzle_noise_level=noise_level)
+        noisy_graph_wrapper = noisy_puzzle_recipe.cook()
 
         drawer = MatchingGraphDrawer(gd_graph_wrapper)
         drawer.init()
@@ -48,34 +45,26 @@ class TestGraphDrawer(unittest.TestCase):
         puzzle_num = 19
         gd_noise_level = 0
         
-        gd_puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
-                                                db=db,puzzle_num=puzzle_num,noise_level=gd_noise_level)
-        gd_puzzle_recipe.cook()
-        gd_recipe = recipes_factory.create("SD1Pairwise",puzzle=gd_puzzle_recipe.puzzle)
-        gd_graph_wrapper = gd_recipe.cook()
+        gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_puzzle_recipe.cook()
 
         drawer = MatchingGraphDrawer(gd_graph_wrapper)
         drawer._draw_ground_truth_adjacency()
         plt.show()
     
     
-    def test_draw_matching(self):
+    def test_draw_matching(self,noise_level = 1):
         db = "1"
-        puzzle_num = "19"
-        gd_noise_level = 0
+        puzzle_num = "19"       
         
-        gd_puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
-                                                db=db,puzzle_num=puzzle_num,noise_level=gd_noise_level)
-        gd_puzzle_recipe.cook()
-        gd_recipe = recipes_factory.create("SD1Pairwise",puzzle=gd_puzzle_recipe.puzzle)
-        gd_graph_wrapper = gd_recipe.cook()
-
-        noise_level = 1
-        noisy_puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
-                                                db=db,puzzle_num=puzzle_num,noise_level=noise_level)
-        noisy_puzzle_recipe.cook()
-        noisy_recipe = recipes_factory.create("SD1Pairwise",puzzle=noisy_puzzle_recipe.puzzle)
-        noisy_graph_wrapper = noisy_recipe.cook()
+        gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_puzzle_recipe.cook()
+        
+        noisy_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                     puzzle_noise_level=noise_level)
+        noisy_graph_wrapper = noisy_puzzle_recipe.cook()
 
         drawer = MatchingGraphDrawer(gd_graph_wrapper)
         drawer.init()
