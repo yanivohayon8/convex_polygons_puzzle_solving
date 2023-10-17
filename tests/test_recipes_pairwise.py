@@ -37,10 +37,9 @@ class TestSD1Pairwise(unittest.TestCase):
         db = "1"
         puzzle_num = "19"
         puzzle_noise_level = 0
-        puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
-                                                db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level)
-        puzzle_recipe.cook()
-        recipe = recipes_factory.create("SD1Pairwise",puzzle=puzzle_recipe.puzzle)
+        
+        recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                        puzzle_noise_level=puzzle_noise_level)
         recipe.cook()
 
         assert len(recipe.matchers.keys()) == 2

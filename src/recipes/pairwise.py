@@ -22,10 +22,10 @@ class GeometricPairwise(Recipe):
         self.graph_wrapper = None
 
     def cook(self, **kwargs):
-        puzzle_recipe = recipes_factory.create(self.puzzle_recipe_name,db=self.db,
+        self.puzzle_recipe = recipes_factory.create(self.puzzle_recipe_name,db=self.db,
                                                puzzle_num=self.puzzle_num,noise_level=self.puzzle_noise_level)
-        puzzle_recipe.cook()
-        puzzle = puzzle_recipe.puzzle
+        self.puzzle_recipe.cook()
+        puzzle = self.puzzle_recipe.puzzle
         bag_of_pieces = puzzle.bag_of_pieces
         extract_features(bag_of_pieces,self.geo_features,**kwargs)
         self.matchers = pairwise_pieces(bag_of_pieces,self.matchers_keys,
@@ -48,8 +48,9 @@ class GeometricPairwiseBuilder():
 
 class SD1Pairwise(GeometricPairwise):
 
-    def __init__(self, puzzle: Puzzle,crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[]) -> None:
-        super().__init__(puzzle, add_geo_features)
+    def __init__(self, db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[]) -> None:
+        super().__init__(db,puzzle_num,puzzle_noise_level,
+                         puzzle_recipe_name=puzzle_recipe_name, add_geo_features=add_geo_features)
         self.crop_num_rows = crop_num_rows
         self.extrap = "NormalizeSDExtrapolatorExtractor"
         self.origin = "NormalizeSDOriginalExtractor"
@@ -57,9 +58,11 @@ class SD1Pairwise(GeometricPairwise):
     
     def cook(self, **kwargs):
         super().cook(**kwargs)
-        pieces = self.puzzle.bag_of_pieces
+        puzzle = self.puzzle_recipe.puzzle
+        pieces = puzzle.bag_of_pieces
 
-        original_extractor = features_factory.create(self.origin,pieces = pieces,crop_num_rows = self.crop_num_rows)
+        original_extractor = features_factory.create(self.origin,pieces = pieces,
+                                                     crop_num_rows = self.crop_num_rows)
         original_extractor.run()
         extrapolation_extractor = features_factory.create(self.extrap,pieces=pieces,
                                                  channels_mean = original_extractor.channels_mean,crop_num_rows = self.crop_num_rows)
@@ -71,7 +74,7 @@ class SD1Pairwise(GeometricPairwise):
         self.matchers.update(pictorial_matchers)
 
         self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
-                                                   pieces=self.puzzle.bag_of_pieces,id2piece=self.puzzle.id2piece,
+                                                   pieces=puzzle.bag_of_pieces,id2piece=puzzle.id2piece,
                                                    geometric_match_edges=self.matchers["EdgeMatcher"].match_edges,
                                                    pictorial_matcher = self.matchers[self.pictorial_pairwisers[0]])
         self.graph_wrapper.build_graph()
@@ -81,8 +84,11 @@ class SD1Pairwise(GeometricPairwise):
 
 class SD1PairwiseBuilder():
 
-    def __call__(self, puzzle: Puzzle,crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[], **_ignored) -> Any:
-        return SD1Pairwise(puzzle,crop_num_rows=crop_num_rows,add_geo_features=add_geo_features)
+    def __call__(self, db,puzzle_num,puzzle_noise_level,
+                 puzzle_recipe_name="loadRegularPuzzle",crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[], **_ignored) -> Any:
+        return SD1Pairwise(db,puzzle_num,puzzle_noise_level,
+                            puzzle_recipe_name=puzzle_recipe_name,
+                            crop_num_rows=crop_num_rows,add_geo_features=add_geo_features)
 
 
 
