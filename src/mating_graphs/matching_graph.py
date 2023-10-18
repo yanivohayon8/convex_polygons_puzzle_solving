@@ -182,18 +182,18 @@ class MatchingGraphWrapper():
 
 
         if curr_node == visited[0]: #and len(visited) > 2:
-
-            debug_is_acc_360 = abs(360-accumulated_loop_angle)<loop_angle_error
-            if debug_is_acc_360:
-                computed_cycles.append(visited)
-            else:    
-                pass
-                # print("Debug:Problematic loop")
+            computed_cycles.append(visited)
+            # debug_is_acc_360 = abs(360-accumulated_loop_angle)<loop_angle_error
+            # if debug_is_acc_360:
+            #     computed_cycles.append(visited)
+            # else:    
+            #     pass
+            #     # print("Debug:Problematic loop")
 
             return
 
-        if accumulated_loop_angle > 360+loop_angle_error:
-            return
+        # if accumulated_loop_angle > 360+loop_angle_error:
+        #     return
         
         prev_step = self.filtered_adjacency_graph[visited[-1]]
         prev_step_type = prev_step[curr_node]["type"]
