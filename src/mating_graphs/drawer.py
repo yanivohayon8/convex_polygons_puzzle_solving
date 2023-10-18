@@ -120,7 +120,7 @@ class MatchingGraphDrawer():
         nx.draw_networkx(adjacency_graph,pos,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10,ax=ax)
 
-    def draw_adjacency_graph(self,graph_wrapper:MatchingGraphWrapper,layout="kamada_kawai",title="Adjacency Graph",ax=None):
+    def draw_adjacency_graph(self,graph,layout="kamada_kawai",title="Adjacency Graph",ax=None):
         if ax is None:
             fig, ax = plt.subplots()
 
@@ -135,7 +135,7 @@ class MatchingGraphDrawer():
 
 
         # for edge in adjacency_with_potential_graph.edges:
-        for edge in graph_wrapper.adjacency_graph.edges:
+        for edge in graph.edges:
             if get_piece_name(edge[0]) == get_piece_name(edge[1]):
                 edges_color.append(color2edge_meaning["intra_piece"])
             elif edge in self.noiseless_ground_truth_wrapper.potential_matings_graph.edges:
@@ -143,7 +143,7 @@ class MatchingGraphDrawer():
             else:
                 edges_color.append(color2edge_meaning["potential"])
         
-        nx.draw_networkx(graph_wrapper.adjacency_graph,self.node2position,with_labels=True,node_color="skyblue",
+        nx.draw_networkx(graph,self.node2position,with_labels=True,node_color="skyblue",
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
 

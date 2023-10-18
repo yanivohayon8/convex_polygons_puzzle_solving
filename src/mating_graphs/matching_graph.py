@@ -2,6 +2,9 @@ import networkx as nx
 from src.mating import Mating
 from src.mating_graphs import factory
 
+INTER_PIECES_EDGE_TYPE = "inter_piece"
+
+
 class MatchingGraphWrapper():
 
     def __init__(self,pieces,id2piece:dict,geometric_match_edges=None,
@@ -14,6 +17,7 @@ class MatchingGraphWrapper():
         self.filtered_potential_matings_graph = None
         self.pieces_only_graph = None#nx.Graph()
         self.adjacency_graph = None
+        self.filtered_adjaceny_graph = None
         self.compatibility_threshold = compatibility_threshold
 
     def _name_node(self,piece_name,edge_name):
@@ -77,7 +81,12 @@ class MatchingGraphWrapper():
             if edge_attributes[2]["compatibility"] >= self.compatibility_threshold:
                 filtered_edges.append(edge_attributes)
         
-        self.filtered_potential_matings_graph.add_edges_from(filtered_edges)    
+        self.filtered_potential_matings_graph.add_edges_from(filtered_edges,type="inter_piece")    
+
+    def _build_filtered_adjacency_graph(self):
+        self.filtered_adjaceny_graph = self.filtered_potential_matings_graph.copy()
+        self.filtered_adjaceny_graph.add_nodes_from(self.pieces_only_graph.nodes)
+        self.filtered_adjaceny_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
 
 
     def build_graph(self):
@@ -85,6 +94,7 @@ class MatchingGraphWrapper():
         self._bulid_only_pieces_graph()
         self._build_adjacency_graph()
         self._build_filtered_matching_graph()
+        self._build_filtered_adjacency_graph()
     
     def get_matching_graph_nodes(self):
         return list(self.potential_matings_graph.nodes)
