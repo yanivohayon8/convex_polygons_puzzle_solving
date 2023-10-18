@@ -207,7 +207,8 @@ class MatchingGraphWrapper():
         if prev_step_type == "inter_piece":
             curr_piece = get_piece_name(curr_node)
             curr_edge = int(get_edge_name(curr_node))
-            adjacent_edge = self.get_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
+            # adjacent_edge = self.get_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
+            adjacent_edge = self.get_counter_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
             neighbor = self._name_node(curr_piece,adjacent_edge)
             self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
                                                 accumulated_loop_angle=accumulated_loop_angle,loop_angle_error=loop_angle_error)
@@ -250,7 +251,8 @@ class MatchingGraphWrapper():
             piece_edge1 = int(get_edge_name(graph_node1))
             node_1_piece_id = get_piece_name(graph_node1)
 
-            piece_edge1_adj = self.get_counter_clockwise_adjacent_edge(piece_edge1,node_1_piece_id)
+            # piece_edge1_adj = self.get_counter_clockwise_adjacent_edge(piece_edge1,node_1_piece_id)
+            piece_edge1_adj = self.get_clockwise_adjacent_edge(piece_edge1,node_1_piece_id)
             visited = [
                 self._name_node(node_1_piece_id,piece_edge1_adj),
                 graph_node1
@@ -259,7 +261,8 @@ class MatchingGraphWrapper():
 
             piece_edge2 = int(get_edge_name(graph_node2))
             node_2_piece_id = get_piece_name(graph_node2)
-            piece_edge2_adj = self.get_counter_clockwise_adjacent_edge(piece_edge2,node_2_piece_id)
+            # piece_edge2_adj = self.get_counter_clockwise_adjacent_edge(piece_edge2,node_2_piece_id)
+            piece_edge2_adj = self.get_clockwise_adjacent_edge(piece_edge2,node_2_piece_id)
             visited = [
                 self._name_node(node_2_piece_id,piece_edge2_adj),
                 graph_node2
