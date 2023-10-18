@@ -1,15 +1,7 @@
 import unittest
-from src.recipes.puzzle import loadRegularPuzzle
 from src.recipes import factory as recipes_factory
-from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.mating_graphs.drawer import MatchingGraphDrawer
 import matplotlib.pyplot as plt
-from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
-from src.pairwise_matchers.geometric import EdgeMatcher
-from src.feature_extraction import extract_features
-# from src.feature_extraction.extrapolator.stable_diffusion import NormalizeSDExtrapolatorExtractor,NormalizeSDOriginalExtractor
-# from src.feature_extraction import geometric as geo_extractor 
-# from src.pairwise_matchers import geometric as geo_pairwiser
 
 class TestGraphDrawer(unittest.TestCase):
 
@@ -59,7 +51,7 @@ class TestGraphDrawer(unittest.TestCase):
         drawer.draw_adjacency_graph(noisy_graph_wrapper.adjacency_graph,
                                     ax=axs[0])
         axs[0].set_title("Unfiltered")
-        drawer.draw_adjacency_graph(noisy_graph_wrapper.filtered_adjaceny_graph,
+        drawer.draw_adjacency_graph(noisy_graph_wrapper.filtered_adjacency_graph,
                                     ax=axs[1])
         axs[1].set_title("Filtered")
 
