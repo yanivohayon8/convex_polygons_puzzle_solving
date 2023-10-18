@@ -17,7 +17,7 @@ class MatchingGraphWrapper():
         self.filtered_potential_matings_graph = None
         self.pieces_only_graph = None#nx.Graph()
         self.adjacency_graph = None
-        self.filtered_adjaceny_graph = None
+        self.filtered_adjacency_graph = None
         self.compatibility_threshold = compatibility_threshold
 
     def _name_node(self,piece_name,edge_name):
@@ -60,13 +60,7 @@ class MatchingGraphWrapper():
             for prev_node,next_node in zip(piece_nodes,piece_nodes[1:]+[piece_nodes[0]]):
                 self.pieces_only_graph.add_edge(prev_node,next_node,compatibility=0)
     
-    def _build_adjacency_graph(self):
-        self.adjacency_graph = nx.Graph()#self.pieces_only_graph.copy()
-        self.adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes)
-        self.adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
-
-        potential_matings = [edge for edge in self.potential_matings_graph.edges if not edge in self.pieces_only_graph]
-        self.adjacency_graph.add_edges_from(potential_matings,type="inter_piece")
+    
 
     def _build_filtered_matching_graph(self):
         # self.filtered_potential_matings_graph = self.potential_matings_graph.copy()
@@ -83,10 +77,24 @@ class MatchingGraphWrapper():
         
         self.filtered_potential_matings_graph.add_edges_from(filtered_edges,type="inter_piece")    
 
+    def _build_adjacency_graph(self):
+        self.adjacency_graph = nx.Graph()#self.pieces_only_graph.copy()
+        self.adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes)
+        self.adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
+
+        potential_matings = [edge for edge in self.potential_matings_graph.edges if not edge in self.pieces_only_graph]
+        self.adjacency_graph.add_edges_from(potential_matings,type="inter_piece")
+    
     def _build_filtered_adjacency_graph(self):
-        self.filtered_adjaceny_graph = self.filtered_potential_matings_graph.copy()
-        self.filtered_adjaceny_graph.add_nodes_from(self.pieces_only_graph.nodes)
-        self.filtered_adjaceny_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
+        # self.filtered_adjaceny_graph = self.filtered_potential_matings_graph.copy()
+        # self.filtered_adjaceny_graph.add_nodes_from(self.pieces_only_graph.nodes)
+        # self.filtered_adjaceny_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
+        
+        self.filtered_adjacency_graph = nx.Graph()
+        self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes)
+        self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
+        potential_matings = [edge for edge in self.filtered_potential_matings_graph.edges if not edge in self.pieces_only_graph]
+        self.filtered_adjacency_graph.add_edges_from(potential_matings, type="inter_piece")
 
 
     def build_graph(self):
@@ -160,6 +168,8 @@ class MatchingGraphWrapper():
             curr_node: the current visited node. Calling the function for the first time put edge start_node->curr_node
             computed_cycles: a list initiated outside. It will contain all the cycles
         '''
+        # print(f"\tVISITED: {visited}")
+
         # if visited is None:
         #     visited = [start_node]
         #     accumulated_loop_angle = 0
@@ -185,7 +195,8 @@ class MatchingGraphWrapper():
         if accumulated_loop_angle > 360+loop_angle_error:
             return
         
-        prev_step_type = self.adjacency_graph[visited[-1]][curr_node]["type"]
+        prev_step = self.filtered_adjacency_graph[visited[-1]]
+        prev_step_type = prev_step[curr_node]["type"]
 
         '''
             Because we pre-sorted the edges counterclock wise,
@@ -207,12 +218,12 @@ class MatchingGraphWrapper():
             inner_angle =  self.id2piece[piece_name].get_inner_angle(edge_index_1,edge_index_2)
             accumulated_loop_angle += inner_angle
 
-            for neighbor in self.adjacency_graph.neighbors(curr_node):
+            for neighbor in self.filtered_adjacency_graph.neighbors(curr_node):
                 
                 if neighbor in visited and neighbor != visited[0]:
                     continue
                 
-                next_step_type = self.adjacency_graph[curr_node][neighbor]["type"]
+                next_step_type = self.filtered_adjacency_graph[curr_node][neighbor]["type"]
                 
                 if next_step_type == "inter_piece":
                     self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
@@ -233,7 +244,7 @@ class MatchingGraphWrapper():
                     cycles_without_duplicates.append(cycle)
                     cycles_without_duplicates_sets.append(cycle_set)
 
-        for inter_piece_link in self.potential_matings_graph.edges():
+        for inter_piece_link in self.filtered_potential_matings_graph.edges():
 
             graph_node1,graph_node2 = inter_piece_link
             piece_edge1 = int(get_edge_name(graph_node1))
@@ -303,7 +314,10 @@ def _link_to_mating(link):
 
 
 
-def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None):
-    return MatchingGraphWrapper(pieces,id2piece,geometric_match_edges=geometric_match_edges,pictorial_matcher=pictorial_matcher)
+def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None,compatibility_threshold=0.4):
+    return MatchingGraphWrapper(pieces,id2piece,
+                                geometric_match_edges=geometric_match_edges,
+                                pictorial_matcher=pictorial_matcher,
+                                compatibility_threshold=compatibility_threshold)
 
 factory.register_builder(MatchingGraphWrapper.__name__,_construct_wrapper)

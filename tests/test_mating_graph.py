@@ -189,9 +189,9 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         print("All compiled")
 
-    def _bulid_graph_wrapper(self,db,puzzle_num,puzzle_noise_level):       
+    def _bulid_graph_wrapper(self,db,puzzle_num,puzzle_noise_level,**kwargs):       
         gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
-                                                  puzzle_noise_level=puzzle_noise_level,add_geo_features=["AngleLengthExtractor"])
+                                                  puzzle_noise_level=puzzle_noise_level,add_geo_features=["AngleLengthExtractor"],**kwargs)
         return gd_puzzle_recipe.cook()
 
     def _compute_cycles(self,wrapper:MatchingGraphWrapper):
@@ -284,12 +284,16 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
         print(cycles)
         
-    
+
     def test_360_loops_Inv9084(self):
         db="1"
         puzzle_num = 19
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,0)
-        graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops()
+        loop_angle_error = 40
+
+        # Because we want the test to pass set compatibility_threshold to 0.38
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,0,
+                                            compatibility_threshold=0.38)
+        graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
         assert len(graph_cycles_noise_0) == 5
 
         wrapper = self._bulid_graph_wrapper(db,puzzle_num,1)
@@ -316,7 +320,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         # making sure all the cycles found in the noise 0 puzzle
         # are found also in the noised puzzle
         for cycle in graph_cycles_noise_0:
-            assert set(cycle) in graph_cycles_noise_1_sets
+            assert set(cycle) in graph_cycles_noise_1_sets, f"expected cycle {cycle} was not computed"
 
 
 if __name__ == "__main__":

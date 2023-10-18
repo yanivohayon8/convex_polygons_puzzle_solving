@@ -7,7 +7,7 @@ from src.feature_extraction import factory as features_factory
 from src.mating_graphs import factory as graphs_factory
 
 DEFAULT_NUM_ROWS_CROP = 5
-
+DEFAULT_COMPATIBILITY_THRESHOLD = 0.4
 
 class GeometricPairwise(Recipe):
 
@@ -48,13 +48,16 @@ class GeometricPairwiseBuilder():
 
 class SD1Pairwise(GeometricPairwise):
 
-    def __init__(self, db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[]) -> None:
+    def __init__(self, db,puzzle_num,puzzle_noise_level,
+                 puzzle_recipe_name="loadRegularPuzzle",crop_num_rows=DEFAULT_NUM_ROWS_CROP,
+                 add_geo_features=[],compatibility_threshold=DEFAULT_COMPATIBILITY_THRESHOLD) -> None:
         super().__init__(db,puzzle_num,puzzle_noise_level,
                          puzzle_recipe_name=puzzle_recipe_name, add_geo_features=add_geo_features)
         self.crop_num_rows = crop_num_rows
         self.extrap = "NormalizeSDExtrapolatorExtractor"
         self.origin = "NormalizeSDOriginalExtractor"
         self.pictorial_pairwisers = ["DotProductExtraToOriginalMatcher"]
+        self.compatibility_threshold = compatibility_threshold
     
     def cook(self, **kwargs):
         super().cook(**kwargs)
@@ -76,7 +79,8 @@ class SD1Pairwise(GeometricPairwise):
         self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
                                                    pieces=puzzle.bag_of_pieces,id2piece=puzzle.id2piece,
                                                    geometric_match_edges=self.matchers["EdgeMatcher"].match_edges,
-                                                   pictorial_matcher = self.matchers[self.pictorial_pairwisers[0]])
+                                                   pictorial_matcher = self.matchers[self.pictorial_pairwisers[0]],
+                                                   compatibility_threshold=self.compatibility_threshold)
         self.graph_wrapper.build_graph()
 
         return self.graph_wrapper
@@ -85,10 +89,13 @@ class SD1Pairwise(GeometricPairwise):
 class SD1PairwiseBuilder():
 
     def __call__(self, db,puzzle_num,puzzle_noise_level,
-                 puzzle_recipe_name="loadRegularPuzzle",crop_num_rows=DEFAULT_NUM_ROWS_CROP, add_geo_features=[], **_ignored) -> Any:
+                 puzzle_recipe_name="loadRegularPuzzle",crop_num_rows=DEFAULT_NUM_ROWS_CROP,
+                   add_geo_features=[],compatibility_threshold=DEFAULT_COMPATIBILITY_THRESHOLD,
+                     **_ignored) -> Any:
         return SD1Pairwise(db,puzzle_num,puzzle_noise_level,
                             puzzle_recipe_name=puzzle_recipe_name,
-                            crop_num_rows=crop_num_rows,add_geo_features=add_geo_features)
+                            crop_num_rows=crop_num_rows,add_geo_features=add_geo_features,
+                            compatibility_threshold=compatibility_threshold)
 
 
 

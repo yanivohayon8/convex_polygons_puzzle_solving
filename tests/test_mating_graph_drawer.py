@@ -54,6 +54,7 @@ class TestGraphDrawer(unittest.TestCase):
         drawer.init()
 
         fig, axs = plt.subplots(1,2)
+        fig.suptitle(f"db_{db}_puzzle_{puzzle_num}_noise_level_{noise_level}")
 
         drawer.draw_adjacency_graph(noisy_graph_wrapper.adjacency_graph,
                                     ax=axs[0])
