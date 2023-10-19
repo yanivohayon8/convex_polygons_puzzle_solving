@@ -1,9 +1,10 @@
 from src.mating_graphs.matching_graph import get_piece_name,get_edge_name,_link_to_mating
-
+from src.mating_graphs import factory
 
 class Cycle():
 
-    def __init__(self, matings_chain:list=None, piece2occurence:dict=None,debug_graph_cycle=None) -> None:
+    def __init__(self, matings_chain:list=None,
+                  piece2occurence:dict=None,debug_graph_cycle=None) -> None:
         self.debug_graph_cycle = debug_graph_cycle
 
         if matings_chain is not None and piece2occurence is not None:
@@ -71,6 +72,14 @@ class Cycle():
                 return False
 
         return len(self.matings_chain) == len(__value.matings_chain)
+
+
+def _reconstruct_cycle(matings_chain:list=None,piece2occurence:dict=None,debug_graph_cycle=None):
+    return Cycle(matings_chain=matings_chain,
+                 piece2occurence=piece2occurence,
+                 debug_graph_cycle=debug_graph_cycle)
+
+factory.register_builder(Cycle.__name__,_reconstruct_cycle)
 
 def map_edge_to_contain_cycles(cycles:list)->dict:
     edge2cycles = {}

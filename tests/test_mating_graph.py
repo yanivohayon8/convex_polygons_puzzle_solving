@@ -193,29 +193,38 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
                                                   puzzle_noise_level=puzzle_noise_level,add_geo_features=["AngleLengthExtractor"],**kwargs)
         return gd_puzzle_recipe.cook()
-
-    def _compute_cycles(self,wrapper:MatchingGraphWrapper):
-        raw_cycles = wrapper.compute_cycles(max_length=10)
-        print(len(list(raw_cycles)))
-
-    def test_red_blue_route_Inv9084_puzzle_1(self,puzzle_noise_level =1 ):
-        image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        puzzle_num = 1
-        puzzle_noise_level = 1
-        wrapper = self._bulid_graph_wrapper(image,puzzle_num,puzzle_noise_level)
-        # self._compute_cycles(wrapper)
+    
+    def test_360_loops_19_noise_0_rec(self):
+        # image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
+        db = "1"
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
 
         cycles = []
-        wrapper._compute_red_blue_cycles("P_7_E_1","P_9_E_0",cycles)
-        print(cycles)
-    
-    def test_360_loops_Inv9084_rec(self,puzzle_noise_level =1 ):
+        visited = ["P_2_E_1"]
+        visited.append("P_2_E_2")
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_3_E_0",cycles,loop_angle_error=6)
+        assert cycles == [['P_2_E_1', 'P_2_E_2', 'P_3_E_0', 'P_3_E_1', 'P_5_E_2', 'P_5_E_3']]
+
+    def test_360_loops_19_noise_1_rec(self):
         # image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
         db = "1"
         puzzle_num = 19
         puzzle_noise_level = 1
         wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
-        # self._compute_cycles(wrapper)
+
+        cycles = []
+        visited = ["P_2_E_1"]
+        visited.append("P_2_E_2")
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_3_E_0",cycles,loop_angle_error=6)
+        print(cycles)
+
+        cycles = []
+        visited = ["P_1_E_0"]
+        visited.append("P_1_E_1")
+        wrapper._compute_red_blue_360_loops_rec(visited,"P_2_E_0",cycles,loop_angle_error=6)
+        print(cycles)
 
         cycles = []
         visited = ["P_1_E_1"]
@@ -285,19 +294,22 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         print(cycles)
         
 
-    def test_360_loops_Inv9084(self):
+    def test_360_loops_19(self):
         db="1"
         puzzle_num = 19
         loop_angle_error = 40
 
         # Because we want the test to pass set compatibility_threshold to 0.38
+        # So all the ground truth links will be present.
         wrapper = self._bulid_graph_wrapper(db,puzzle_num,0,
                                             compatibility_threshold=0.38)
         graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
         assert len(graph_cycles_noise_0) == 5
 
         wrapper = self._bulid_graph_wrapper(db,puzzle_num,1)
+
         graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
+
         graph_cycles_noise_1_sets = [set(cycle) for cycle in graph_cycles_noise_1]
 
         # Verifying no duplicates
@@ -319,6 +331,7 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         # making sure all the cycles found in the noise 0 puzzle
         # are found also in the noised puzzle
+
         for cycle in graph_cycles_noise_0:
             assert set(cycle) in graph_cycles_noise_1_sets, f"expected cycle {cycle} was not computed"
 
