@@ -294,6 +294,15 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         print(cycles)
         
 
+    def test_360_loops_19_noise_1(self):
+        db="1"
+        puzzle_num = 19
+        puzzle_noise_level = 1
+        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
+        graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
+
+        print(graph_cycles_noise_1)
+
     def test_360_loops_19(self):
         db="1"
         puzzle_num = 19

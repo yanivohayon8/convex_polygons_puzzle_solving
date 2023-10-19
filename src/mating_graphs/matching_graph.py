@@ -120,7 +120,7 @@ class MatchingGraphWrapper():
             curr_node: the current visited node. Calling the function for the first time put edge start_node->curr_node
             computed_cycles: a list initiated outside. It will contain all the cycles
         '''
-        # print(f"\tVISITED: {visited}")
+        print(f"\tVISITED: {visited}")
         
         if len(visited)==2:
             piece_name = get_piece_name(visited[-1])
@@ -185,20 +185,6 @@ class MatchingGraphWrapper():
                                                     visited_pieces=visited_pieces,loop_angle_error=loop_angle_error)
 
     def compute_red_blue_360_loops(self,loop_angle_error=6):
-        # cycles_without_duplicates = []
-        # cycles_without_duplicates_sets = []
-
-        # def _compute_from_edge(visited,curr_node):
-        #     new_cycles = []
-        #     self._compute_red_blue_360_loops_rec(visited,curr_node,new_cycles,loop_angle_error=loop_angle_error)
-
-        #     for cycle in new_cycles:
-        #         cycle_set = set(cycle) 
-
-        #         if  cycle_set not in cycles_without_duplicates_sets:
-        #             cycles_without_duplicates.append(cycle)
-        #             cycles_without_duplicates_sets.append(cycle_set)
-
         cycles = []
 
         for inter_piece_link in self.filtered_potential_matings_graph.edges():
@@ -215,11 +201,10 @@ class MatchingGraphWrapper():
             ]
 
             new_cycles = []
-            self._compute_red_blue_360_loops_rec(visited,graph_node2,new_cycles)
+            # self._compute_red_blue_360_loops_rec(visited,"P_3_E_0",new_cycles)
+            self._compute_red_blue_360_loops_rec(visited,graph_node2,new_cycles,visited_pieces=list())
             [cycles.append(cycle) for cycle in new_cycles if cycle not in cycles]
                                                  
-            # _compute_from_edge(visited,graph_node2) 
-
             # # piece_edge2 = int(get_edge_name(graph_node2))
             # # node_2_piece_id = get_piece_name(graph_node2)
             # # # piece_edge2_adj = self.get_counter_clockwise_adjacent_edge(piece_edge2,node_2_piece_id)
