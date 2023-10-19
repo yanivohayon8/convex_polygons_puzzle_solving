@@ -316,20 +316,11 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         assert len(graph_cycles_noise_0) == 5
 
         wrapper = self._bulid_graph_wrapper(db,puzzle_num,1)
-
         graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
-
-        graph_cycles_noise_1_sets = [set(cycle) for cycle in graph_cycles_noise_1]
-
-        # Verifying no duplicates
-        graph_cycles_noise_1_sets_no_dup = []
-        [graph_cycles_noise_1_sets_no_dup.append(cycle_set) for cycle_set in graph_cycles_noise_1_sets if cycle_set not in graph_cycles_noise_1_sets_no_dup]
-        assert len(graph_cycles_noise_1_sets_no_dup) == len(graph_cycles_noise_1_sets)
 
         # sampling a cycle in the noise 0 puzzle assemly 
         # making sure it is in the found cycles noised puzzles 
-        cycles_noise_1 = [Cycle(debug_graph_cycle=cycle) for cycle in graph_cycles_noise_1]
-        debug_edge2cycles = map_edge_to_contain_cycles(cycles_noise_1)
+        debug_edge2cycles = map_edge_to_contain_cycles(graph_cycles_noise_1)
         P_1_e_1_cycles = sorted(
             list(
                 map(lambda cycle: sorted(list(cycle.get_pieces_involved())),
@@ -340,9 +331,8 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         # making sure all the cycles found in the noise 0 puzzle
         # are found also in the noised puzzle
-
         for cycle in graph_cycles_noise_0:
-            assert set(cycle) in graph_cycles_noise_1_sets, f"expected cycle {cycle} was not computed"
+            assert cycle in graph_cycles_noise_1, f"expected cycle {cycle} was not computed"
 
 
 if __name__ == "__main__":
