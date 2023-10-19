@@ -120,7 +120,7 @@ class MatchingGraphWrapper():
             curr_node: the current visited node. Calling the function for the first time put edge start_node->curr_node
             computed_cycles: a list initiated outside. It will contain all the cycles
         '''
-        print(f"\tVISITED: {visited}")
+        # print(f"\tVISITED: {visited}")
         
         if len(visited)==2:
             piece_name = get_piece_name(visited[-1])
@@ -129,11 +129,10 @@ class MatchingGraphWrapper():
             edge_index_2 = int(get_edge_name(visited[-1]))
 
 
-        if curr_node == visited[0]: #and len(visited) > 2:
+        if curr_node == visited[0]:
             
             if len(visited_pieces) > 2:
                 curr_cycle = factory.create("Cycle",debug_graph_cycle=visited)
-                # computed_cycles.append(visited)
                 computed_cycles.append(curr_cycle)
             # debug_is_acc_360 = abs(360-accumulated_loop_angle)<loop_angle_error
             # if debug_is_acc_360:
@@ -147,8 +146,7 @@ class MatchingGraphWrapper():
         # if accumulated_loop_angle > 360+loop_angle_error:
         #     return
         
-        prev_step = self.filtered_adjacency_graph[visited[-1]]
-        prev_step_type = prev_step[curr_node]["type"]
+        prev_step_type = self.filtered_adjacency_graph[visited[-1]][curr_node]["type"]
 
         '''
             Because we pre-sorted the edges counterclock wise,
@@ -159,10 +157,8 @@ class MatchingGraphWrapper():
         if prev_step_type == "inter_piece":
             curr_piece = get_piece_name(curr_node)
             curr_edge = int(get_edge_name(curr_node))
-            # adjacent_edge = self.get_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
             adjacent_edge = self.get_counter_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
             neighbor = self._name_node(curr_piece,adjacent_edge)
-            # visited_pieces.append(curr_piece)
             visited_piece_tmp = visited_pieces+[curr_piece]
             self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
                                                 visited_pieces=visited_piece_tmp,loop_angle_error=loop_angle_error)
@@ -193,7 +189,6 @@ class MatchingGraphWrapper():
             piece_edge1 = int(get_edge_name(graph_node1))
             node_1_piece_id = get_piece_name(graph_node1)
 
-            # piece_edge1_adj = self.get_counter_clockwise_adjacent_edge(piece_edge1,node_1_piece_id)
             piece_edge1_adj = self.get_clockwise_adjacent_edge(piece_edge1,node_1_piece_id)
             visited = [
                 self._name_node(node_1_piece_id,piece_edge1_adj),
@@ -201,21 +196,10 @@ class MatchingGraphWrapper():
             ]
 
             new_cycles = []
-            # self._compute_red_blue_360_loops_rec(visited,"P_3_E_0",new_cycles)
             self._compute_red_blue_360_loops_rec(visited,graph_node2,new_cycles,visited_pieces=list())
             [cycles.append(cycle) for cycle in new_cycles if cycle not in cycles]
-                                                 
-            # # piece_edge2 = int(get_edge_name(graph_node2))
-            # # node_2_piece_id = get_piece_name(graph_node2)
-            # # # piece_edge2_adj = self.get_counter_clockwise_adjacent_edge(piece_edge2,node_2_piece_id)
-            # # piece_edge2_adj = self.get_clockwise_adjacent_edge(piece_edge2,node_2_piece_id)
-            # # visited = [
-            # #     self._name_node(node_2_piece_id,piece_edge2_adj),
-            # #     graph_node2
-            # # ]
-            # # _compute_from_edge(visited,graph_node1) 
-
-        return cycles #cycles_without_duplicates
+                      
+        return cycles 
 
     
         

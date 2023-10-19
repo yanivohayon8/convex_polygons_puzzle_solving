@@ -60,7 +60,7 @@ class Cycle():
 
         # for mate in self.matings_chain:
         #     acc = acc + delimiter + repr(mate)
-        for piece in self.piece2occurence.keys():
+        for piece in sorted(self.piece2occurence.keys()):
             acc = acc + delimiter + piece
         
         return acc[len(delimiter):]
