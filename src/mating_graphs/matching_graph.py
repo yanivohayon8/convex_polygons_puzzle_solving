@@ -115,7 +115,7 @@ class MatchingGraphWrapper():
     def _compute_red_blue_360_loops_rec(self, visited, curr_node,computed_cycles:list, 
                                    visited_pieces=[],loop_angle_error=3):
         '''
-            computes zero loops around a vertex 360 degrees.
+            COMPUTES ZERO LOOPS AROUND A VERTEX IN 360 DEGREES FASHION.
             start_node: like P_7_E_1, from where to start the search
             curr_node: the current visited node. Calling the function for the first time put edge start_node->curr_node
             computed_cycles: a list initiated outside. It will contain all the cycles
