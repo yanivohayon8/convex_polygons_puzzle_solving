@@ -58,10 +58,13 @@ class Cycle():
         acc = ""
         delimiter = "==>"
 
-        for mate in self.matings_chain:
-            acc = acc + delimiter + repr(mate)
+        # for mate in self.matings_chain:
+        #     acc = acc + delimiter + repr(mate)
+        for piece in self.piece2occurence.keys():
+            acc = acc + delimiter + piece
         
         return acc[len(delimiter):]
+
     
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value,Cycle):
