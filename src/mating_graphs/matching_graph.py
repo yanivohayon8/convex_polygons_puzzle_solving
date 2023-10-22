@@ -246,6 +246,12 @@ def _link_to_mating(link):
     return Mating(piece_1=piece1,edge_1=edge1,piece_2=piece2,edge_2=edge2)
 
 
+def name_node(piece_name,edge_name):
+    '''
+        same as _name_node but not an instance function
+    '''
+    return f"P_{piece_name}_E_{edge_name}"
+
 
 def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None,compatibility_threshold=0.4):
     return MatchingGraphWrapper(pieces,id2piece,

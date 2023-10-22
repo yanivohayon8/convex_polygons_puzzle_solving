@@ -126,6 +126,13 @@ class Piece():
     def push_original_coordinates(self,distance:int)->Polygon:
         return self._push_polygon_outwards(Polygon(self.coordinates),distance)
 
+    def get_clockwise_adjacent_edge(self,edge):
+        return (edge-1)%self.get_num_coords()
+    
+    def get_counter_clockwise_adjacent_edge(self,edge):
+        return (edge+1)%self.get_num_coords()
+
+
 def overlapping_area(polygons:list):
     '''
         polygons: list of lists of tuples
