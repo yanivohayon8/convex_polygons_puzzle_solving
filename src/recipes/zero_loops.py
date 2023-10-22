@@ -2,6 +2,10 @@ from typing import Any
 from src.recipes import Recipe,factory as recipes_factory
 from src.mating_graphs import factory as graph_factory
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
+from functools import reduce
+from src.mating import convert_mating_to_vertex_mating
+from src.my_http_client import HTTPClient
+from src.data_structures.physical_assember import PhysicalAssembler
 
 class ZeroLoopsAroundVertex(Recipe):
 
@@ -11,6 +15,9 @@ class ZeroLoopsAroundVertex(Recipe):
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
         self.pairwise_recipe_name = pairwise_recipe_name
+        self.http = HTTPClient(self.db,self.puzzle_num,self.puzzle_noise_level)
+        self.physical_assembler = PhysicalAssembler(self.http)
+        self.loops_scores = []
     
 
     def cook(self,**kwargs):
@@ -23,9 +30,23 @@ class ZeroLoopsAroundVertex(Recipe):
 
         piece2matings = graph_wrapper.get_piece2filtered_potential_matings()
         zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
-        zero_loops = zero_loops_loader.load()
+        loops = zero_loops_loader.load()
 
-        return zero_loops
+        self.loops_scores = []
+
+        for i,loop in enumerate(loops):
+            matings = loop.get_as_mating_list()
+            matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,id2piece[mat.piece_1],id2piece[mat.piece_2]),matings,"")
+            loop.set_matings_as_csv(matings_csv)
+            screenhost_name = ""#f"level_{0}_loop_{i}" # ""
+            response = self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
+            score = self.physical_assembler.score_assembly(response)
+            loop.set_score(score)
+            self.loops_scores.append(score)
+
+        loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
+
+        return loops_ranked
 
 
 
