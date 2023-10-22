@@ -8,6 +8,7 @@ from src.pairwise_matchers import factory as pairwisers_factory
 from src.pairwise_matchers import pairwise_pieces
 from src.mating_graphs import factory as graph_factory
 
+
 class TestFeatureFactory(unittest.TestCase):
 
     def test_print_builders(self):
