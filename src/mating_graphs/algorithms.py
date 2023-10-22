@@ -1,6 +1,6 @@
 from typing import Any
 from networkx import Graph as nxGraph
-from src.mating_graphs.matching_graph import get_edge_name,get_piece_name,name_node
+from src.mating_graphs.matching_graph import get_edge_name,get_piece_name,name_node,INTER_PIECES_EDGE_TYPE
 from src.mating_graphs import factory as graph_factory
 
 class RedBlueCycleAlgo():
@@ -11,21 +11,23 @@ class RedBlueCycleAlgo():
     def compute(self,graph:nxGraph):
         cycles = []
 
-        for inter_piece_link in graph.edges():
+        for inter_piece_link in graph.edges(data=True):
 
-            graph_node1,graph_node2 = inter_piece_link
-            piece_edge1 = int(get_edge_name(graph_node1))
-            node_1_piece_id = get_piece_name(graph_node1)
+            if inter_piece_link[2]["type"] == INTER_PIECES_EDGE_TYPE:
+                graph_node1 = inter_piece_link[0]
+                graph_node2 = inter_piece_link[1]
+                piece_edge1 = int(get_edge_name(graph_node1))
+                node_1_piece_id = get_piece_name(graph_node1)
 
-            piece_edge1_adj = self.id2piece[node_1_piece_id].get_clockwise_adjacent_edge(piece_edge1)
-            visited = [
-                name_node(node_1_piece_id,piece_edge1_adj),
-                graph_node1
-            ]
+                piece_edge1_adj = self.id2piece[node_1_piece_id].get_clockwise_adjacent_edge(piece_edge1)
+                visited = [
+                    name_node(node_1_piece_id,piece_edge1_adj),
+                    graph_node1
+                ]
 
-            new_cycles = []
-            self._compute_from(graph,visited,graph_node2,new_cycles,visited_pieces=list())
-            [cycles.append(cycle) for cycle in new_cycles if cycle not in cycles]
+                new_cycles = []
+                self._compute_from(graph,visited,graph_node2,new_cycles,visited_pieces=list())
+                [cycles.append(cycle) for cycle in new_cycles if cycle not in cycles]
                       
         return cycles 
     
@@ -64,8 +66,8 @@ class RedBlueCycleAlgo():
             adjacent_edge = self.id2piece[curr_piece].get_counter_clockwise_adjacent_edge(curr_edge)
             neighbor = name_node(curr_piece,adjacent_edge)
             visited_piece_tmp = visited_pieces+[curr_piece]
-            self._compute_from(graph,visited + [curr_node], neighbor,
-                               computed_cycles,visited_pieces=visited_piece_tmp)
+            self._compute_from(graph,visited + [curr_node], neighbor,computed_cycles,
+                               visited_pieces=visited_piece_tmp)
             
         elif prev_step_type == "within_piece":
  
