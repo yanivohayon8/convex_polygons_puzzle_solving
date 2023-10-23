@@ -12,8 +12,31 @@ class silentLoopsSimulation():
     
     def __init__(self, physical_assembler:PhysicalAssembler) -> None:
         self.physical_assembler = physical_assembler
-        self.next_screen_shot_name = ""
 
+    def _send_request(self,loop,id2piece,screenshot_name):
+        csv = get_loop_matings_as_csv(loop,id2piece)
+        return self.physical_assembler.run(csv,screenshot_name=screenshot_name)
+
+    def _score(self,loop,response):
+        score = self.physical_assembler.score_assembly(response)
+        loop.set_score(score)
+        return score
+    
+    def simulate(self,loops:list,id2piece):      
+        loops_scores = []
+
+        for loop in loops:
+            response = self._send_request(loop,id2piece,"")
+            score = self._score(loop,response)  
+            loops_scores.append(score)
+
+        return loops_scores
+    
+
+class imagedLoopsSimulator(silentLoopsSimulation):
+    '''
+        Saves images to display after the simulation ends
+    '''
     def simulate(self,loops:list,id2piece):      
         loops_scores = []
 
