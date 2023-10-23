@@ -2,11 +2,10 @@ from typing import Any
 from src.recipes import Recipe,factory as recipes_factory
 from src.mating_graphs import factory as graph_factory
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
-from functools import reduce
-from src.mating import convert_mating_to_vertex_mating
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
+from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
 
 class silentLoopsSimulation():
     
@@ -78,10 +77,10 @@ class ZeroLoopsAroundVertex(Recipe):
     
 
     def cook(self,**kwargs):
-        pairwise_recipe = recipes_factory.create(self.pairwise_recipe_name,db=self.db,puzzle_num=self.puzzle_num,puzzle_noise_level=self.puzzle_noise_level,**kwargs)
-        graph_wrapper = pairwise_recipe.cook()
+        self.pairwise_recipe = recipes_factory.create(self.pairwise_recipe_name,db=self.db,puzzle_num=self.puzzle_num,puzzle_noise_level=self.puzzle_noise_level,**kwargs)
+        graph_wrapper = self.pairwise_recipe.cook()
 
-        id2piece = pairwise_recipe.puzzle_recipe.puzzle.id2piece
+        id2piece = self.pairwise_recipe.puzzle_recipe.puzzle.id2piece
         algo = graph_factory.create("RedBlueCycleAlgo",id2piece=id2piece)
         cycles = algo.compute(graph_wrapper.filtered_adjacency_graph)
 
@@ -93,6 +92,9 @@ class ZeroLoopsAroundVertex(Recipe):
         loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
 
         return loops_ranked
+    
+    def get_num_piece_in_puzzle(self):
+        return len(self.pairwise_recipe.puzzle_recipe.puzzle.bag_of_pieces)
 
 
 
@@ -102,6 +104,82 @@ class ZeroLoopsAroundVertexBuilder():
                  pairwise_recipe_name = "SD1Pairwise",simulation_mode="silent",**_ignored) -> Any:
         return ZeroLoopsAroundVertex(db,puzzle_num,puzzle_noise_level,
                                      pairwise_recipe_name=pairwise_recipe_name,simulation_mode=simulation_mode)
-    
+
+
+class LoopsMerge():
+
+    def __init__(self,ranked_loops:list,puzzle_num_pieces) -> None:
+        self.puzzle_num_pieces = puzzle_num_pieces
+        self.ranked_loops = ranked_loops
+        self.merger = BasicLoopMerger()
+
+    def cook(self):
+        aggregated_loops = []
+        first_detected_solution = None
+        self.debug_merging_phases = []
+
+        for i,curr_loop in enumerate(self.ranked_loops):
+            print(f"Try to merge the {i+1}-th loop")
+            is_merged = False
+            loops_merge_with_curr_loop = []
+
+            for agg_lop in aggregated_loops:
+                try:
+                    print(f"Try to Merge {curr_loop} into {agg_lop}")
+                    merged_res = self.merger.merge(agg_lop,curr_loop)
+                    print(f"Suceed")
+                    is_merged = True
+                    loops_merge_with_curr_loop.append(merged_res)
+
+                except LoopMutualPiecesMergeError as e:
+                    # This loop doesnot have a common pieces with other loops
+                    # so, merge it for later...
+                    pass
+                except LoopMergeError as e:
+                    pass
+            
+
+            if is_merged:
+                
+                # delete loops that are contained in the merging result
+                # of the current loop with.
+
+                aggregated_loops_tmp = []
+                for lop1 in loops_merge_with_curr_loop:
+                    
+                    for lop2 in aggregated_loops:
+                        if not lop2.is_contained(lop1):
+                            aggregated_loops_tmp.append(lop2)
+
+                    aggregated_loops_tmp.append(lop1)
+
+                aggregated_loops = aggregated_loops_tmp
+
+                # for the result to be converge, try to merge merges of loops...
+
+                aggregated_loops_tmp = []
+                for lop1 in aggregated_loops:
+                    for lop2 in aggregated_loops:
+                        if lop1 != lop2:
+                            try:
+                                result = self.merger.merge(lop1,lop2)
+                                aggregated_loops_tmp.append(result)
+                            except (LoopMutualPiecesMergeError, LoopMergeError) as e:
+                                if lop2 not in aggregated_loops_tmp:
+                                    aggregated_loops_tmp.append(lop2)
+                aggregated_loops = aggregated_loops_tmp   
+            else:
+                aggregated_loops.append(curr_loop)
+
+            for lop in aggregated_loops:
+                if len(lop.get_pieces_invovled()) == self.puzzle_num_pieces:
+                    first_detected_solution = lop
+                    break
+            
+            self.debug_merging_phases.append(aggregated_loops.copy())
+        
+        return first_detected_solution
+
 
 recipes_factory.register_builder(ZeroLoopsAroundVertex.__name__,ZeroLoopsAroundVertexBuilder())
+recipes_factory.register_builder(LoopsMerge.__name__,lambda ranked_loops,puzzle_num_pieces: LoopsMerge(ranked_loops,puzzle_num_pieces))
