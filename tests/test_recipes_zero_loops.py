@@ -5,9 +5,17 @@ from src.recipes.zero_loops import ZeroLoopsAroundVertex # so the key would apea
 
 class TestZeroLoopsAroundVertex(unittest.TestCase):
 
-    def test_db_1_puzzle_19_noise_0(self):
+    def test_SILENT_db_1_puzzle_19_noise_0(self):
         zero_loops_recipe = ZeroLoopsAroundVertex(db=1,puzzle_num=19,puzzle_noise_level=0,
                                                 pairwise_recipe_name = "SD1Pairwise")
+        zero_loops = zero_loops_recipe.cook(compatibility_threshold=0.38)
+
+        assert len(zero_loops) == 5
+
+    def test_IMAGED_db_1_puzzle_19_noise_0(self):
+        zero_loops_recipe = ZeroLoopsAroundVertex(db=1,puzzle_num=19,puzzle_noise_level=0,
+                                                pairwise_recipe_name = "SD1Pairwise",
+                                                simulation_mode="imaged")
         zero_loops = zero_loops_recipe.cook(compatibility_threshold=0.38)
 
         assert len(zero_loops) == 5

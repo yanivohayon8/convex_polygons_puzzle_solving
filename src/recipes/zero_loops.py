@@ -37,14 +37,21 @@ class imagedLoopsSimulator(silentLoopsSimulation):
     '''
         Saves images to display after the simulation ends
     '''
-    def simulate(self,loops:list,id2piece):      
+    def simulate(self, loops: list, id2piece,level=None):
+        
+        # Because we score only after we save an image, we need to save the 
+        # images of all loops and then 
+
         loops_scores = []
 
-        for i,loop in enumerate(loops):
-            csv = get_loop_matings_as_csv(loop,id2piece)
-            response = self.physical_assembler.run(csv,screenshot_name=self.next_screen_shot_name)
-            score = self.physical_assembler.score_assembly(response)
-            loop.set_score(score)
+        for loop in loops:
+            screenshot_name = repr(loop)
+
+            if not level is None:
+                screenshot_name = f"{level}-{screenshot_name}"
+
+            response = self._send_request(loop,id2piece,screenshot_name)
+            score = self._score(loop,response)  
             loops_scores.append(score)
 
         return loops_scores
@@ -64,6 +71,8 @@ class ZeroLoopsAroundVertex(Recipe):
 
         if simulation_mode == "silent":
             self.simulator = silentLoopsSimulation(self.physical_assembler)
+        elif simulation_mode == "imaged":
+            self.simulator = imagedLoopsSimulator(self.physical_assembler)
 
         self.loops_scores = []
     
