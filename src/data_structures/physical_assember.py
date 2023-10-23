@@ -32,7 +32,7 @@ class PhysicalAssembler():
 
 class AssemblyPlotter():
 
-    def __init__(self,background_width = 3000,background_height = 3000) -> None:
+    def __init__(self,background_width = 5000,background_height = 5000) -> None:
         self.images = []
         self.background_width = background_width
         self.background_height = background_height
@@ -40,30 +40,34 @@ class AssemblyPlotter():
     def load_images(self,pieces):
         # self.images = [Image.open(piece.img_path).convert('RGB') for piece in pieces]
 
-        self.images = [Image.open(piece.img_path) for piece in pieces]
+        # self.images = [Image.open(piece.img_path) for piece in pieces]
 
-        # self.images = []
+        self.images = []
 
-        # for piece in pieces:
-        #     original_image = Image.open(piece.img_path)
+        for piece in pieces:
+            original_image = Image.open(piece.img_path)
 
-        #     # Create a new blank RGBA image with the desired dimensions
-        #     new_width, new_height = 2000, 2000
-        #     new_image = Image.new('RGBA', (new_width, new_height), (0, 0, 0, 0))
+            # Create a new blank RGBA image with the desired dimensions
+            new_width, new_height = 2000, 2000
+            new_image = Image.new('RGBA', (new_width, new_height), (0, 0, 0, 0))
 
-        #     # Calculate the position to center the original image in the new image
-        #     x = (new_width - original_image.width) // 2
-        #     y = (new_height - original_image.height) // 2
+            # Calculate the position to center the original image in the new image
+            centroid = piece.polygon.centroid
 
-        #     # Paste the original image onto the new image at the calculated position
-        #     new_image.paste(original_image, (x, y))
+            # x = new_width//2 - original_image.width//2
+            x = new_width//2 #-  int(centroid.x)
+            # y = new_height//2 - original_image.height//2
+            y = new_height//2 # - int(centroid.y)
 
-        #     self.images.append(new_image)
+            # Paste the original image onto the new image at the calculated position
+            new_image.paste(original_image, (x, y))
+
+            self.images.append(new_image)
     
-    def plot(self,rotation_angles,translate_vectors,centers):
+    def plot(self,rotation_angles,translate_vectors):
         background_img = Image.new("RGBA",(self.background_width,self.background_height),color=0)
 
-        for radians,trans_vec,image,center in zip(rotation_angles,translate_vectors,self.images,centers):
+        for radians,trans_vec,image in zip(rotation_angles,translate_vectors,self.images):
     
             # x = background_img.width//2 + trans_vec[0] - center.x
             # y = background_img.height//2 + trans_vec[1] - center.y
@@ -80,8 +84,8 @@ class AssemblyPlotter():
                         mask.putpixel((row,col),0)
             
             rotation_angle = math.degrees(-radians)
-            rotated_image = image.rotate(rotation_angle,expand=1)
-            rotated_mask = mask.rotate(rotation_angle,expand=1)
+            rotated_image = image.rotate(rotation_angle) # ,expand=1
+            rotated_mask = mask.rotate(rotation_angle) #,expand=1
             background_img.paste(rotated_image,box=pos,mask=rotated_mask)
 
             # background_img.paste(rotated_image,box=pos)
