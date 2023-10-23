@@ -17,18 +17,28 @@ class TestAssemblyPlotter(unittest.TestCase):
         plotter = AssemblyPlotter()
 
         plotter.load_images([bag_of_pieces[0],bag_of_pieces[1]])
+
+        print(bag_of_pieces[1].polygon.centroid)
         rotation_angles = [0.0,-5.688992977142334]
         # transvectors = [(0.0,0.0),(-403.9974060058594,-452.70440673828125)]
+        centers = [bag_of_pieces[0].polygon.centroid,bag_of_pieces[1].polygon.centroid]
+        # transvectors = [(0.0,0.0),(-147,130)]
         transvectors = [(0.0,0.0),(-900,-1200.70440673828125)]
+        # transvectors = [(0.0,0.0),(-150,130)]
         
         # plotter.load_images([bag_of_pieces[1]])
         # rotation_angles = [-5.688992977142334]#[-5.688992977142334] # #
-        # transvectors = [(0,0)] #[(-403.9974060058594,-452.70440673828125)]# #
+        # transvectors =[(-403.9974060058594,-452.70440673828125)]# # #[(0,0)] #
 
-        img = plotter.plot(rotation_angles,transvectors)
+        # img = plotter.plot(rotation_angles,transvectors)
+        img = plotter.plot(rotation_angles,transvectors,centers)
 
         plt.imshow(img)
         plt.show()
+
+        raise NotImplementedError("This is not working...... rewrite the code (it is hard coded)")
+
+
 
 
 
