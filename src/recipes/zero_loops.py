@@ -6,17 +6,42 @@ from functools import reduce
 from src.mating import convert_mating_to_vertex_mating
 from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
+from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
+
+class silentLoopsSimulation():
+    
+    def __init__(self, physical_assembler:PhysicalAssembler) -> None:
+        self.physical_assembler = physical_assembler
+        self.next_screen_shot_name = ""
+
+    def simulate(self,loops:list,id2piece):      
+        loops_scores = []
+
+        for i,loop in enumerate(loops):
+            csv = get_loop_matings_as_csv(loop,id2piece)
+            response = self.physical_assembler.run(csv,screenshot_name=self.next_screen_shot_name)
+            score = self.physical_assembler.score_assembly(response)
+            loop.set_score(score)
+            loops_scores.append(score)
+
+        return loops_scores
 
 class ZeroLoopsAroundVertex(Recipe):
 
     def __init__(self,db,puzzle_num,puzzle_noise_level,
-                 pairwise_recipe_name = "SD1Pairwise",**kwargs) -> None:
+                 pairwise_recipe_name = "SD1Pairwise",
+                 simulation_mode="silent") -> None:
         self.db = db
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
         self.pairwise_recipe_name = pairwise_recipe_name
+        
         self.http = HTTPClient(self.db,self.puzzle_num,self.puzzle_noise_level)
         self.physical_assembler = PhysicalAssembler(self.http)
+
+        if simulation_mode == "silent":
+            self.simulator = silentLoopsSimulation(self.physical_assembler)
+
         self.loops_scores = []
     
 
@@ -32,18 +57,7 @@ class ZeroLoopsAroundVertex(Recipe):
         zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
         loops = zero_loops_loader.load()
 
-        self.loops_scores = []
-
-        for i,loop in enumerate(loops):
-            matings = loop.get_as_mating_list()
-            matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,id2piece[mat.piece_1],id2piece[mat.piece_2]),matings,"")
-            loop.set_matings_as_csv(matings_csv)
-            screenhost_name = ""#f"level_{0}_loop_{i}" # ""
-            response = self.physical_assembler.run(matings_csv,screenshot_name=screenhost_name)
-            score = self.physical_assembler.score_assembly(response)
-            loop.set_score(score)
-            self.loops_scores.append(score)
-
+        self.loops_scores = self.simulator.simulate(loops,id2piece)
         loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
 
         return loops_ranked
@@ -53,9 +67,9 @@ class ZeroLoopsAroundVertex(Recipe):
 class ZeroLoopsAroundVertexBuilder():
 
     def __call__(self,db,puzzle_num,puzzle_noise_level,
-                 pairwise_recipe_name = "SD1Pairwise",**_ignored) -> Any:
+                 pairwise_recipe_name = "SD1Pairwise",simulation_mode="silent",**_ignored) -> Any:
         return ZeroLoopsAroundVertex(db,puzzle_num,puzzle_noise_level,
-                                     pairwise_recipe_name=pairwise_recipe_name)
+                                     pairwise_recipe_name=pairwise_recipe_name,simulation_mode=simulation_mode)
     
 
 recipes_factory.register_builder(ZeroLoopsAroundVertex.__name__,ZeroLoopsAroundVertexBuilder())

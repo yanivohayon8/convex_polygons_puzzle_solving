@@ -1,5 +1,5 @@
 from functools import reduce
-from src.mating import Mating
+from src.mating import Mating,convert_mating_to_vertex_mating
 
 
 class ZeroLoopError(Exception):
@@ -191,40 +191,48 @@ class Loop():
         return False
          
 
+
 def get_loop_matings_as_csv(loop:Loop,id2piece:dict):
-    data = ""
+    matings = loop.get_as_mating_list()
+    matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,id2piece[mat.piece_1],id2piece[mat.piece_2]),matings,"")
+    loop.set_matings_as_csv(matings_csv)
 
-    for mating in loop.get_as_mating_list():
-        piece_1 = id2piece[mating.piece_1]
-        edge_1_index_before_ccw = piece_1.get_origin_index(mating.edge_1)
-        piece_1_vertex_1, piece_1_vertex_2 = piece_1.get_vertices_indices(edge_1_index_before_ccw)
+    return matings_csv
 
-        piece_2 = id2piece[mating.piece_2]
-        edge_2_index_before_ccw = piece_2.get_origin_index(mating.edge_2)
-        piece_2_vertex_1, piece_2_vertex_2 = piece_2.get_vertices_indices(edge_2_index_before_ccw)
+# def get_loop_matings_as_csv(loop:Loop,id2piece:dict):
+#     data = ""
 
-        '''The following way of putting springs might be probelmatic'''
-        overlap_area,_,__ = piece_1.align_pieces_on_edge_and_compute_overlap_area(
-            piece_2,
-            [piece_1_vertex_1, piece_1_vertex_2],
-            [piece_2_vertex_1, piece_2_vertex_2])
+#     for mating in loop.get_as_mating_list():
+#         piece_1 = id2piece[mating.piece_1]
+#         edge_1_index_before_ccw = piece_1.get_origin_index(mating.edge_1)
+#         piece_1_vertex_1, piece_1_vertex_2 = piece_1.get_vertices_indices(edge_1_index_before_ccw)
+
+#         piece_2 = id2piece[mating.piece_2]
+#         edge_2_index_before_ccw = piece_2.get_origin_index(mating.edge_2)
+#         piece_2_vertex_1, piece_2_vertex_2 = piece_2.get_vertices_indices(edge_2_index_before_ccw)
+
+#         '''The following way of putting springs might be probelmatic'''
+#         overlap_area,_,__ = piece_1.align_pieces_on_edge_and_compute_overlap_area(
+#             piece_2,
+#             [piece_1_vertex_1, piece_1_vertex_2],
+#             [piece_2_vertex_1, piece_2_vertex_2])
         
-        overlap_area_opp,_,__ = piece_1.align_pieces_on_edge_and_compute_overlap_area(
-            piece_2,
-            [piece_1_vertex_1, piece_1_vertex_2],
-            [piece_2_vertex_2, piece_2_vertex_1])
+#         overlap_area_opp,_,__ = piece_1.align_pieces_on_edge_and_compute_overlap_area(
+#             piece_2,
+#             [piece_1_vertex_1, piece_1_vertex_2],
+#             [piece_2_vertex_2, piece_2_vertex_1])
 
-        epsilon = 1
+#         epsilon = 1
 
-        if (overlap_area > epsilon and overlap_area_opp > epsilon) or \
-            (overlap_area < epsilon and overlap_area_opp < epsilon):
-            raise("Problematic transformation")
+#         if (overlap_area > epsilon and overlap_area_opp > epsilon) or \
+#             (overlap_area < epsilon and overlap_area_opp < epsilon):
+#             raise("Problematic transformation")
 
-        if overlap_area < epsilon:
-            data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_1}\r\n"
-            data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_2}\r\n"
-        else:
-            data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_2}\r\n"
-            data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_1}\r\n"
+#         if overlap_area < epsilon:
+#             data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_1}\r\n"
+#             data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_2}\r\n"
+#         else:
+#             data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_2}\r\n"
+#             data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_1}\r\n"
 
-    return data 
+#     return data 
