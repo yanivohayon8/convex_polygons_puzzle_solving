@@ -128,6 +128,11 @@ class ZeroLoops360Solver():
                     pass
             
             if is_merged:
+                
+                # delete loops that are contained in the merging result
+                # of the current loop with.
+
+
                 merged_loops_tmp = []
                 for lop1 in loops_merge_with_curr_loop:
                     
@@ -138,6 +143,9 @@ class ZeroLoops360Solver():
                     merged_loops_tmp.append(lop1)
 
                 merged_loops = merged_loops_tmp
+
+                # for the result to be converge, try to merge merges of loops...
+                # 
 
                 merged_loops_tmp = []
                 for lop1 in merged_loops:
