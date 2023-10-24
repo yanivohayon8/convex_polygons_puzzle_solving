@@ -40,7 +40,7 @@ class ZeroLoopAroundVertexLoader():
             if not self._is_valid(cycle,accumulated_angle_err):
                 continue
             
-            next_loop = Loop(piece2edge2matings={},availiable_matings=[])
+            next_loop = Loop(piece2edge2matings={},availiable_matings=[],cycle=cycle)
 
             for piece in cycle.get_pieces_involved():
                 for mating in self.piece2potential_matings[piece]:

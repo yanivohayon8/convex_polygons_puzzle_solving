@@ -28,9 +28,9 @@ class BasicLoopMerger():
             mess = f"The loops {repr(loop_1)} and {repr(loop_2)} don't have mutual pieces"
             raise LoopMutualPiecesMergeError(mess)
         
-        if len(mutual_availiable_matings) == 0:
-            mess = f"The loops {repr(loop_1)} and {repr(loop_2)} don't have potential mutual availiable matings"
-            raise LoopMergeError(mess) #LoopMergeError(mess)
+        # if len(mutual_availiable_matings) == 0:
+        #     mess = f"The loops {repr(loop_1)} and {repr(loop_2)} don't have potential mutual availiable matings"
+        #     raise LoopMergeError(mess) #LoopMergeError(mess)
 
         conflict = loop_1._mating_conflict(loop_2)
 

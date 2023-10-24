@@ -10,7 +10,7 @@ class LoopUnionConflictError(Exception):
 
 class Loop():
     
-    def __init__(self,piece2edge2matings={},availiable_matings=[]) -> None:
+    def __init__(self,piece2edge2matings={},availiable_matings=[],cycle=None) -> None:
         '''
             piece2edge2matings: a dictionary of dictionaries
             piece2edge2matings keys are the pieces ids and the values are dictionaries
@@ -21,6 +21,7 @@ class Loop():
         self.unions_history = [] # For Debug
         self.score = None
         self.matings_as_csv = "" # This is computed in get_loop_matings_as_csv below (the http body request)
+        self.cycle = cycle
     
     def set_score(self,score):
         self.score = score
@@ -83,12 +84,16 @@ class Loop():
         return matings
     
     def insert_mating(self,mating:Mating):
-        key_p_1 = f"{mating.piece_1}" #f"P_{piece_1}"
+        key_p_1 = f"{mating.piece_1}" 
+        key_p_2 = f"{mating.piece_2}" 
         self.piece2edge2matings.setdefault(key_p_1,{})
-        self.piece2edge2matings[key_p_1][mating.edge_1] = mating # Because each edge has only one mating in the loop
-
-        key_p_2 = f"{mating.piece_2}" #f"P_{piece_2}"
         self.piece2edge2matings.setdefault(key_p_2,{})
+
+        if mating.edge_1 in self.piece2edge2matings[key_p_1].keys() or \
+            mating.edge_2 in self.piece2edge2matings[key_p_2].keys():
+            return # Override is not permitted
+
+        self.piece2edge2matings[key_p_1][mating.edge_1] = mating # Because each edge has only one mating in the loop
         self.piece2edge2matings[key_p_2][mating.edge_2] = mating
     
     def insert_availiable_mating(self,mating:Mating):

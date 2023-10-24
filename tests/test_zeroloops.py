@@ -2,7 +2,10 @@ import unittest
 from src.solvers.apictorial import FirstSolver
 from src.recipes.puzzle import loadRegularPuzzle
 from src.recipes import factory as recipes_factory
+from src.mating_graphs import factory as graph_factory
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
+from src.data_structures.loop_merger import BasicLoopMerger
+from src.mating import Mating
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.feature_extraction import geometric as geo_extractor 
 
@@ -31,7 +34,43 @@ class TestZeroLoopKeepCycleAsIs(unittest.TestCase):
             matings_csv = get_loop_matings_as_csv(zero_loop,solver.id2piece)
             # zero_loop.set_matings_as_csv(matings_csv)
             response = solver.physical_assembler.run(matings_csv,screenshot_name=f"cycle_{i}")
-        
+    
+
+
+class TestBasicLoopMerger(unittest.TestCase):
+    def test_loop_merging(self):
+        graph_cycles = [
+            ['P_2_E_1', 'P_2_E_2', 'P_3_E_0', 'P_3_E_1', 'P_5_E_2', 'P_5_E_3'],
+            ['P_3_E_1', 'P_3_E_2', 'P_4_E_0', 'P_4_E_1', 'P_6_E_2', 'P_6_E_0', 'P_5_E_1', 'P_5_E_2'],
+            ['P_7_E_1', 'P_7_E_2', 'P_8_E_0', 'P_8_E_1', 'P_9_E_3', 'P_9_E_0'],
+            ['P_0_E_2', 'P_0_E_3', 'P_1_E_0', 'P_1_E_1', 'P_2_E_0', 'P_2_E_1', 'P_5_E_3', 'P_5_E_0'],
+            ['P_0_E_1', 'P_0_E_2', 'P_5_E_0', 'P_5_E_1', 'P_6_E_0', 'P_6_E_1', 'P_9_E_2', 'P_9_E_3', 'P_8_E_1', 'P_8_E_2']
+        ]
+
+        cycles = [graph_factory.create("Cycle",debug_graph_cycle=graph_cy) for graph_cy in graph_cycles]
+
+        # Beware of side affects
+        pairwise_recipe = recipes_factory.create("SD1Pairwise",db=1,puzzle_num=19,
+                                                 puzzle_noise_level=1)
+        graph_wrapper = pairwise_recipe.cook()
+        piece2potential_matings = graph_wrapper.get_piece2filtered_potential_matings()
+        bag_of_pieces = pairwise_recipe.puzzle_recipe.puzzle.bag_of_pieces
+        zero_loops_loader = ZeroLoopKeepCycleAsIs(bag_of_pieces,cycles,piece2potential_matings)
+        zero_loops = zero_loops_loader.load()
+        merger = BasicLoopMerger()
+
+        expected_mating = Mating(piece_1="5",edge_1=2,
+                                 piece_2="3",edge_2=1)
+        lop1,lop2 =  zero_loops[0],zero_loops[1]
+        assert expected_mating in lop1.get_as_mating_list()
+        assert expected_mating in lop2.get_as_mating_list()
+        merged_loop = merger.merge(lop1,lop2)
+        assert expected_mating in merged_loop.get_as_mating_list()
+
+
+
+
+
 class TestAngleSum(unittest.TestCase):
 
     def test_Inv9084_noise_1zero_loops(self):

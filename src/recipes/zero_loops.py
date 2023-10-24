@@ -114,6 +114,30 @@ class LoopsMerge():
         self.merger = BasicLoopMerger()
 
     def cook(self):
+        aggregated_loop = self.ranked_loops[0]
+        to_be_merged_loops = []
+        
+        while True:
+            for i,curr_loop in enumerate(self.ranked_loops[1:]):
+                queue_size = len(to_be_merged_loops)
+
+                for _ in range(queue_size):
+                    lop = to_be_merged_loops.pop(0)
+                    try:
+                        aggregated_loop = self.merger.merge(aggregated_loop,lop)    
+                    except (LoopMutualPiecesMergeError,LoopMergeError) as e:
+                        to_be_merged_loops.append(lop)
+
+                try:
+                    aggregated_loop = self.merger.merge(aggregated_loop,curr_loop)
+                except (LoopMutualPiecesMergeError,LoopMergeError) as e:
+                    to_be_merged_loops.append(curr_loop)
+                
+                if len(aggregated_loop.get_pieces_invovled()) == self.puzzle_num_pieces:
+                    return aggregated_loop
+            
+
+    def cook_old(self):
         aggregated_loops = []
         first_detected_solution = None
         self.debug_merging_phases = []
@@ -125,9 +149,9 @@ class LoopsMerge():
 
             for agg_lop in aggregated_loops:
                 try:
-                    print(f"Try to Merge {curr_loop} into {agg_lop}")
+                    # print(f"Try to Merge {curr_loop} into {agg_lop}")
                     merged_res = self.merger.merge(agg_lop,curr_loop)
-                    print(f"Suceed")
+                    # print(f"Suceed")
                     is_merged = True
                     loops_merge_with_curr_loop.append(merged_res)
 
