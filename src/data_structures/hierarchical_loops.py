@@ -10,7 +10,8 @@ class LoopUnionConflictError(Exception):
 
 class Loop():
     
-    def __init__(self,piece2edge2matings={},availiable_matings=[],cycle=None) -> None:
+    def __init__(self,piece2edge2matings={},availiable_matings=[],
+                 cycle=None,level=0) -> None:
         '''
             piece2edge2matings: a dictionary of dictionaries
             piece2edge2matings keys are the pieces ids and the values are dictionaries
@@ -22,6 +23,7 @@ class Loop():
         self.score = None
         self.matings_as_csv = "" # This is computed in get_loop_matings_as_csv below (the http body request)
         self.cycle = cycle
+        self.level = level
     
     def set_score(self,score):
         self.score = score
@@ -73,6 +75,11 @@ class Loop():
     def get_mutual_availiable_matings(self,other_loop):
         return [mat for mat in self.get_availiable_matings() if mat in other_loop.get_availiable_matings()]
 
+    def get_mutual_matings(self,other_loop):
+        self_matings = self.get_as_mating_list()
+        other_matings = other_loop.get_as_mating_list()
+
+        return [mating for mating  in self_matings if mating in other_matings]
 
     def get_as_mating_list(self):
         matings = []
@@ -89,9 +96,14 @@ class Loop():
         self.piece2edge2matings.setdefault(key_p_1,{})
         self.piece2edge2matings.setdefault(key_p_2,{})
 
-        if mating.edge_1 in self.piece2edge2matings[key_p_1].keys() or \
-            mating.edge_2 in self.piece2edge2matings[key_p_2].keys():
-            return # Override is not permitted
+        if mating.edge_1 in self.piece2edge2matings[key_p_1].keys():
+            if mating != self.piece2edge2matings[key_p_1][mating.edge_1]:
+                raise Exception(f"Try to override {self.piece2edge2matings[key_p_1][mating.edge_1]} with {mating}")
+
+        if mating.edge_2 in self.piece2edge2matings[key_p_2].keys():
+            if mating != self.piece2edge2matings[key_p_2][mating.edge_2]:
+                raise Exception(f"Try to override {self.piece2edge2matings[key_p_2][mating.edge_2]} with {mating}")
+            
 
         self.piece2edge2matings[key_p_1][mating.edge_1] = mating # Because each edge has only one mating in the loop
         self.piece2edge2matings[key_p_2][mating.edge_2] = mating

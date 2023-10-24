@@ -56,10 +56,12 @@ class TestLoopMerge(unittest.TestCase):
                                                 pairwise_recipe_name = "SD1Pairwise")
         loops = zero_loops_recipe.cook()
 
+        puzzle_num_pieces = 10
         merger = recipes_factory.create("LoopsMerge",
-                                        ranked_loops=loops,puzzle_num_pieces=10)
+                                        ranked_loops=loops,puzzle_num_pieces=puzzle_num_pieces)
         solution = merger.cook()
         assert len(solution.get_as_mating_list()) == 14
+        assert len(solution.get_pieces_invovled()) == puzzle_num_pieces
         print(solution)
 
 

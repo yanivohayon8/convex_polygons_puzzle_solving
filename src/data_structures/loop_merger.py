@@ -40,6 +40,19 @@ class BasicLoopMerger():
                     f"The former loop assert the mating {repr(conflict[0])} " +\
                     f"while the latter {repr(conflict[1])}"
             raise LoopMergeError(mess)
+        
+        # if loop_1.level != loop_2.level:
+        #     mess = f"Tried to merge loops in different levels:"
+        #     mess = mess +f" {loop_1} level is {loop_1.level} while {loop_2} level is {loop_2.level}"
+        #     raise LoopMergeError(mess)
+        
+        mutual_matings = loop_1.get_mutual_matings(loop_2)
+        expected_num_matings = min(loop_1.level,loop_2.level) + 1
+
+        if len(mutual_matings) < expected_num_matings:
+            mess = f"Expected to have at least {expected_num_matings} mutual matings since "
+            mess = mess +  f"{loop_1} is {loop_1.level}-loop and {loop_2} is {loop_2.level}-loop"
+            raise LoopMergeError(mess)
 
     def merge(self,loop_1:Loop, loop_2:Loop):
         
@@ -60,10 +73,10 @@ class BasicLoopMerger():
         total_availiable_matings = loop_1.get_availiable_matings() +loop_2.get_availiable_matings()
 
         for mating in total_availiable_matings:
-            if mating in mutual_availiable_matings:
-                if mating.piece_1 in pieces_involved and mating.piece_2 in pieces_involved:
-                    new_loop.insert_mating(mating)
-                    continue
+            # if mating in mutual_availiable_matings:
+            #     if mating.piece_1 in pieces_involved and mating.piece_2 in pieces_involved:
+            #         new_loop.insert_mating(mating)
+            #         continue
 
             if mating in total_occupied_matings:
                 continue
@@ -71,6 +84,8 @@ class BasicLoopMerger():
             new_loop.insert_availiable_mating(mating)
         
         new_loop.unions_history.append((repr(loop_1),repr(loop_2)))
+        new_loop.level = max(loop_1.level,loop_2.level) + 1
+        
         return new_loop        
         
         
