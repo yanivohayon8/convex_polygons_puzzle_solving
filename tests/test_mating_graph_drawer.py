@@ -30,7 +30,7 @@ class TestGraphDrawer(unittest.TestCase):
 
         plt.show()
     
-    def test_draw_filtered_adjacency(self,noise_level = 0):
+    def test_draw_filtered_adjacency(self,noise_level = 1):
         db = "1"
         puzzle_num = "19"
         
