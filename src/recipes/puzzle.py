@@ -11,12 +11,15 @@ class loadRegularPuzzle(Recipe):
         self.noise_level = noise_level
         self.puzzle = None
     
-    def cook(self):
-        assembler.init(self.db,self.puzzle_num,self.noise_level)
+    def cook(self,is_override_shared_vars=True):
         puzzle_directory = f"../ConvexDrawingDataset/DB{self.db}/Puzzle{self.puzzle_num}/noise_{self.noise_level}"
         self.puzzle = Puzzle(puzzle_directory)
-        shared_variables.puzzle = self.puzzle
         self.puzzle.load()
+
+        if is_override_shared_vars:
+            assembler.init(self.db,self.puzzle_num,self.noise_level)
+            shared_variables.puzzle = self.puzzle
+            
         return self.puzzle.get_bag_of_pieces()
 
 
