@@ -1,5 +1,6 @@
 from src.recipes import factory as recipes_factory
-
+from src.physics import assembler
+from src.assembly import Assembly
 
 class LoopMergerSolver():
 
@@ -18,17 +19,22 @@ class LoopMergerSolver():
             "pairwise_recipe_name": self.pairwise_recipe
         }
         
-        config.update(zero_loops_config)
+        config.update()
 
         zero_loop_recipe = recipes_factory.create("ZeroLoopsAroundVertex",**config)
-        zero_loops = zero_loop_recipe.cook()
+        zero_loops = zero_loop_recipe.cook(**zero_loops_config)
 
         # TODO: implement wrapping mechanism here to union loops (When we will have larger puzzles)
         loops = zero_loops
 
         total_num_pieces = zero_loop_recipe.get_num_piece_in_puzzle()
         merger = recipes_factory.create("LoopsMerge",ranked_loops=loops,puzzle_num_pieces=total_num_pieces)
-        solution = merger.cook()
+        loop_solution = merger.cook()
 
-        return solution
+        response = assembler.simulate(loop_solution.get_matings_as_csv())
+        physical_score = assembler.score(response)
+        solution_polygons = assembler.get_final_coordinates_as_polygons(response)
+        matings = loop_solution.get_as_mating_list()
+        
+        return Assembly(solution_polygons,matings,physical_score=physical_score)
 

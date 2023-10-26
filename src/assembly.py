@@ -1,12 +1,13 @@
 class Assembly():
 
-    def __init__(self,polygons, matings) -> None:
+    def __init__(self,polygons, matings,physical_score=None) -> None:
         '''
             polygons - List of shapely polygons
             matings - list of matings 
         '''
         self.polygons = polygons
         self.matings = matings
+        self.physical_score = physical_score
     
     def get_polygons(self):
         return self.polygons
