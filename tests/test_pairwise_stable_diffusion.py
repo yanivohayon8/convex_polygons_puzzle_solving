@@ -204,10 +204,10 @@ class TestFunction_score_pair(unittest.TestCase):
         print(f"CONCLUSION: {winner} > {loser}")
 
 
-class TestFunctionPairwise(unittest.TestCase):
+class TestHistogram(unittest.TestCase):
     
         
-    def test_comp_distribution(self,db=1,puzzle_num=19,puzzle_noise_level=1):
+    def test_comp_histogram(self,db=1,puzzle_num=19,puzzle_noise_level=1):
         puzzle_recipe = recipes_factory.create("loadRegularPuzzle",
                                                 db=db,puzzle_num=puzzle_num,noise_level=puzzle_noise_level)
         bag_of_pieces = puzzle_recipe.cook()
@@ -242,33 +242,76 @@ class TestFunctionPairwise(unittest.TestCase):
         ax.set_title("Find the right threshold for comp filter")
         # ax.set_xlim(-1,1)
 
+        # plt.show()
+        return ax
+
+    def _draw_adjacency_graph(self,db=1,puzzle_num=19,puzzle_noise_level=1):
+        gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_puzzle_recipe.cook()
+
+        noisy_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                     puzzle_noise_level=puzzle_noise_level)
+        noisy_graph_wrapper = noisy_puzzle_recipe.cook()
+
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+
+        fig, axs = plt.subplots(1,2)
+        fig.suptitle(f"db_{db}_puzzle_{puzzle_num}_noise_level_{puzzle_noise_level}")
+
+        drawer.draw_adjacency_graph(noisy_graph_wrapper.adjacency_graph,
+                                    ax=axs[0])
+        axs[0].set_title("Unfiltered")
+        drawer.draw_adjacency_graph(noisy_graph_wrapper.filtered_adjacency_graph,
+                                    ax=axs[1])
+        axs[1].set_title("Filtered")
+
+        # plt.show()
+        return fig, axs
+
+
+    def test_plot_as_params(self,db=1,puzzle_num=19,puzzle_noise_level=0):
+        ax = self.test_comp_histogram(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
+        fig, axs =self._draw_adjacency_graph(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
         plt.show()
 
+    def test_db_1_puzzle_19_noise_0(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+        self.test_plot_as_params(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
+    
+    def test_db_1_puzzle_19_noise_1(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 1
+        self.test_plot_as_params(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
+    
+    def test_db_1_puzzle_19_noise_2(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 2
+        self.test_plot_as_params(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
+    
+    def test_db_1_puzzle_20_noise_0(self):
+        db = 1
+        puzzle_num = 20
+        puzzle_noise_level = 0
+        self.test_plot_as_params(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
+    
+    def test_db_1_puzzle_20_noise_1(self):
+        db = 1
+        puzzle_num = 20
+        puzzle_noise_level = 1
+        self.test_plot_as_params(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
+    
+    def test_db_1_puzzle_20_noise_2(self):
+        db = 1
+        puzzle_num = 20
+        puzzle_noise_level = 2
+        self.test_plot_as_params(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
 
-
-    # def _load_graph(self):
-    #     wrapper = MatchingGraphWrapper(bag_of_pieces,id2piece,
-    #                                             edge_length_pairwiser.match_edges,
-    #                                             edge_length_pairwiser.match_pieces_score,
-    #                                             pictorial_matcher=pictorial_matcher,
-    #                                             compatibility_threshold=0.7)
-    #     wrapper.build_graph()
-
-    # def _draw_graph(self):
-        
-    #     ground_truth_wrapper = self._load_graph(db,puzzle_num,0)
-    #     wrapper = self._load_graph(db,puzzle_num,1)
-
-    #     drawer = MatchingGraphDrawer(ground_truth_wrapper)
-    #     drawer.init()
-
-    #     # Because we you use the normalized dot product
-    #     min_edge_weight = -1
-    #     max_edge_weight = 1
-    #     drawer.draw_graph_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
-    #     drawer.draw_graph_filtered_matching(wrapper,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
-
-    #     plt.show()
 
 
 
