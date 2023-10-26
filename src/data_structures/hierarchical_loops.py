@@ -1,6 +1,6 @@
 from functools import reduce
 from src.mating import Mating,convert_mating_to_vertex_mating
-
+from src import shared_variables 
 
 class ZeroLoopError(Exception):
     pass
@@ -206,7 +206,14 @@ class Loop():
                 return True
             
         return False
-         
+    
+    def get_matings_as_csv(self):
+        matings = self.get_as_mating_list()
+        id2piece = shared_variables.puzzle.id2piece
+        matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,id2piece[mat.piece_1],id2piece[mat.piece_2]),matings,"")
+        self.set_matings_as_csv(matings_csv)
+
+        return matings_csv
 
 
 def get_loop_matings_as_csv(loop:Loop,id2piece:dict):
