@@ -36,6 +36,19 @@ class TestZeroLoopsAroundVertex(unittest.TestCase):
 
         print("Check if the right loops exists in the folder...")
 
+
+    def test_SILENT_db_1_puzzle_20_noise_0(self):
+        '''
+            Test a puzzle that has pieces that are not part of a zero loop (ground truth zero loops)
+        '''
+        db = 1
+        puzzle_num = 20
+        puzzle_noise_level = 0
+
+        zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
+                                                pairwise_recipe_name = "SD1Pairwise")
+        zero_loops = zero_loops_recipe.cook()
+
 class TestLoopMerge(unittest.TestCase):
 
     def test_db_1_puzzle_19_noise_0(self):

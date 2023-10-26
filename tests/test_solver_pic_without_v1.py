@@ -23,6 +23,27 @@ class TestLoopMergerSolver(unittest.TestCase):
         print("\t area overlap: ", area_overlap)
 
         print("All compile")
+    
+
+    def _run(self,db,puzzle_num,puzzle_noise_level):
+        
+        solver = LoopMergerSolver(db,puzzle_num,puzzle_noise_level)
+        solution = solver.solve()
+
+        precision = shared_variables.puzzle.evaluate_precision(solution.get_matings())
+        print("\tmatings precision is ",precision)
+        recall = shared_variables.puzzle.evaluate_recall(solution.get_matings())
+        print("\tmatings recall is ",recall)
+        
+        area_evaluator = AreaOverlappingEvaluator(shared_variables.puzzle.get_ground_truth_puzzle())
+        area_overlap = area_evaluator.evaluate(solution.get_polygons())
+        print("\t area overlap: ", area_overlap)
+
+    def test_db_1_puzzle_19_noise_2(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 2
+        self._run(db,puzzle_num,puzzle_noise_level)
 
 
 
