@@ -39,10 +39,22 @@ class TestLoopMergerSolver(unittest.TestCase):
         area_overlap = area_evaluator.evaluate(solution.get_polygons())
         print("\t area overlap: ", area_overlap)
 
+    def test_db_1_puzzle_19_noise_1(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 1
+        self._run(db,puzzle_num,puzzle_noise_level)
+    
     def test_db_1_puzzle_19_noise_2(self):
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 2
+        self._run(db,puzzle_num,puzzle_noise_level)
+    
+    def test_db_1_puzzle_20_noise_0(self):
+        db = 1
+        puzzle_num = 20
+        puzzle_noise_level = 0
         self._run(db,puzzle_num,puzzle_noise_level)
 
 
