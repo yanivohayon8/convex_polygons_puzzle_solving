@@ -6,6 +6,8 @@ from src.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
+from src import shared_variables
+
 
 class silentLoopsSimulation():
     
@@ -89,9 +91,29 @@ class ZeroLoopsAroundVertex(Recipe):
         loops = zero_loops_loader.load()
 
         self.loops_scores = self.simulator.simulate(loops,id2piece)
-        loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
+        self.loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
 
-        return loops_ranked
+        MAX_DERIVATIVE = 50
+        scores = sorted(self.loops_scores)
+        best_loops = [self.loops_ranked[0]]
+
+        pieces_not_own_loops = [piece.id for piece in shared_variables.puzzle.bag_of_pieces]
+
+        for ii in range(1,len(scores),1):
+            if scores[ii] - scores[ii-1] > MAX_DERIVATIVE:
+                break
+
+            best_loops.append(self.loops_ranked[ii])
+
+            for piece_id in self.loops_ranked[ii].get_pieces_invovled():
+                if piece_id in pieces_not_own_loops:
+                    pieces_not_own_loops.remove(piece_id)
+        
+        for piece_id in pieces_not_own_loops:
+            lonely_loop = zero_loops_loader.create_loop_from_lonely(piece_id)
+            best_loops.append(lonely_loop)
+
+        return best_loops
     
     def get_num_piece_in_puzzle(self):
         return len(self.pairwise_recipe.puzzle_recipe.puzzle.bag_of_pieces)
@@ -126,12 +148,14 @@ class LoopsMerge():
                     try:
                         aggregated_loop = self.merger.merge(aggregated_loop,lop)    
                     except (LoopMutualPiecesMergeError,LoopMergeError) as e:
-                        to_be_merged_loops.append(lop)
+                        if not lop in to_be_merged_loops:
+                            to_be_merged_loops.append(lop)
 
                 try:
                     aggregated_loop = self.merger.merge(aggregated_loop,curr_loop)
                 except (LoopMutualPiecesMergeError,LoopMergeError) as e:
-                    to_be_merged_loops.append(curr_loop)
+                    if not curr_loop in to_be_merged_loops:
+                        to_be_merged_loops.append(curr_loop)
                 
                 if len(aggregated_loop.get_pieces_invovled()) == self.puzzle_num_pieces:
                     return aggregated_loop

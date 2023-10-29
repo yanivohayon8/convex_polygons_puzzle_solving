@@ -54,19 +54,29 @@ class ZeroLoopAroundVertexLoader():
                 
             self.zero_loops.append(next_loop)
         
-        for piece_id in self.piece2potential_matings.keys():
+        # for piece_id in self.piece2potential_matings.keys():
 
-            if piece_id in pieces_in_zero_loops:
-                continue
+        #     if piece_id in pieces_in_zero_loops:
+        #         continue
 
-            loop_single_piece = Loop(piece2edge2matings={piece_id:{}},availiable_matings=[])
+        #     loop_single_piece = Loop(piece2edge2matings={piece_id:{}},availiable_matings=[])
 
-            for mat in self.piece2potential_matings[piece_id]:
-                loop_single_piece.insert_availiable_mating(mat)
+        #     for mat in self.piece2potential_matings[piece_id]:
+        #         loop_single_piece.insert_availiable_mating(mat)
 
-            self.zero_loops.append(loop_single_piece)
+        #     self.zero_loops.append(loop_single_piece)
         
         return self.zero_loops
+    
+    def create_loop_from_lonely(self,piece_id):
+        loop = Loop(piece2edge2matings={piece_id:{}},availiable_matings=[])
+
+        for mat in self.piece2potential_matings[piece_id]:
+            loop.insert_availiable_mating(mat)
+
+        self.zero_loops.append(loop)
+
+        return loop
     
 class ZeroLoopKeepCycleAsIs(ZeroLoopAroundVertexLoader):
 
