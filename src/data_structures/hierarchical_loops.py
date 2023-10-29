@@ -217,6 +217,9 @@ class Loop():
 
 
 def get_loop_matings_as_csv(loop:Loop,id2piece:dict):
+    '''
+        Deprecated function
+    '''
     matings = loop.get_as_mating_list()
     matings_csv = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,id2piece[mat.piece_1],id2piece[mat.piece_2]),matings,"")
     loop.set_matings_as_csv(matings_csv)
