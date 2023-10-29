@@ -273,7 +273,30 @@ class TestHistogram(unittest.TestCase):
 
     def test_plot_as_params(self,db=1,puzzle_num=19,puzzle_noise_level=0):
         ax = self.test_comp_histogram(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
-        fig, axs =self._draw_adjacency_graph(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level)
+
+        gd_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_puzzle_recipe.cook()
+
+        noisy_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                     puzzle_noise_level=puzzle_noise_level)
+        noisy_graph_wrapper = noisy_puzzle_recipe.cook()
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+
+        fig, axs_adj = plt.subplots(1,2)
+        fig.suptitle(f"db_{db}_puzzle_{puzzle_num}_noise_level_{puzzle_noise_level}")
+        drawer.draw_adjacency_graph(noisy_graph_wrapper.adjacency_graph,ax=axs_adj[0])
+        axs_adj[0].set_title("Unfiltered")
+        drawer.draw_adjacency_graph(noisy_graph_wrapper.filtered_adjacency_graph,ax=axs_adj[1])
+        axs_adj[1].set_title("Filtered")
+        
+        fig3,ax_matching = plt.subplots(1,1)
+        # Because we you use the normalized dot product
+        min_edge_weight = -1
+        max_edge_weight = 1
+        drawer.draw_graph_filtered_matching(noisy_graph_wrapper,ax=ax_matching,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+
         plt.show()
 
     def test_db_1_puzzle_19_noise_0(self):
