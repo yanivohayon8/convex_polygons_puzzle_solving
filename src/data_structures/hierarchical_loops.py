@@ -1,6 +1,7 @@
 from functools import reduce
 from src.mating import Mating,convert_mating_to_vertex_mating
 from src import shared_variables 
+from src.physics import assembler
 
 class ZeroLoopError(Exception):
     pass
@@ -215,6 +216,18 @@ class Loop():
 
         return matings_csv
 
+    def physical_assemble(self,mode="silent"):
+        csv = self.get_matings_as_csv()
+        screenshot_name = ""
+
+        if mode == "imaged":
+            screenshot_name = f"{self.level}-{repr(self)}"
+
+        response = assembler.simulate(csv,screenshot_name=screenshot_name)
+        physical_score = assembler.score(response)
+        self.set_score(physical_score)
+
+        return physical_score
 
 def get_loop_matings_as_csv(loop:Loop,id2piece:dict):
     '''
