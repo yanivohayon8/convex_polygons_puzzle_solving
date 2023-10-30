@@ -119,6 +119,32 @@ class TestGraphDrawer(unittest.TestCase):
 
         plt.show()
 
+    
+    def test_draw_loop_graph(self):
+        db = 1
+        puzzle_num = 19 # 19
+        puzzle_noise_level = 1
+
+        gd_pairwise_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_pairwise_recipe.cook()
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+
+        zero_loops_recipe = recipes_factory.create("ZeroLoopsAroundVertex",
+                                                   db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
+                                                   pairwise_recipe_name = "SD1Pairwise")
+        loops = zero_loops_recipe.cook()
+
+        merger = recipes_factory.create("ZeroLoopsMerge",
+                                        ranked_loops=loops,puzzle_num_pieces=10)
+        aggregates_loops = merger.cook()
+        agg_graph = zero_loops_recipe.graph_wrapper.compute_loops_graph(aggregates_loops)
+
+        drawer.draw_loops_graph(agg_graph)
+
+        plt.show()
+
 
         
 

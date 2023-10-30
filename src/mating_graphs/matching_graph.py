@@ -171,12 +171,39 @@ class MatchingGraphWrapper():
         return agg_graph
 
     def compute_aggregated_filtered_pot_graph(self,aggregates_matings:list)->nx.Graph:
+        '''
+            DEPRECATED ?
+        '''
         return self._aggregate_matings_graph(self.filtered_potential_matings_graph,
                                              self.pieces_only_graph,
                                              aggregates_matings)
 
 
+    def compute_loops_graph(self,loops:list)->nx.Graph:
+        agg_graph =  nx.Graph()
+        agg_graph.add_nodes_from(self.pieces_only_graph.nodes)
+        agg_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_EDGE_TYPE)
 
+        num_loops = len(loops)
+
+        for loop_i,loop in enumerate(loops):
+            within_matings = loop.get_as_mating_list() # known interface (?)
+
+            for mating in within_matings:
+                node1 = name_node(mating.piece_1,mating.edge_1)
+                node2 = name_node(mating.piece_2,mating.edge_2)
+                
+                agg_graph.add_edge(node1,node2,type=WITHIN_AGGREGATE_EDGE_TYPE,
+                                   debug=repr(loop),loop_index=loop_i,total_num_loops=num_loops) # for the repr I insisted to get loop as parameter... (and for the easy interface...)
+
+            inter_matings = loop.get_availiable_matings() # known interface (?)
+
+            for mating in inter_matings:
+                node1 = name_node(mating.piece_1,mating.edge_1)
+                node2 = name_node(mating.piece_2,mating.edge_2)
+                agg_graph.add_edge(node1,node2,type=INTER_AGGREGATE_EDGE_TYPE)
+
+        return agg_graph
 
 
 def get_piece_name(node_name:str):
