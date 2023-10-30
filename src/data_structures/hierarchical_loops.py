@@ -115,6 +115,9 @@ class Loop():
     def insert_availiable_mating(self,mating:Mating):
         if mating not in self.availible_matings:
             self.availible_matings.append(mating)
+    
+    def remove_availiable_mating(self,mating:Mating):
+        self.availible_matings.remove(mating)
 
     def _mating_conflict(self,other_loop):
         '''

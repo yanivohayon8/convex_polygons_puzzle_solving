@@ -70,12 +70,13 @@ class BasicLoopMerger():
         pieces_involved_with_duplicates = list(loop_1.get_pieces_invovled()) + list(loop_2.get_pieces_invovled())
         [pieces_involved.append(piece) for piece in pieces_involved_with_duplicates if piece not in pieces_involved]
         mutual_availiable_matings = loop_1.get_mutual_availiable_matings(loop_2)
+
         total_availiable_matings = loop_1.get_availiable_matings() +loop_2.get_availiable_matings()
 
         for mating in total_availiable_matings:
             # if mating in mutual_availiable_matings:
             #     if mating.piece_1 in pieces_involved and mating.piece_2 in pieces_involved:
-            #         new_loop.insert_mating(mating)
+            #         # new_loop.insert_mating(mating)
             #         continue
 
             if mating in total_occupied_matings:
