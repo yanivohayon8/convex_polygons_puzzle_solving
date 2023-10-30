@@ -28,7 +28,7 @@ class LoopMergerSolver():
         loops = zero_loops
 
         total_num_pieces = zero_loop_recipe.get_num_piece_in_puzzle()
-        merger = recipes_factory.create("LoopsMerge",ranked_loops=loops,puzzle_num_pieces=total_num_pieces)
+        merger = recipes_factory.create("ZeroLoopsMerge",ranked_loops=loops,puzzle_num_pieces=total_num_pieces)
         loop_solution = merger.cook()
 
         response = assembler.simulate(loop_solution.get_matings_as_csv())

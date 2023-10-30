@@ -74,7 +74,7 @@ class TestLoopMerge(unittest.TestCase):
         loops = zero_loops_recipe.cook(compatibility_threshold=0.38)
         assert len(loops) == 5
 
-        merger = recipes_factory.create("LoopsMerge",
+        merger = recipes_factory.create("ZeroLoopsMerge",
                                         ranked_loops=loops,puzzle_num_pieces=10)
         solution = merger.cook()
         assert len(solution.get_as_mating_list()) == 14
@@ -87,7 +87,7 @@ class TestLoopMerge(unittest.TestCase):
         loops = zero_loops_recipe.cook()
 
         puzzle_num_pieces = 10
-        merger = recipes_factory.create("LoopsMerge",
+        merger = recipes_factory.create("ZeroLoopsMerge",
                                         ranked_loops=loops,puzzle_num_pieces=puzzle_num_pieces)
         solution = merger.cook()
         assert len(solution.get_as_mating_list()) == 14

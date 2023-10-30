@@ -94,7 +94,7 @@ class ZeroLoopsAroundVertexFilteredByScoreBuilder(ZeroLoopsAroundVertexBuilder):
         return ZeroLoopsAroundVertexFilteredByScore(db, puzzle_num, puzzle_noise_level,max_derivative=max_derivative, pairwise_recipe_name=pairwise_recipe_name, simulation_mode=simulation_mode, **_ignored)
 
 
-class LoopsMerge():
+class ZeroLoopsMerge():
 
     def __init__(self,ranked_loops:list,puzzle_num_pieces) -> None:
         self.puzzle_num_pieces = puzzle_num_pieces
@@ -131,4 +131,4 @@ class LoopsMerge():
 
 recipes_factory.register_builder(ZeroLoopsAroundVertex.__name__,ZeroLoopsAroundVertexBuilder())
 recipes_factory.register_builder(ZeroLoopsAroundVertexFilteredByScore.__name__,ZeroLoopsAroundVertexFilteredByScoreBuilder())
-recipes_factory.register_builder(LoopsMerge.__name__,lambda ranked_loops,puzzle_num_pieces: LoopsMerge(ranked_loops,puzzle_num_pieces))
+recipes_factory.register_builder(ZeroLoopsMerge.__name__,lambda ranked_loops,puzzle_num_pieces: ZeroLoopsMerge(ranked_loops,puzzle_num_pieces))
