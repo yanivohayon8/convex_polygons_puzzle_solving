@@ -22,13 +22,13 @@ class ZeroLoopsAroundVertex(Recipe):
 
     def cook(self,**kwargs):
         self.pairwise_recipe = recipes_factory.create(self.pairwise_recipe_name,db=self.db,puzzle_num=self.puzzle_num,puzzle_noise_level=self.puzzle_noise_level,**kwargs)
-        graph_wrapper = self.pairwise_recipe.cook()
+        self.graph_wrapper = self.pairwise_recipe.cook()
 
         id2piece = self.pairwise_recipe.puzzle_recipe.puzzle.id2piece
         algo = graph_factory.create("RedBlueCycleAlgo",id2piece=id2piece)
-        cycles = algo.compute(graph_wrapper.filtered_adjacency_graph)
+        cycles = algo.compute(self.graph_wrapper.filtered_adjacency_graph)
 
-        piece2matings = graph_wrapper.get_piece2filtered_potential_matings()
+        piece2matings = self.graph_wrapper.get_piece2filtered_potential_matings()
         self.zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
         loops = self.zero_loops_loader.load()
 

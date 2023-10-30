@@ -4,7 +4,9 @@ from src.mating_graphs import factory
 
 
 INTER_PIECES_EDGE_TYPE = "inter_piece"
-
+WITHIN_PIECE_EDGE_TYPE = "within_piece"
+INTER_AGGREGATE_EDGE_TYPE = "inter_agg"
+WITHIN_AGGREGATE_EDGE_TYPE = "within_agg"
 
 class MatchingGraphWrapper():
 
@@ -112,101 +114,6 @@ class MatchingGraphWrapper():
         self.matching =  list(nx.matching.max_weight_matching(self.potential_matings_graph,weight="compatibility"))
 
 
-    # def _compute_red_blue_360_loops_rec(self, visited, curr_node,computed_cycles:list, 
-    #                                visited_pieces=[],loop_angle_error=3):
-    #     '''
-    #         COMPUTES ZERO LOOPS AROUND A VERTEX IN 360 DEGREES FASHION.
-    #         start_node: like P_7_E_1, from where to start the search
-    #         curr_node: the current visited node. Calling the function for the first time put edge start_node->curr_node
-    #         computed_cycles: a list initiated outside. It will contain all the cycles
-    #     '''
-    #     # print(f"\tVISITED: {visited}")
-        
-    #     if len(visited)==2:
-    #         piece_name = get_piece_name(visited[-1])
-    #         visited_pieces.append(piece_name)
-    #         edge_index_1 = int(get_edge_name(visited[-2]))
-    #         edge_index_2 = int(get_edge_name(visited[-1]))
-
-
-    #     if curr_node == visited[0]:
-            
-    #         if len(visited_pieces) > 2:
-    #             curr_cycle = factory.create("Cycle",debug_graph_cycle=visited)
-    #             computed_cycles.append(curr_cycle)
-    #         # debug_is_acc_360 = abs(360-accumulated_loop_angle)<loop_angle_error
-    #         # if debug_is_acc_360:
-    #         #     computed_cycles.append(visited)
-    #         # else:    
-    #         #     pass
-    #         #     # print("Debug:Problematic loop")
-
-    #         return
-
-    #     # if accumulated_loop_angle > 360+loop_angle_error:
-    #     #     return
-        
-    #     prev_step_type = self.filtered_adjacency_graph[visited[-1]][curr_node]["type"]
-
-    #     '''
-    #         Because we pre-sorted the edges counterclock wise,
-    #         to find a 360 loop, we sum the angles in clockwise direction.
-    #         Remember, for an edge of a piece, it has two adjacent edges (within the piece)
-    #         So we select the one of the right
-    #     '''
-    #     if prev_step_type == "inter_piece":
-    #         curr_piece = get_piece_name(curr_node)
-    #         curr_edge = int(get_edge_name(curr_node))
-    #         adjacent_edge = self.get_counter_clockwise_adjacent_edge(curr_edge,curr_piece)#(curr_edge-1)%self.id2piece[curr_piece].get_num_coords()
-    #         neighbor = self._name_node(curr_piece,adjacent_edge)
-    #         visited_piece_tmp = visited_pieces+[curr_piece]
-    #         self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
-    #                                             visited_pieces=visited_piece_tmp,loop_angle_error=loop_angle_error)
-    #     elif prev_step_type == "within_piece":
- 
-    #         for neighbor in self.filtered_adjacency_graph.neighbors(curr_node):
-                
-    #             if neighbor in visited and neighbor != visited[0]:
-    #                 continue
-                
-    #             neighbor_piece = get_piece_name(neighbor)
-
-    #             if neighbor_piece in visited_pieces and neighbor != visited[0]:
-    #                 continue
-
-    #             next_step_type = self.filtered_adjacency_graph[curr_node][neighbor]["type"]
-                
-    #             if next_step_type == "inter_piece":
-    #                 self._compute_red_blue_360_loops_rec(visited + [curr_node], neighbor,computed_cycles,
-    #                                                 visited_pieces=visited_pieces,loop_angle_error=loop_angle_error)
-
-    # def compute_red_blue_360_loops(self,loop_angle_error=6):
-    #     cycles = []
-
-    #     for inter_piece_link in self.filtered_potential_matings_graph.edges():
-
-    #         graph_node1,graph_node2 = inter_piece_link
-    #         piece_edge1 = int(get_edge_name(graph_node1))
-    #         node_1_piece_id = get_piece_name(graph_node1)
-
-    #         piece_edge1_adj = self.get_clockwise_adjacent_edge(piece_edge1,node_1_piece_id)
-    #         visited = [
-    #             self._name_node(node_1_piece_id,piece_edge1_adj),
-    #             graph_node1
-    #         ]
-
-    #         new_cycles = []
-    #         self._compute_red_blue_360_loops_rec(visited,graph_node2,new_cycles,visited_pieces=list())
-    #         [cycles.append(cycle) for cycle in new_cycles if cycle not in cycles]
-                      
-    #     return cycles 
-
-    # def get_clockwise_adjacent_edge(self,edge,piece_id):
-    #     return (edge-1)%self.id2piece[piece_id].get_num_coords()
-    
-    # def get_counter_clockwise_adjacent_edge(self,edge,piece_id):
-    #     return (edge+1)%self.id2piece[piece_id].get_num_coords()
-
     def _get_piece2matings(self,matings_graph):
         piece2matings = {}
 
@@ -228,6 +135,45 @@ class MatchingGraphWrapper():
     def get_piece2filtered_potential_matings(self):
         return self._get_piece2matings(self.filtered_potential_matings_graph)
         
+    def _aggregate_matings_graph(self,mating_graph:nx.Graph,base_graph:nx.Graph,aggregates_matings:list)->nx.Graph:
+        '''
+            mating_graph - the graph to act on. it could be self.filtered_potential_matings_graph etc
+            aggregates_matings - list of list of matings. each list represents a loop (cluster)
+        '''
+        agg_graph =  nx.Graph()
+        agg_graph.add_nodes_from(base_graph.nodes)
+        agg_graph.add_edges_from(base_graph.edges, type=WITHIN_PIECE_EDGE_TYPE)
+        # This line is should be computed outside the function?
+        flat_mating_list = [mat for agg in aggregates_matings for mat in agg]
+
+        for mating in flat_mating_list:
+            node1 = name_node(mating.piece_1,mating.edge_1)
+            node2 = name_node(mating.piece_2,mating.edge_2)
+            agg_graph.add_edge(node1,node2,type=WITHIN_AGGREGATE_EDGE_TYPE)
+
+        # occupied_nodes = []
+
+        # for link in mating_graph.edges:
+            
+        #     if link in base_graph:
+        #         continue
+            
+        #     link_type = INTER_AGGREGATE_EDGE_TYPE
+        #     link_as_mating = _link_to_mating(link)
+
+        #     if link_as_mating in flat_mating_list:
+        #         link_type = WITHIN_AGGREGATE_EDGE_TYPE
+            
+        #     agg_graph.add_edge(link[0],link[1],type=link_type)
+
+        return agg_graph
+
+    def compute_aggregated_filtered_pot_graph(self,aggregates_matings:list)->nx.Graph:
+        return self._aggregate_matings_graph(self.filtered_potential_matings_graph,
+                                             self.pieces_only_graph,
+                                             aggregates_matings)
+
+
 
 
 

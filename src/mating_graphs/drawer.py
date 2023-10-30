@@ -1,4 +1,5 @@
 from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name
+from src.mating_graphs.matching_graph import INTER_AGGREGATE_EDGE_TYPE,WITHIN_AGGREGATE_EDGE_TYPE,WITHIN_PIECE_EDGE_TYPE
 import numpy as np
 import networkx as nx
 import math
@@ -227,3 +228,42 @@ class MatchingGraphDrawer():
         self._draw_graph_matching(graph_wrapper.filtered_potential_matings_graph,
                                   layout=layout,title=title+f"( >{graph_wrapper.compatibility_threshold})",ax=ax,
                                   max_edge_weight = max_edge_weight,min_edge_weight = min_edge_weight)
+
+
+    def draw_filtered_pot_aggregated_graph(self,agg_graph:nx.Graph,ax=None):
+        if ax is None:
+            fig, ax = plt.subplots()
+
+
+        edges_color = []
+        color2edge_meaning = {
+            WITHIN_PIECE_EDGE_TYPE:"red",
+            WITHIN_AGGREGATE_EDGE_TYPE:"purple",
+            INTER_AGGREGATE_EDGE_TYPE:"blue"
+        }
+
+
+        # for edge in adjacency_with_potential_graph.edges:
+        for link in agg_graph.edges(data=True):
+            link_type = link[2]["type"]
+            edges_color.append(color2edge_meaning[link_type])
+
+        
+        nx.draw_networkx(agg_graph,self.node2position,with_labels=True,node_color="skyblue",
+                         edge_color=edges_color,font_size=10,ax=ax,width=1.5)
+        
+
+        within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_EDGE_TYPE], label='Within Piece')
+        within_agg_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_AGGREGATE_EDGE_TYPE], label='Within Aggregate')
+        inter_agg_patch = mpatches.Patch(color=color2edge_meaning[INTER_AGGREGATE_EDGE_TYPE], label='Inter Aggregate')
+
+        # Plot empty lists with the desired colors and labels
+        ax.plot([], [], color=color2edge_meaning[WITHIN_PIECE_EDGE_TYPE], label='Internal edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[WITHIN_AGGREGATE_EDGE_TYPE], label='Ground Truth edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[INTER_AGGREGATE_EDGE_TYPE], label='Potential edge', linewidth=5)
+
+        # Create and show legend
+        ax.legend(loc='upper left')
+        handles = [within_piece_patch, within_agg_patch,inter_agg_patch]
+        ax.legend(handles=handles, loc='upper left')
+        ax.axis('off')
