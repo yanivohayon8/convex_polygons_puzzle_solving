@@ -104,7 +104,7 @@ class TestGraphDrawer(unittest.TestCase):
         drawer = MatchingGraphDrawer(gd_graph_wrapper)
         drawer.init()
 
-        zero_loops_recipe = recipes_factory.create("ZeroLoopsAroundVertex",
+        zero_loops_recipe = recipes_factory.create("ZeroLoopsAroundVertexFilteredByScore",
                                                    db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
                                                    pairwise_recipe_name = "SD1Pairwise")
         loops = zero_loops_recipe.cook()
@@ -120,9 +120,10 @@ class TestGraphDrawer(unittest.TestCase):
         plt.show()
 
     
-    def test_draw_loop_graph(self):
+
+    def test_draw_after_merge_loop_graph(self):
         db = 1
-        puzzle_num = 19 # 19
+        puzzle_num = 20 # 19
         puzzle_noise_level = 1
 
         gd_pairwise_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
@@ -131,7 +132,7 @@ class TestGraphDrawer(unittest.TestCase):
         drawer = MatchingGraphDrawer(gd_graph_wrapper)
         drawer.init()
 
-        zero_loops_recipe = recipes_factory.create("ZeroLoopsAroundVertex",
+        zero_loops_recipe = recipes_factory.create("ZeroLoopsAroundVertexFilteredByScore",
                                                    db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
                                                    pairwise_recipe_name = "SD1Pairwise")
         loops = zero_loops_recipe.cook()
@@ -146,7 +147,35 @@ class TestGraphDrawer(unittest.TestCase):
         plt.show()
 
 
-        
+    def test_draw_zero_loop_graph_19_0(self):
+        db = 1
+        puzzle_num = 19 # 19
+        puzzle_noise_level = 0
+
+        gd_pairwise_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_pairwise_recipe.cook()
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+
+        fig, axs = plt.subplots(1,2)
+
+        zero_loops_recipe = recipes_factory.create("ZeroLoopsAroundVertexFilteredByScore",
+                                                   db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
+                                                   pairwise_recipe_name = "SD1Pairwise")
+        loops = zero_loops_recipe.cook(compatibility_threshold=0.38)
+        zero_loops_graph = zero_loops_recipe.graph_wrapper.compute_loops_graph(loops)
+        drawer.draw_loops_graph(zero_loops_graph,ax=axs[0])
+        axs[0].set_title("zero_loops_graph")
+
+        merger = recipes_factory.create("ZeroLoopsMerge",
+                                        ranked_loops=loops,puzzle_num_pieces=10)
+        aggregates_loops = merger.cook()
+        agg_graph = zero_loops_recipe.graph_wrapper.compute_loops_graph(aggregates_loops)
+        drawer.draw_loops_graph(agg_graph,ax=axs[1])
+        axs[1].set_title("aggregates_loops")
+
+        plt.show()
 
 
 

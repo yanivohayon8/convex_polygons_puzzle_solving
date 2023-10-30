@@ -283,7 +283,7 @@ class MatchingGraphDrawer():
             INTER_AGGREGATE_EDGE_TYPE:"black"
         }
 
-        within_agg_colors = ["purple","cyan","green"]
+        within_agg_colors = ["pink","cyan","green"]
 
 
         # for edge in adjacency_with_potential_graph.edges:
