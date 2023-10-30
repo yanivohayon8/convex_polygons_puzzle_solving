@@ -5,6 +5,7 @@ from src.pairwise_matchers import pairwise_pieces
 from src.recipes import Recipe,factory as recipes_factory
 from src.feature_extraction import factory as features_factory
 from src.mating_graphs import factory as graphs_factory
+from src import shared_variables
 
 DEFAULT_NUM_ROWS_CROP = 5
 DEFAULT_COMPATIBILITY_THRESHOLD = 0.4
@@ -59,7 +60,7 @@ class SD1Pairwise(GeometricPairwise):
         self.pictorial_pairwisers = ["DotProductExtraToOriginalMatcher"]
         self.compatibility_threshold = compatibility_threshold
     
-    def cook(self, **kwargs):
+    def cook(self,is_override_shared_vars=True, **kwargs):
         super().cook(**kwargs)
         puzzle = self.puzzle_recipe.puzzle
         pieces = puzzle.bag_of_pieces
@@ -82,6 +83,9 @@ class SD1Pairwise(GeometricPairwise):
                                                    pictorial_matcher = self.matchers[self.pictorial_pairwisers[0]],
                                                    compatibility_threshold=self.compatibility_threshold)
         self.graph_wrapper.build_graph()
+
+        if is_override_shared_vars:
+            shared_variables.graph_wrapper = self.graph_wrapper
 
         return self.graph_wrapper
     
