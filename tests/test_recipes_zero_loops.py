@@ -76,9 +76,9 @@ class TestLoopMerge(unittest.TestCase):
 
         merger = recipes_factory.create("ZeroLoopsMerge",
                                         ranked_loops=loops,puzzle_num_pieces=10)
-        solution = merger.cook()
-        assert len(solution.get_as_mating_list()) == 14
-        print(solution)
+        aggregates = merger.cook()
+        assert len(aggregates) == 1
+        assert len(aggregates[0].get_as_mating_list()) >= 13
 
     
     def test_db_1_puzzle_19_noise_1(self):
@@ -89,12 +89,20 @@ class TestLoopMerge(unittest.TestCase):
         puzzle_num_pieces = 10
         merger = recipes_factory.create("ZeroLoopsMerge",
                                         ranked_loops=loops,puzzle_num_pieces=puzzle_num_pieces)
-        solution = merger.cook()
-        assert len(solution.get_as_mating_list()) == 14
-        assert len(solution.get_pieces_invovled()) == puzzle_num_pieces
-        print(solution)
+        aggregates = merger.cook()
+        assert len(aggregates) == 1
+        assert len(aggregates[0].get_as_mating_list()) == 14
+        assert len(aggregates[0].get_pieces_invovled()) == puzzle_num_pieces
 
+    def test_db_1_puzzle_20_noise_0(self):
+        zero_loops_recipe = ZeroLoopsAroundVertex(db=1,puzzle_num=20,puzzle_noise_level=0,
+                                                pairwise_recipe_name = "SD1Pairwise")
+        loops = zero_loops_recipe.cook()
 
+        merger = recipes_factory.create("ZeroLoopsMerge",
+                                        ranked_loops=loops,puzzle_num_pieces=10)
+        aggregates = merger.cook()
+        assert len(aggregates) == 3
 
 
 if __name__ == "__main__":

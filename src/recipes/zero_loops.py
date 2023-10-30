@@ -101,30 +101,49 @@ class ZeroLoopsMerge():
         self.ranked_loops = ranked_loops
         self.merger = BasicLoopMerger()
 
-    def cook(self):
-        aggregated_loop = self.ranked_loops[0]
-        to_be_merged_loops = []
+    def _merge(self,to_be_merge_loops:list):
+        aggregated_loop = to_be_merge_loops[0]
+        queued_loops = []
+        is_changed = True
         
-        while True:
-            for i,curr_loop in enumerate(self.ranked_loops[1:]):
-                queue_size = len(to_be_merged_loops)
+        while is_changed:
+            is_changed = False
+
+            for i,curr_loop in enumerate(to_be_merge_loops[1:]):
+                queue_size = len(queued_loops)
 
                 for _ in range(queue_size):
-                    lop = to_be_merged_loops.pop(0)
+                    lop = queued_loops.pop(0)
                     try:
                         aggregated_loop = self.merger.merge(aggregated_loop,lop)    
+                        is_changed = True
+                        to_be_merge_loops.remove(lop)
                     except (LoopMutualPiecesMergeError,LoopMergeError) as e:
-                        if not lop in to_be_merged_loops:
-                            to_be_merged_loops.append(lop)
+                        if not lop in queued_loops:
+                            queued_loops.append(lop)
 
                 try:
                     aggregated_loop = self.merger.merge(aggregated_loop,curr_loop)
+                    is_changed = True
+                    to_be_merge_loops.remove(curr_loop)
                 except (LoopMutualPiecesMergeError,LoopMergeError) as e:
-                    if not curr_loop in to_be_merged_loops:
-                        to_be_merged_loops.append(curr_loop)
+                    if not curr_loop in queued_loops:
+                        queued_loops.append(curr_loop)
                 
                 if len(aggregated_loop.get_pieces_invovled()) == self.puzzle_num_pieces:
-                    return aggregated_loop
+                    return aggregated_loop,list() #queued_loops
+        
+        return aggregated_loop,queued_loops
+                
+    def cook(self):
+        aggregated_loop,queued_loops = self._merge(self.ranked_loops)
+        aggregates = [aggregated_loop]
+
+        while len(queued_loops) > 0:
+            aggregated_loop,queued_loops = self._merge(queued_loops)
+            aggregates.append(aggregated_loop)
+        
+        return aggregates
             
 
 
