@@ -238,8 +238,8 @@ class MatchingGraphDrawer():
         edges_color = []
         color2edge_meaning = {
             WITHIN_PIECE_EDGE_TYPE:"red",
-            WITHIN_AGGREGATE_EDGE_TYPE:"purple",
-            INTER_AGGREGATE_EDGE_TYPE:"blue"
+            WITHIN_AGGREGATE_EDGE_TYPE:"green",
+            INTER_AGGREGATE_EDGE_TYPE:"black"
         }
 
 

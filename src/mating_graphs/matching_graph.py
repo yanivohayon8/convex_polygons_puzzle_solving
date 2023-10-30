@@ -145,26 +145,28 @@ class MatchingGraphWrapper():
         agg_graph.add_edges_from(base_graph.edges, type=WITHIN_PIECE_EDGE_TYPE)
         # This line is should be computed outside the function?
         flat_mating_list = [mat for agg in aggregates_matings for mat in agg]
+        occupied_nodes = set()
 
         for mating in flat_mating_list:
             node1 = name_node(mating.piece_1,mating.edge_1)
+            occupied_nodes.add(node1)
             node2 = name_node(mating.piece_2,mating.edge_2)
+            occupied_nodes.add(node2)
             agg_graph.add_edge(node1,node2,type=WITHIN_AGGREGATE_EDGE_TYPE)
 
-        # occupied_nodes = []
 
-        # for link in mating_graph.edges:
+        for link in mating_graph.edges:
             
-        #     if link in base_graph:
-        #         continue
+            if link in base_graph:
+                continue
             
-        #     link_type = INTER_AGGREGATE_EDGE_TYPE
-        #     link_as_mating = _link_to_mating(link)
+            node1 = link[0]
+            node2 = link[1]
 
-        #     if link_as_mating in flat_mating_list:
-        #         link_type = WITHIN_AGGREGATE_EDGE_TYPE
-            
-        #     agg_graph.add_edge(link[0],link[1],type=link_type)
+            if node1 in occupied_nodes or node2 in occupied_nodes:
+                continue
+
+            agg_graph.add_edge(node1,node2,type=INTER_AGGREGATE_EDGE_TYPE)
 
         return agg_graph
 
