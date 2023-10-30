@@ -28,6 +28,9 @@ class Loop():
     
     def set_score(self,score):
         self.score = score
+    
+    def get_physics_score(self):
+        return self.score
 
     def set_matings_as_csv(self,string_lines):
         '''
