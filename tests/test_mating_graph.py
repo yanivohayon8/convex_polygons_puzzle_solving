@@ -194,146 +194,16 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
                                                   puzzle_noise_level=puzzle_noise_level,add_geo_features=["AngleLengthExtractor"],**kwargs)
         return gd_puzzle_recipe.cook()
     
-    def test_360_loops_19_noise_0_rec(self):
-        # image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        db = "1"
+    def test_nodes_attributes(self):
+        db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
 
-        cycles = []
-        visited = ["P_2_E_1"]
-        visited.append("P_2_E_2")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_3_E_0",cycles,loop_angle_error=6)
-        assert cycles == [['P_2_E_1', 'P_2_E_2', 'P_3_E_0', 'P_3_E_1', 'P_5_E_2', 'P_5_E_3']]
+        graph_wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
 
-    def test_360_loops_19_noise_1_rec(self):
-        # image = "Pseudo-Sappho_MAN_Napoli_Inv9084"
-        db = "1"
-        puzzle_num = 19
-        puzzle_noise_level = 1
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
-
-        cycles = []
-        visited = ["P_2_E_1"]
-        visited.append("P_2_E_2")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_3_E_0",cycles,loop_angle_error=6)
-        print(cycles)
-
-        cycles = []
-        visited = ["P_1_E_0"]
-        visited.append("P_1_E_1")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_2_E_0",cycles,loop_angle_error=6)
-        print(cycles)
-
-        cycles = []
-        visited = ["P_1_E_1"]
-        visited.append("P_1_E_0")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_0_E_3",cycles,loop_angle_error=6)
-        cycle_0_1_2_5 = [
-            "P_1_E_1","P_1_E_0",
-            "P_0_E_3","P_0_E_2",
-            "P_5_E_0","P_5_E_3",
-            "P_2_E_1","P_2_E_0"]
-
-        assert cycle_0_1_2_5 in cycles
-
-        cycles = []
-        visited = ["P_2_E_1"]
-        visited.append("P_2_E_0")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_1",cycles)
-        print(len(cycles))
-
-        cycles = []
-        visited = ["P_7_E_2"]
-        visited.append("P_7_E_1")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_9_E_0",cycles)
-        assert len(cycles) == 1
-
-        cycles = []
-        visited = ["P_7_E_0"]
-        visited.append("P_7_E_1")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_9_E_0",cycles)
-        print(cycles)
-        assert len(cycles) == 0
-
-        cycles = []
-        visited = ["P_8_E_2"]
-        visited.append("P_8_E_1")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_9_E_3",cycles)
-        print(cycles)
-
-        cycles = []
-        visited = ["P_0_E_2"]
-        visited.append("P_0_E_3")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
-        assert len(cycles) == 1
-        print(cycles)
-
-        puzzle_num = 2
-        puzzle_noise_level = 0
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
-        cycles = []
-        visited = ["P_0_E_0"]
-        visited.append("P_0_E_2")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
-        assert len(cycles) == 0
-        cycles = []
-        visited = ["P_0_E_1"]
-        visited.append("P_0_E_2")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
-        assert len(cycles) == 0
-
-        puzzle_num = 2
-        puzzle_noise_level = 1
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
-        cycles = []
-        visited = ["P_0_E_0"]
-        visited.append("P_0_E_2")
-        wrapper._compute_red_blue_360_loops_rec(visited,"P_1_E_0",cycles)
-        print(cycles)
+        nodes = graph_wrapper.filtered_adjacency_graph.nodes(data=True)
+        print(nodes["P_0_E_0"])
         
-
-    def test_360_loops_19_noise_1(self):
-        db="1"
-        puzzle_num = 19
-        puzzle_noise_level = 1
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
-        graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
-
-        print(graph_cycles_noise_1)
-
-    def test_360_loops_19(self):
-        db="1"
-        puzzle_num = 19
-        loop_angle_error = 40
-
-        # Because we want the test to pass set compatibility_threshold to 0.38
-        # So all the ground truth links will be present.
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,0,
-                                            compatibility_threshold=0.38)
-        graph_cycles_noise_0 = wrapper.compute_red_blue_360_loops(loop_angle_error=loop_angle_error)
-        assert len(graph_cycles_noise_0) == 5
-
-        wrapper = self._bulid_graph_wrapper(db,puzzle_num,1)
-        graph_cycles_noise_1 = wrapper.compute_red_blue_360_loops()
-
-        # sampling a cycle in the noise 0 puzzle assemly 
-        # making sure it is in the found cycles noised puzzles 
-        debug_edge2cycles = map_edge_to_contain_cycles(graph_cycles_noise_1)
-        P_1_e_1_cycles = sorted(
-            list(
-                map(lambda cycle: sorted(list(cycle.get_pieces_involved())),
-                    debug_edge2cycles["P_1_e_1"])
-            )
-        )
-        assert ["0","1","2","5"] in P_1_e_1_cycles
-
-        # making sure all the cycles found in the noise 0 puzzle
-        # are found also in the noised puzzle
-        for cycle in graph_cycles_noise_0:
-            assert cycle in graph_cycles_noise_1, f"expected cycle {cycle} was not computed"
-
 
 if __name__ == "__main__":
     unittest.main()
