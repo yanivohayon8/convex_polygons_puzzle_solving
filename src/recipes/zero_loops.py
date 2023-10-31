@@ -1,7 +1,5 @@
 from typing import Any
 from src.recipes import Recipe,factory as recipes_factory
-from src.mating_graphs import factory as graph_factory
-from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
 from src import shared_variables
 from src.local_assemblies.loops import Loop,create_loop_from_single
