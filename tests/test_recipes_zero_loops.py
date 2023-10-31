@@ -1,6 +1,6 @@
 import unittest
 from src.recipes import factory as recipes_factory
-from src.recipes.zero_loops import ZeroLoopsAroundVertex,ZeroLoopsAroundVertexFilteredByScore # so the key would apear in the factory
+from src.recipes.zero_loops import ZeroLoopsAroundVertex
 from src.mating_graphs import factory as graph_factory
 
 class TestZeroLoopsAroundVertex(unittest.TestCase):
@@ -49,22 +49,8 @@ class TestZeroLoopsAroundVertex(unittest.TestCase):
                                                 pairwise_recipe_name = "SD1Pairwise")
         zero_loops = zero_loops_recipe.cook()
 
+        assert len(zero_loops) == 6
 
-class TestZeroLoopsAroundVertexFilteredByScore(unittest.TestCase):
-
-    def test_SILENT_db_1_puzzle_19_noise_0(self):
-        zero_loops_recipe = ZeroLoopsAroundVertexFilteredByScore(db=1,puzzle_num=19,puzzle_noise_level=0,
-                                                pairwise_recipe_name = "SD1Pairwise")
-        zero_loops = zero_loops_recipe.cook(compatibility_threshold=0.38)
-
-        assert len(zero_loops) == 5
-
-    
-    def test_db_1_puzzle_19_noise_1(self):
-        zero_loops_recipe = ZeroLoopsAroundVertexFilteredByScore(db=1,puzzle_num=19,puzzle_noise_level=1,
-                                                pairwise_recipe_name = "SD1Pairwise")
-        zero_loops = zero_loops_recipe.cook()
-        print(zero_loops)
 
 class TestLoopMerge(unittest.TestCase):
 

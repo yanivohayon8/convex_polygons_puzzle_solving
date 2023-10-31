@@ -1,6 +1,6 @@
 from src.mating_graphs.matching_graph import get_piece_name
 from functools import reduce
-from src.mating_graphs.matching_graph import MatchingGraphWrapper,_link_to_mating,INTER_PIECES_LINK_TYPE
+from src.mating_graphs.matching_graph import MatchingGraphWrapper,_link_to_mating,INTER_PIECES_LINK_TYPE,name_node
 from src.physics import assembler
 from src import shared_variables
 from src.mating import convert_mating_to_vertex_mating
@@ -28,8 +28,11 @@ class Loop():
         for node in self.nodes:
             self.graph_wrapper_ref.assign_node(graph_name,node,self)
 
+    def get_pieces_involved(self):
+        return list(set([get_piece_name(node) for node in self.nodes]))
+
     def __repr__(self) -> str:
-        pieces_names = sorted(list(set([get_piece_name(node) for node in self.nodes])))
+        pieces_names = sorted(self.get_pieces_involved())
         return reduce(lambda acc,x: f"P_{x}_"+acc,pieces_names,"")[:-1]
 
     def get_nodes(self):
@@ -76,6 +79,22 @@ class Loop():
             return __value.nodes == self.nodes
 
         return False
+    
+    def get_physics_score(self):
+        return self.physics_score
                     
 
+
+def create_loop_from_single(piece_id,graph_name = "filtered_adjacency_graph"):
+    piece = shared_variables.puzzle.id2piece[piece_id]
+    nodes = [name_node(piece_id,edge_i) for edge_i in range(piece.get_num_coords())]
+    links = [(prev_node,next_node) for prev_node,next_node in zip(nodes[:-1],nodes[1:])]
+    links.append((nodes[-1],nodes[0]))
+    graph_wrapper = shared_variables.graph_wrapper
+
+    return Loop(graph_wrapper,links,graph_name=graph_name)
+
+
+
+        
 

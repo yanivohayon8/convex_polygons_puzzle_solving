@@ -4,52 +4,69 @@ from src.mating_graphs import factory as graph_factory
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
 from src import shared_variables
-from src.local_assemblies.loops import Loop
+from src.local_assemblies.loops import Loop,create_loop_from_single
 from src.mating_graphs.algorithms import red_blue_cycle
 
+MAX_DERIVATIVE = 50
 
 class ZeroLoopsAroundVertex(Recipe):
 
     def __init__(self,db,puzzle_num,puzzle_noise_level,
                  pairwise_recipe_name = "SD1Pairwise",
-                 simulation_mode="silent") -> None:
+                 simulation_mode="silent",max_derivative= MAX_DERIVATIVE) -> None:
         self.db = db
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
         self.pairwise_recipe_name = pairwise_recipe_name
         self.simulation_mode = simulation_mode
         self.loops_scores = []
+        self.max_derivative = max_derivative
     
     def _compute_graph_wrapper(self,**kwargs):
-        pass
-
-    def _compute_loops_from_cycles(self,**kwargs):
-        pass
-    
-    def _rank_loops(self,**kwargs):
-        pass
-
-    def _create_lonely_loops(self,**kwargs):
-        pass
-
-    def cook(self,**kwargs):
         self.pairwise_recipe = recipes_factory.create(self.pairwise_recipe_name,db=self.db,puzzle_num=self.puzzle_num,puzzle_noise_level=self.puzzle_noise_level,**kwargs)
         self.graph_wrapper = self.pairwise_recipe.cook()
 
+    def _compute_loops_from_cycles(self,**kwargs):
         cycles = red_blue_cycle.compute(self.graph_wrapper.filtered_adjacency_graph)
-
-        # piece2matings = self.graph_wrapper.get_piece2filtered_potential_matings()
-        # self.zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
-        # loops = self.zero_loops_loader.load()
-
-        # loops = [Loop(self.graph_wrapper,cycle.debug_graph_cycle,cycle.debug_graph_links) for cycle in cycles]
         loops = [Loop(self.graph_wrapper,cycle.debug_graph_links) for cycle in cycles]
-
-
+        return loops
+    
+    def _rank_loops(self,loops,**kwargs):
         self.loops_scores = [loop.physical_assemble(mode=self.simulation_mode) for loop in loops]
         self.loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
 
-        return self.loops_ranked
+    def _filter_best(self):
+        self.best_loops = [self.loops_ranked[0]]
+        
+        for ii in range(1,len(self.loops_ranked),1):
+            curr_score = self.loops_ranked[ii].get_physics_score()
+            prev_score = self.loops_ranked[ii-1].get_physics_score()
+
+            if curr_score - prev_score > self.max_derivative:
+                break
+
+            self.best_loops.append(self.loops_ranked[ii])
+
+        return self.best_loops
+
+    def _create_lonely_loops(self):
+        pieces_not_own_loops = [piece.id for piece in shared_variables.puzzle.bag_of_pieces]
+        [pieces_not_own_loops.remove(piece_id) for loop in self.best_loops for piece_id in loop.get_pieces_involved() if piece_id in pieces_not_own_loops]
+                    
+        for piece_id in pieces_not_own_loops:
+            loop = create_loop_from_single(piece_id)
+            self.best_loops.append(loop)
+        
+        return self.best_loops
+
+    def cook(self,**kwargs):
+        self._compute_graph_wrapper(**kwargs)
+        loops = self._compute_loops_from_cycles(**kwargs)
+        self._rank_loops(loops)
+        self._filter_best()
+        self._create_lonely_loops()        
+
+        return self.best_loops
     
     def get_num_piece_in_puzzle(self):
         return len(self.pairwise_recipe.puzzle_recipe.puzzle.bag_of_pieces)
@@ -59,53 +76,12 @@ class ZeroLoopsAroundVertex(Recipe):
 class ZeroLoopsAroundVertexBuilder():
 
     def __call__(self,db,puzzle_num,puzzle_noise_level,
-                 pairwise_recipe_name = "SD1Pairwise",simulation_mode="silent",**_ignored) -> Any:
+                 pairwise_recipe_name = "SD1Pairwise",simulation_mode="silent",max_derivative= MAX_DERIVATIVE,**_ignored) -> Any:
         return ZeroLoopsAroundVertex(db,puzzle_num,puzzle_noise_level,
-                                     pairwise_recipe_name=pairwise_recipe_name,simulation_mode=simulation_mode)
+                                     pairwise_recipe_name=pairwise_recipe_name,
+                                     simulation_mode=simulation_mode,max_derivative=max_derivative)
 
 
-MAX_DERIVATIVE = 50
-
-class ZeroLoopsAroundVertexFilteredByScore(ZeroLoopsAroundVertex):
-
-    def __init__(self, db, puzzle_num, puzzle_noise_level,max_derivative= MAX_DERIVATIVE,
-                 pairwise_recipe_name="SD1Pairwise", simulation_mode="silent") -> None:
-        super().__init__(db, puzzle_num, puzzle_noise_level, pairwise_recipe_name, simulation_mode)
-        self.max_derivative = max_derivative
-
-    def cook(self, **kwargs):
-        super().cook(**kwargs)
-        
-        best_loops = [self.loops_ranked[0]]
-        pieces_not_own_loops = [piece.id for piece in shared_variables.puzzle.bag_of_pieces]
-
-        for piece_id in self.loops_ranked[0].get_pieces_invovled():
-            pieces_not_own_loops.remove(piece_id)
-
-        for ii in range(1,len(self.loops_ranked),1):
-            curr_score = self.loops_ranked[ii].get_physics_score()
-            prev_score = self.loops_ranked[ii-1].get_physics_score()
-
-            if curr_score - prev_score > self.max_derivative:
-                break
-
-            best_loops.append(self.loops_ranked[ii])
-
-            for piece_id in self.loops_ranked[ii].get_pieces_invovled():
-                if piece_id in pieces_not_own_loops:
-                    pieces_not_own_loops.remove(piece_id)
-        
-        for piece_id in pieces_not_own_loops:
-            lonely_loop = self.zero_loops_loader.create_loop_from_lonely(piece_id)
-            best_loops.append(lonely_loop)
-
-        return best_loops
-
-        
-class ZeroLoopsAroundVertexFilteredByScoreBuilder(ZeroLoopsAroundVertexBuilder):
-
-    def __call__(self, db, puzzle_num, puzzle_noise_level,max_derivative= MAX_DERIVATIVE, pairwise_recipe_name="SD1Pairwise", simulation_mode="silent", **_ignored) -> Any:
-        return ZeroLoopsAroundVertexFilteredByScore(db, puzzle_num, puzzle_noise_level,max_derivative=max_derivative, pairwise_recipe_name=pairwise_recipe_name, simulation_mode=simulation_mode, **_ignored)
 
 
 class ZeroLoopsMerge():
@@ -163,5 +139,4 @@ class ZeroLoopsMerge():
 
 
 recipes_factory.register_builder(ZeroLoopsAroundVertex.__name__,ZeroLoopsAroundVertexBuilder())
-recipes_factory.register_builder(ZeroLoopsAroundVertexFilteredByScore.__name__,ZeroLoopsAroundVertexFilteredByScoreBuilder())
 recipes_factory.register_builder(ZeroLoopsMerge.__name__,lambda ranked_loops,puzzle_num_pieces: ZeroLoopsMerge(ranked_loops,puzzle_num_pieces))
