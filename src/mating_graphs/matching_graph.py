@@ -3,10 +3,10 @@ from src.mating import Mating
 from src.mating_graphs import factory
 
 
-INTER_PIECES_EDGE_TYPE = "inter_piece"
-WITHIN_PIECE_EDGE_TYPE = "within_piece"
-INTER_AGGREGATE_EDGE_TYPE = "inter_agg"
-WITHIN_AGGREGATE_EDGE_TYPE = "within_agg"
+INTER_PIECES_LINK_TYPE = "inter_piece"
+WITHIN_PIECE_LINK_TYPE = "within_piece"
+INTER_AGGREGATE_LINK_TYPE = "inter_agg"
+WITHIN_AGGREGATE_LINK_TYPE = "within_agg"
 
 class MatchingGraphWrapper():
 
@@ -91,9 +91,9 @@ class MatchingGraphWrapper():
     def _build_filtered_adjacency_graph(self):     
         self.filtered_adjacency_graph = nx.Graph()
         self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes,local_assembly=None)
-        self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_EDGE_TYPE)
+        self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_LINK_TYPE)
         potential_matings = [edge for edge in self.filtered_potential_matings_graph.edges if not edge in self.pieces_only_graph]
-        self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_EDGE_TYPE)
+        self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_LINK_TYPE)
 
 
     def build_graph(self):
@@ -108,7 +108,36 @@ class MatchingGraphWrapper():
         graph = getattr(self,graph_name)
         graph.nodes[node][att] = val
 
+    def assign_node(self,graph_name:str,node:str,local_assembly):
+        graph = getattr(self,graph_name)
 
+        if graph.nodes[node]["local_assembly"] is None:
+            graph.nodes[node]["local_assembly"] = [local_assembly]
+        else:
+            graph.nodes[node]["local_assembly"].append(local_assembly)
+
+
+    # def occupy_inter_piece_link(self,graph_name:str,node:str,mate_node:str):
+    #     graph = getattr(self,graph_name)
+
+    #     links_to_remove = [neighbor for neighbor in graph.adj[node] \
+    #      if  neighbor!=mate_node and graph.edges[node,neighbor]["type"] == INTER_PIECES_LINK_TYPE]
+        
+    #     graph.remove_edges_from(links_to_remove)
+
+    def get_mating(self,graph_name,node):
+        '''
+            deprecated
+        '''
+        graph = getattr(self,graph_name)
+
+        for neighbor in graph.adj[node]:
+            if graph.edges[node,neighbor]["type"] == INTER_PIECES_LINK_TYPE:
+                return _link_to_mating((node,neighbor))
+
+    def get_link_attributes(self,graph_name,link):
+        graph = getattr(self,graph_name)
+        return graph.edges[link]
 
 
     def get_matching_graph_nodes(self):
@@ -145,7 +174,7 @@ class MatchingGraphWrapper():
         '''
         agg_graph =  nx.Graph()
         agg_graph.add_nodes_from(base_graph.nodes)
-        agg_graph.add_edges_from(base_graph.edges, type=WITHIN_PIECE_EDGE_TYPE)
+        agg_graph.add_edges_from(base_graph.edges, type=WITHIN_PIECE_LINK_TYPE)
         # This line is should be computed outside the function?
         flat_mating_list = [mat for agg in aggregates_matings for mat in agg]
         occupied_nodes = set()
@@ -155,7 +184,7 @@ class MatchingGraphWrapper():
             occupied_nodes.add(node1)
             node2 = name_node(mating.piece_2,mating.edge_2)
             occupied_nodes.add(node2)
-            agg_graph.add_edge(node1,node2,type=WITHIN_AGGREGATE_EDGE_TYPE)
+            agg_graph.add_edge(node1,node2,type=WITHIN_AGGREGATE_LINK_TYPE)
 
 
         for link in mating_graph.edges:
@@ -169,7 +198,7 @@ class MatchingGraphWrapper():
             if node1 in occupied_nodes or node2 in occupied_nodes:
                 continue
 
-            agg_graph.add_edge(node1,node2,type=INTER_AGGREGATE_EDGE_TYPE)
+            agg_graph.add_edge(node1,node2,type=INTER_AGGREGATE_LINK_TYPE)
 
         return agg_graph
 
@@ -185,7 +214,7 @@ class MatchingGraphWrapper():
     def compute_loops_graph(self,loops:list)->nx.Graph:
         agg_graph =  nx.Graph()
         agg_graph.add_nodes_from(self.pieces_only_graph.nodes)
-        agg_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_EDGE_TYPE)
+        agg_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_LINK_TYPE)
 
         num_loops = len(loops)
 
@@ -196,7 +225,7 @@ class MatchingGraphWrapper():
                 node1 = name_node(mating.piece_1,mating.edge_1)
                 node2 = name_node(mating.piece_2,mating.edge_2)
                 
-                agg_graph.add_edge(node1,node2,type=WITHIN_AGGREGATE_EDGE_TYPE,
+                agg_graph.add_edge(node1,node2,type=WITHIN_AGGREGATE_LINK_TYPE,
                                    debug=repr(loop),loop_index=loop_i,total_num_loops=num_loops) # for the repr I insisted to get loop as parameter... (and for the easy interface...)
 
             inter_matings = loop.get_availiable_matings() # known interface (?)
@@ -204,7 +233,7 @@ class MatchingGraphWrapper():
             for mating in inter_matings:
                 node1 = name_node(mating.piece_1,mating.edge_1)
                 node2 = name_node(mating.piece_2,mating.edge_2)
-                agg_graph.add_edge(node1,node2,type=INTER_AGGREGATE_EDGE_TYPE)
+                agg_graph.add_edge(node1,node2,type=INTER_AGGREGATE_LINK_TYPE)
 
         return agg_graph
 

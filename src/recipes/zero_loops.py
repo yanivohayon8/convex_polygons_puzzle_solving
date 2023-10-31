@@ -20,6 +20,15 @@ class ZeroLoopsAroundVertex(Recipe):
         self.loops_scores = []
     
 
+    def _compute_loops_from_cycles(self,**kwargs):
+        pass
+    
+    def _rank_loops(self,**kwargs):
+        pass
+
+    def _create_lonely_loops(self,**kwargs):
+        pass
+
     def cook(self,**kwargs):
         self.pairwise_recipe = recipes_factory.create(self.pairwise_recipe_name,db=self.db,puzzle_num=self.puzzle_num,puzzle_noise_level=self.puzzle_noise_level,**kwargs)
         self.graph_wrapper = self.pairwise_recipe.cook()
@@ -32,7 +41,8 @@ class ZeroLoopsAroundVertex(Recipe):
         # self.zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
         # loops = self.zero_loops_loader.load()
 
-        loops = [Loop(self.graph_wrapper,cycle.debug_graph_cycle) for cycle in cycles]
+        # loops = [Loop(self.graph_wrapper,cycle.debug_graph_cycle,cycle.debug_graph_links) for cycle in cycles]
+        loops = [Loop(self.graph_wrapper,cycle.debug_graph_links) for cycle in cycles]
 
 
         self.loops_scores = [loop.physical_assemble(mode=self.simulation_mode) for loop in loops]

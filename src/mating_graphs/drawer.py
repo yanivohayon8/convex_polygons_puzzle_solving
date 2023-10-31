@@ -1,5 +1,5 @@
 from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name
-from src.mating_graphs.matching_graph import INTER_AGGREGATE_EDGE_TYPE,WITHIN_AGGREGATE_EDGE_TYPE,WITHIN_PIECE_EDGE_TYPE
+from src.mating_graphs.matching_graph import INTER_AGGREGATE_LINK_TYPE,WITHIN_AGGREGATE_LINK_TYPE,WITHIN_PIECE_LINK_TYPE
 import numpy as np
 import networkx as nx
 import math
@@ -238,9 +238,9 @@ class MatchingGraphDrawer():
 
         edges_color = []
         color2edge_meaning = {
-            WITHIN_PIECE_EDGE_TYPE:"red",
-            WITHIN_AGGREGATE_EDGE_TYPE:"pink",
-            INTER_AGGREGATE_EDGE_TYPE:"black"
+            WITHIN_PIECE_LINK_TYPE:"red",
+            WITHIN_AGGREGATE_LINK_TYPE:"pink",
+            INTER_AGGREGATE_LINK_TYPE:"black"
         }
 
 
@@ -254,14 +254,14 @@ class MatchingGraphDrawer():
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
 
-        within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_EDGE_TYPE], label='Within Piece')
-        within_agg_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_AGGREGATE_EDGE_TYPE], label='Within Aggregate')
-        inter_agg_patch = mpatches.Patch(color=color2edge_meaning[INTER_AGGREGATE_EDGE_TYPE], label='Inter Aggregate')
+        within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Within Piece')
+        within_agg_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_AGGREGATE_LINK_TYPE], label='Within Aggregate')
+        inter_agg_patch = mpatches.Patch(color=color2edge_meaning[INTER_AGGREGATE_LINK_TYPE], label='Inter Aggregate')
 
         # Plot empty lists with the desired colors and labels
-        ax.plot([], [], color=color2edge_meaning[WITHIN_PIECE_EDGE_TYPE], label='Internal edge', linewidth=5)
-        ax.plot([], [], color=color2edge_meaning[WITHIN_AGGREGATE_EDGE_TYPE], label='Ground Truth edge', linewidth=5)
-        ax.plot([], [], color=color2edge_meaning[INTER_AGGREGATE_EDGE_TYPE], label='Potential edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Internal edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[WITHIN_AGGREGATE_LINK_TYPE], label='Ground Truth edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[INTER_AGGREGATE_LINK_TYPE], label='Potential edge', linewidth=5)
 
         # Create and show legend
         ax.legend(loc='upper left')
@@ -278,9 +278,9 @@ class MatchingGraphDrawer():
 
         edges_color = []
         color2edge_meaning = {
-            WITHIN_PIECE_EDGE_TYPE:"red",
-            WITHIN_AGGREGATE_EDGE_TYPE:"pink",
-            INTER_AGGREGATE_EDGE_TYPE:"black"
+            WITHIN_PIECE_LINK_TYPE:"red",
+            WITHIN_AGGREGATE_LINK_TYPE:"pink",
+            INTER_AGGREGATE_LINK_TYPE:"black"
         }
 
         within_agg_colors = ["pink","cyan","green"]
@@ -290,7 +290,7 @@ class MatchingGraphDrawer():
         for link in loop_graph.edges(data=True):
             link_type = link[2]["type"]
 
-            if link_type == WITHIN_AGGREGATE_EDGE_TYPE:
+            if link_type == WITHIN_AGGREGATE_LINK_TYPE:
                 loop_i = link[2]["loop_index"]
                 color_index = loop_i%len(within_agg_colors)
                 edges_color.append(within_agg_colors[color_index])
@@ -302,14 +302,14 @@ class MatchingGraphDrawer():
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
 
-        within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_EDGE_TYPE], label='Within Piece')
-        within_agg_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_AGGREGATE_EDGE_TYPE], label='Within Aggregate')
-        inter_agg_patch = mpatches.Patch(color=color2edge_meaning[INTER_AGGREGATE_EDGE_TYPE], label='Inter Aggregate')
+        within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Within Piece')
+        within_agg_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_AGGREGATE_LINK_TYPE], label='Within Aggregate')
+        inter_agg_patch = mpatches.Patch(color=color2edge_meaning[INTER_AGGREGATE_LINK_TYPE], label='Inter Aggregate')
 
         # Plot empty lists with the desired colors and labels
-        ax.plot([], [], color=color2edge_meaning[WITHIN_PIECE_EDGE_TYPE], label='Internal edge', linewidth=5)
-        ax.plot([], [], color=color2edge_meaning[WITHIN_AGGREGATE_EDGE_TYPE], label='Ground Truth edge', linewidth=5)
-        ax.plot([], [], color=color2edge_meaning[INTER_AGGREGATE_EDGE_TYPE], label='Potential edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Internal edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[WITHIN_AGGREGATE_LINK_TYPE], label='Ground Truth edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning[INTER_AGGREGATE_LINK_TYPE], label='Potential edge', linewidth=5)
 
         # Create and show legend
         ax.legend(loc='upper left')

@@ -178,7 +178,37 @@ class TestGraphDrawer(unittest.TestCase):
         plt.show()
 
 
+    def test_draw_zero_loop_graph_19_0_new_ds(self):
+        db = 1
+        puzzle_num = 19 # 19
+        puzzle_noise_level = 1
 
+        gd_pairwise_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_pairwise_recipe.cook()
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+
+        fig, axs = plt.subplots(1,2)
+
+        noisy_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                     puzzle_noise_level=puzzle_noise_level)
+        graph_wrapper_before_loops = noisy_puzzle_recipe.cook()
+
+        drawer.draw_adjacency_graph(graph_wrapper_before_loops.filtered_adjacency_graph,
+                                    ax=axs[0])
+        axs[0].set_title("before loops")
+
+        zero_loops_recipe = recipes_factory.create("ZeroLoopsAroundVertex",
+                                                   db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
+                                                   pairwise_recipe_name = "SD1Pairwise")
+        loops = zero_loops_recipe.cook()
+        
+        drawer.draw_adjacency_graph(zero_loops_recipe.graph_wrapper.filtered_adjacency_graph,
+                                    ax=axs[1])
+        axs[1].set_title("after loops")
+
+        plt.show()
 
 
         

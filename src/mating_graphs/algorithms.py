@@ -1,6 +1,6 @@
 from typing import Any
 from networkx import Graph as nxGraph
-from src.mating_graphs.matching_graph import get_edge_name,get_piece_name,name_node,INTER_PIECES_EDGE_TYPE
+from src.mating_graphs.matching_graph import get_edge_name,get_piece_name,name_node,INTER_PIECES_LINK_TYPE
 from src.mating_graphs import factory as graph_factory
 
 class RedBlueCycleAlgo():
@@ -13,7 +13,7 @@ class RedBlueCycleAlgo():
 
         for inter_piece_link in graph.edges(data=True):
 
-            if inter_piece_link[2]["type"] == INTER_PIECES_EDGE_TYPE:
+            if inter_piece_link[2]["type"] == INTER_PIECES_LINK_TYPE:
                 graph_node1 = inter_piece_link[0]
                 graph_node2 = inter_piece_link[1]
                 piece_edge1 = int(get_edge_name(graph_node1))
