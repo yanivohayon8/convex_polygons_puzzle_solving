@@ -5,6 +5,7 @@ from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
 from src import shared_variables
 from src.local_assemblies.loops import Loop
+from src.mating_graphs.algorithms import red_blue_cycle
 
 
 class ZeroLoopsAroundVertex(Recipe):
@@ -19,6 +20,8 @@ class ZeroLoopsAroundVertex(Recipe):
         self.simulation_mode = simulation_mode
         self.loops_scores = []
     
+    def _compute_graph_wrapper(self,**kwargs):
+        pass
 
     def _compute_loops_from_cycles(self,**kwargs):
         pass
@@ -33,9 +36,7 @@ class ZeroLoopsAroundVertex(Recipe):
         self.pairwise_recipe = recipes_factory.create(self.pairwise_recipe_name,db=self.db,puzzle_num=self.puzzle_num,puzzle_noise_level=self.puzzle_noise_level,**kwargs)
         self.graph_wrapper = self.pairwise_recipe.cook()
 
-        id2piece = self.pairwise_recipe.puzzle_recipe.puzzle.id2piece
-        algo = graph_factory.create("RedBlueCycleAlgo",id2piece=id2piece)
-        cycles = algo.compute(self.graph_wrapper.filtered_adjacency_graph)
+        cycles = red_blue_cycle.compute(self.graph_wrapper.filtered_adjacency_graph)
 
         # piece2matings = self.graph_wrapper.get_piece2filtered_potential_matings()
         # self.zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
