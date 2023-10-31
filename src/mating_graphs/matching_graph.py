@@ -88,16 +88,12 @@ class MatchingGraphWrapper():
         potential_matings = [edge for edge in self.potential_matings_graph.edges if not edge in self.pieces_only_graph]
         self.adjacency_graph.add_edges_from(potential_matings,type="inter_piece")
     
-    def _build_filtered_adjacency_graph(self):
-        # self.filtered_adjaceny_graph = self.filtered_potential_matings_graph.copy()
-        # self.filtered_adjaceny_graph.add_nodes_from(self.pieces_only_graph.nodes)
-        # self.filtered_adjaceny_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
-        
+    def _build_filtered_adjacency_graph(self):     
         self.filtered_adjacency_graph = nx.Graph()
-        self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes)
-        self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type="within_piece")
+        self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes,local_assembly=None)
+        self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_EDGE_TYPE)
         potential_matings = [edge for edge in self.filtered_potential_matings_graph.edges if not edge in self.pieces_only_graph]
-        self.filtered_adjacency_graph.add_edges_from(potential_matings, type="inter_piece")
+        self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_EDGE_TYPE)
 
 
     def build_graph(self):
@@ -107,12 +103,19 @@ class MatchingGraphWrapper():
         self._build_filtered_matching_graph()
         self._build_filtered_adjacency_graph()
     
+
+    def update_node(self,graph_name,node,att,val):
+        graph = getattr(self,graph_name)
+        graph.nodes[node][att] = val
+
+
+
+
     def get_matching_graph_nodes(self):
         return list(self.potential_matings_graph.nodes)
 
     def compute_max_weight_matching(self):
         self.matching =  list(nx.matching.max_weight_matching(self.potential_matings_graph,weight="compatibility"))
-
 
     def _get_piece2matings(self,matings_graph):
         piece2matings = {}
@@ -204,6 +207,7 @@ class MatchingGraphWrapper():
                 agg_graph.add_edge(node1,node2,type=INTER_AGGREGATE_EDGE_TYPE)
 
         return agg_graph
+
 
 
 def get_piece_name(node_name:str):

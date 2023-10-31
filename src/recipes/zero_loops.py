@@ -4,7 +4,7 @@ from src.mating_graphs import factory as graph_factory
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
 from src import shared_variables
-
+from src.local_assemblies.loops import Loop
 
 
 class ZeroLoopsAroundVertex(Recipe):
@@ -28,9 +28,12 @@ class ZeroLoopsAroundVertex(Recipe):
         algo = graph_factory.create("RedBlueCycleAlgo",id2piece=id2piece)
         cycles = algo.compute(self.graph_wrapper.filtered_adjacency_graph)
 
-        piece2matings = self.graph_wrapper.get_piece2filtered_potential_matings()
-        self.zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
-        loops = self.zero_loops_loader.load()
+        # piece2matings = self.graph_wrapper.get_piece2filtered_potential_matings()
+        # self.zero_loops_loader = ZeroLoopKeepCycleAsIs(id2piece,cycles,piece2matings)
+        # loops = self.zero_loops_loader.load()
+
+        loops = [Loop(self.graph_wrapper,cycle.debug_graph_cycle) for cycle in cycles]
+
 
         self.loops_scores = [loop.physical_assemble(mode=self.simulation_mode) for loop in loops]
         self.loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
