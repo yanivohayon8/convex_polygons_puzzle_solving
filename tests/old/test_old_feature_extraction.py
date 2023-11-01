@@ -1,11 +1,11 @@
 import unittest 
 import cv2
-from src.piece import Piece
+from src.data_types.piece import Piece
 import matplotlib.pyplot as plt
 from src.feature_extraction.pictorial import trans_image,image_edge,EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor,EdgePictorialExtractorOnExtrapolation
 import numpy as np
 from src.feature_extraction import geometric as geo_extractor 
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator,reshape_line_to_image#,OriginalImgExtractor
 from PIL import Image
 

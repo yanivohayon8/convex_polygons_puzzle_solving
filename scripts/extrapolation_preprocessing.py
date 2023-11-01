@@ -4,7 +4,7 @@ sys.path.append("./")
 
 import argparse
 # from ..src.puzzle import Puzzle
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 from PIL import Image
 from PIL import ImageDraw
 import shutil

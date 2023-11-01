@@ -1,6 +1,6 @@
 from src.feature_extraction.geometric import EdgeLengthExtractor
 from src.pairwise_matchers.geometric import EdgeMatcher
-from src.piece import Piece
+from src.data_types.piece import Piece
 
 
 import unittest

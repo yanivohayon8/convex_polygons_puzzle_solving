@@ -1,12 +1,12 @@
 import unittest 
 import numpy as np
 import matplotlib.pyplot as plt
-from src.piece import Piece
+from src.data_types.piece import Piece
 from src.feature_extraction.extrapolator.lama_masking import LamaEdgeExtrapolator
 from src.feature_extraction.pictorial import EdgePictorialExtractor,EdgePictorialAndNormalizeExtractor
 from src.pairwise_matchers.pictorial import NaiveExtrapolatorMatcher,DotProductNoisslessMatcher
 from src.pairwise_matchers.stable_diffusion import DotProductExtraToOriginalMatcher
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 
 
 class TestDotProductNoisslessMatcher(unittest.TestCase):

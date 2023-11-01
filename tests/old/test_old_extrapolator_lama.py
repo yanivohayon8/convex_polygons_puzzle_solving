@@ -6,7 +6,7 @@ from shapely import Polygon,Point
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor
 from src.feature_extraction.pictorial import find_rotation_angle,padd_image_before_translate,trans_image
 
@@ -24,7 +24,7 @@ class TestPOC(unittest.TestCase):
         piece_name = "4"
         input_image_path = f"{directory}/images/{piece_name}.png"
         output_rgb_image_path = f"{directory}/rgb/{piece_name}.png"
-        convert_rgba_to_rgb(input_image_path,output_rgb_image_path)
+        # convert_rgba_to_rgb(input_image_path,output_rgb_image_path)
         # output_mask_path = f"{directory}/masks/{piece_name}_mask.png"
 
     def test_draw_white_lines(self):

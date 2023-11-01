@@ -1,6 +1,6 @@
 import unittest
 from src.solvers.apictorial import FirstSolver,GraphMatchingSolver
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 from src.evaluator import AreaOverlappingEvaluator
 import matplotlib.pyplot as plt
 

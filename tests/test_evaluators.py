@@ -1,7 +1,7 @@
 import unittest
 from src.evaluator import least_square_rigid_motion_svd,AreaOverlappingEvaluator
 import numpy as np
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 
 class TestLeastSquareRigidBody(unittest.TestCase):
 

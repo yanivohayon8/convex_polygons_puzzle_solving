@@ -1,6 +1,6 @@
 import unittest
 from src.solvers.apictorial_v2 import ZeroLoops360Solver
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 from src.evaluator import AreaOverlappingEvaluator
 import matplotlib.pyplot as plt
 from src.mating_graphs.cycle import map_edge_to_contain_cycles

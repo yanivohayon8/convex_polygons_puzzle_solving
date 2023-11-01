@@ -1,7 +1,7 @@
 import numpy as np
 from src.feature_extraction import Extractor
 from src.feature_extraction import factory
-from src.piece import Piece
+from src.data_types.piece import Piece
 
 
 class EdgeLengthExtractor(Extractor):

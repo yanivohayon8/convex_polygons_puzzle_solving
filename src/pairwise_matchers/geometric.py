@@ -1,7 +1,7 @@
 
 from typing import Any
 import numpy as np
-from src.mating import Mating
+from src.data_types.mating import Mating
 from src.pairwise_matchers import factory
 
 class EdgeMatcher():

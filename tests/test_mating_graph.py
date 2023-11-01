@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.piece import Piece
+from src.data_types.piece import Piece
 from src.mating_graphs.inter_env_graph import InterEnvGraph
 from src.mating_graphs.matching_graph import MatchingGraphWrapper
 from src.recipes.puzzle import loadRegularPuzzle

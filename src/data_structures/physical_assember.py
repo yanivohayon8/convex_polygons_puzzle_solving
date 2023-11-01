@@ -1,5 +1,5 @@
 from src.data_structures.hierarchical_loops import Loop
-from src.piece import semi_dice_coef_overlapping
+from src.data_types.piece import semi_dice_coef_overlapping
 from shapely import Polygon
 from PIL import Image
 import math

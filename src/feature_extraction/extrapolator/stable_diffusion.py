@@ -2,7 +2,7 @@
 from typing import Any
 from src.feature_extraction import Extractor,factory
 from src.feature_extraction.pictorial import find_rotation_angle,trans_image
-from src.piece import Piece
+from src.data_types.piece import Piece
 import numpy as np
 from src.feature_extraction import image_process
 

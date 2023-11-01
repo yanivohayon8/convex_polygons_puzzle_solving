@@ -2,7 +2,7 @@ import pandas as pd
 import cv2
 from src import RGB_COLORS
 import numpy as np
-from src.piece import Piece
+from src.data_types.piece import Piece
 
 
 class Solver():

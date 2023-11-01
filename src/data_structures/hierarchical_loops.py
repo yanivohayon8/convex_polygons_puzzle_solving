@@ -1,5 +1,5 @@
 from functools import reduce
-from src.mating import Mating,convert_mating_to_vertex_mating
+from src.data_types.mating import Mating,convert_mating_to_vertex_mating
 from src import shared_variables 
 from src.physics import assembler
 

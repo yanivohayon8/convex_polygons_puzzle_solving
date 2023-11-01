@@ -1,5 +1,5 @@
 import unittest
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 import matplotlib.pyplot as plt
 
 class TestLoader(unittest.TestCase):

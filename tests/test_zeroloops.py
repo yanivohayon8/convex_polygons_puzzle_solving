@@ -5,7 +5,7 @@ from src.recipes import factory as recipes_factory
 from src.mating_graphs import factory as graph_factory
 from src.data_structures.zero_loops import ZeroLoopKeepCycleAsIs
 from src.data_structures.loop_merger import BasicLoopMerger
-from src.mating import Mating
+from src.data_types.mating import Mating
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.feature_extraction import geometric as geo_extractor 
 

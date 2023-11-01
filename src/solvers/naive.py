@@ -4,7 +4,7 @@ from src.pairwise_matchers.geometric import GeometricPairwiseMatcher
 import numpy as np
 import networkx as nx
 from src.data_structures.hierarchical_loops import Loop,ZeroLoopError,LoopUnionConflictError
-from src.mating import Mating
+from src.data_types.mating import Mating
 
 import cv2
 from src.feature_extraction.pictorial import PixelEnviormnetExtractor

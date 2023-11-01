@@ -1,5 +1,5 @@
 from src.recipes import Recipe,factory
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 from src.physics import assembler
 from src import shared_variables
 

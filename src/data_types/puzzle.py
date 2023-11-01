@@ -1,7 +1,7 @@
 import pandas as pd
-from src.piece import Piece,StableDiffusionExtrapolationDetails
+from src.data_types.piece import Piece,StableDiffusionExtrapolationDetails
 from shapely.geometry.polygon import orient as orient_as_ccw
-from src.mating import Mating
+from src.data_types.mating import Mating
 import glob
 import json
 

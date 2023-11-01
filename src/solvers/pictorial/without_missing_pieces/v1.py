@@ -1,6 +1,6 @@
 from src.recipes import factory as recipes_factory
 from src.physics import assembler
-from src.assembly import Assembly
+from src.data_types.assembly import Assembly
 
 class LoopMergerSolver():
 

@@ -1,5 +1,5 @@
 import unittest
-from src.piece import Piece
+from src.data_types.piece import Piece
 from src.feature_extraction import geometric as geo_extractor 
 from src.feature_extraction import factory
 

@@ -1,6 +1,6 @@
 # use global states instead of a class (a like singleton)
 from src.physics.my_http_client import HTTPClient
-from src.piece import semi_dice_coef_overlapping
+from src.data_types.piece import semi_dice_coef_overlapping
 from shapely import Polygon
 
 db_ = -1

@@ -6,7 +6,7 @@ import glob
 import numpy as np
 
 from src.feature_extraction.extrapolator.stable_diffusion import SDExtrapolatorExtractor,SDOriginalExtractor
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 
 images_folder = "data/poc_10_pictorial_compatibility/db-1-puzzle-19-noise-0_v2/"
 

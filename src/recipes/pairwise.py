@@ -1,5 +1,5 @@
 from typing import Any
-from src.puzzle import Puzzle
+from src.data_types.puzzle import Puzzle
 from src.feature_extraction import extract_features
 from src.pairwise_matchers import pairwise_pieces
 from src.recipes import Recipe,factory as recipes_factory

@@ -3,7 +3,7 @@ from functools import reduce
 from src.mating_graphs.matching_graph import MatchingGraphWrapper,_link_to_mating,INTER_PIECES_LINK_TYPE,name_node
 from src.physics import assembler
 from src import shared_variables
-from src.mating import convert_mating_to_vertex_mating
+from src.data_types.mating import convert_mating_to_vertex_mating
 
 
 class Loop():

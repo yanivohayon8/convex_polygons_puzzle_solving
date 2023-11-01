@@ -1,4 +1,4 @@
-from src.piece import Piece
+from src.data_types.piece import Piece
 from src.factory import Factory
 
 class Extractor():

@@ -3,7 +3,7 @@ from PIL import ImageDraw
 import numpy as np
 import cv2
 from src.feature_extraction import Extractor
-from src.piece import Piece
+from src.data_types.piece import Piece
 
 class LamaEdgeExtrapolator(Extractor):
 

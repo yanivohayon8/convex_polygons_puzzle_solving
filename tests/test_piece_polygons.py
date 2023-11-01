@@ -1,7 +1,7 @@
 import unittest
 # from src.piece import move_and_rotate_polygons
-from src.piece import Piece
-from src.piece import overlapping_area,semi_dice_coef_overlapping,compute_iou
+from src.data_types.piece import Piece
+from src.data_types.piece import overlapping_area,semi_dice_coef_overlapping,compute_iou
 from matplotlib.patches import Polygon as MatplotlibPolygon
 import matplotlib.pyplot as plt
 import numpy as np
