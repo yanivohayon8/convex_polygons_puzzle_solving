@@ -195,6 +195,10 @@ def merge(loop1:Loop,loop2:Loop):
     new_level = max(loop1.level,loop2.level) + 1
     new_links = list(set(loop1.links + loop2.links))
     
+    # This might have side affects
+    loop1.remove_from_graph()
+    loop2.remove_from_graph()
+
     return Loop(loop1.graph_wrapper_ref,new_links,level=new_level,graph_name=loop1.graph_name)
 
         

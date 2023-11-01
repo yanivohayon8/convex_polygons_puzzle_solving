@@ -1,6 +1,7 @@
 from typing import Any
 from src.recipes import Recipe,factory as recipes_factory
-from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
+# from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
+from src.local_assemblies.loops import merge ,LoopMergeError,LoopMutualPiecesMergeError
 from src import shared_variables
 from src.local_assemblies.loops import Loop,create_loop_from_single
 from src.mating_graphs.algorithms import red_blue_cycle
@@ -94,7 +95,7 @@ class ZeroLoopsMerge():
     def __init__(self,ranked_loops:list,puzzle_num_pieces) -> None:
         self.puzzle_num_pieces = puzzle_num_pieces
         self.ranked_loops = ranked_loops
-        self.merger = BasicLoopMerger()
+        # self.merger = BasicLoopMerger()
 
     def _merge(self,to_be_merge_loops:list):
         aggregated_loop = to_be_merge_loops[0]
@@ -110,7 +111,7 @@ class ZeroLoopsMerge():
                 for _ in range(queue_size):
                     lop = queued_loops.pop(0)
                     try:
-                        aggregated_loop = self.merger.merge(aggregated_loop,lop)    
+                        aggregated_loop = merge(aggregated_loop,lop)
                         is_changed = True
                         to_be_merge_loops.remove(lop)
                     except (LoopMutualPiecesMergeError,LoopMergeError) as e:
@@ -118,14 +119,14 @@ class ZeroLoopsMerge():
                             queued_loops.append(lop)
 
                 try:
-                    aggregated_loop = self.merger.merge(aggregated_loop,curr_loop)
+                    aggregated_loop = merge(aggregated_loop,curr_loop)
                     is_changed = True
                     to_be_merge_loops.remove(curr_loop)
                 except (LoopMutualPiecesMergeError,LoopMergeError) as e:
                     if not curr_loop in queued_loops:
                         queued_loops.append(curr_loop)
                 
-                if len(aggregated_loop.get_pieces_invovled()) == self.puzzle_num_pieces:
+                if len(aggregated_loop.get_pieces_involved()) == self.puzzle_num_pieces:
                     return aggregated_loop,list() #queued_loops
         
         return aggregated_loop,queued_loops
