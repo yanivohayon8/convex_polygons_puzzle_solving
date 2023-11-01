@@ -126,14 +126,41 @@ class MatchingGraphWrapper():
                 if len(graph.nodes[node]["local_assembly"]) == 0:
                     graph.nodes[node]["local_assembly"] = None
 
-    # def occupy_inter_piece_link(self,graph_name:str,node:str,mate_node:str):
-    #     graph = getattr(self,graph_name)
+    def clear_unassigned_inter_links(self,graph_name,loops):
+        graph = getattr(self,graph_name)
+        links_to_remove = []
 
-    #     links_to_remove = [neighbor for neighbor in graph.adj[node] \
-    #      if  neighbor!=mate_node and graph.edges[node,neighbor]["type"] == INTER_PIECES_LINK_TYPE]
-        
-    #     graph.remove_edges_from(links_to_remove)
+        for link in graph.edges(data=True):
+            
+            if link[2]["type"] != INTER_PIECES_LINK_TYPE:
+                continue
+            
+            node1_assemblies = graph.nodes[link[0]]["local_assembly"]
+            adj1 = [neighbor for neighbor in graph.adj[link[0]] if graph.edges[link[0],neighbor]["type"] == INTER_PIECES_LINK_TYPE]
+            node2_assemblies = graph.nodes[link[1]]["local_assembly"]
+            adj2 = [neighbor for neighbor in graph.adj[link[1]] if graph.edges[link[1],neighbor]["type"] == INTER_PIECES_LINK_TYPE]
 
+            if node1_assemblies is None and node2_assemblies is None:
+                continue
+            elif node1_assemblies is None and len(node2_assemblies) == 1 and len(adj2) == 1:
+                continue
+            elif node2_assemblies is None and len(node1_assemblies) == 1 and len(adj1) == 1:
+                continue
+            else:
+                
+                is_to_remove = True
+
+                for loop in loops:
+                    if loop.is_link_present((link[0],link[1])):
+                        is_to_remove = False 
+                        break
+                
+                if is_to_remove:
+                    links_to_remove.append(link)
+    
+        graph.remove_edges_from(links_to_remove)
+
+    
     def get_mating(self,graph_name,node):
         '''
             deprecated

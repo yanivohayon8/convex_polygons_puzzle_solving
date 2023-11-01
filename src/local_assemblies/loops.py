@@ -90,6 +90,9 @@ class Loop():
     # def __del__(self) -> None:
     #     self.remove_from_graph(self)
 
+    def is_link_present(self,link):
+        link_reversed = (link[1],link[0])
+        return link in self.links or link_reversed in self.links
 
 def create_loop_from_single(piece_id,graph_name = "filtered_adjacency_graph"):
     piece = shared_variables.puzzle.id2piece[piece_id]
