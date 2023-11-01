@@ -180,7 +180,7 @@ class TestGraphDrawer(unittest.TestCase):
 
     def test_draw_zero_loop_graph_19_0_new_ds(self):
         db = 1
-        puzzle_num = 19 # 19
+        puzzle_num = 20 # 19
         puzzle_noise_level = 1
 
         gd_pairwise_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,

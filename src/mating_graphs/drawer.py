@@ -276,31 +276,53 @@ class MatchingGraphDrawer():
             fig, ax = plt.subplots()
 
 
-        edges_color = []
         color2edge_meaning = {
-            WITHIN_PIECE_LINK_TYPE:"red",
-            INTER_PIECES_LINK_TYPE: "blue"
+            WITHIN_PIECE_LINK_TYPE:"black",
+            INTER_PIECES_LINK_TYPE: "gray"
         }
 
+        edges_color = [color2edge_meaning[link[2]["type"]] for link in graph.edges(data=True)]
 
-        # for edge in adjacency_with_potential_graph.edges:
-        for link in graph.edges(data=True):
-            edges_color.append(color2edge_meaning[link[2]["type"]])
+        nodes_color = []
+        loops_color_pool = ["blue","green","red","pink","purple"]
+        color_index = 0
+        loop2color = {}
+        free_loop_color = "gray"
+        multiple_loop_color = "skyblue"
 
-        
-        nx.draw_networkx(graph,self.node2position,with_labels=True,node_color="skyblue",
+        for node in graph.nodes(data=True):
+            attributes = node[1]
+            
+            if attributes["local_assembly"] is None:
+                nodes_color.append(free_loop_color)
+            elif len(attributes["local_assembly"]) > 1:
+                nodes_color.append(multiple_loop_color)
+            else:
+                ass_name = repr(attributes["local_assembly"])
+                
+                if not ass_name in loop2color.keys():
+                    loop2color[ass_name] = loops_color_pool[color_index]
+                    color_index= (color_index+1)%len(loops_color_pool)
+
+                nodes_color.append(loop2color[ass_name])
+            
+        nx.draw_networkx(graph,self.node2position,with_labels=True,node_color=nodes_color,
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
 
         within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Within Piece')
         inter_piece_patch = mpatches.Patch(color=color2edge_meaning[INTER_PIECES_LINK_TYPE], label='Inter Piece')
+        free_loop_patch = plt.Line2D([0], [0], marker='o', color='w', label=f'No loop', markersize=10,markerfacecolor=free_loop_color)
+        multiple_loop_patch = plt.Line2D([0], [0], marker='o', color='w', label=f"Multiple Loops", markersize=10,markerfacecolor=multiple_loop_color)
 
         # Plot empty lists with the desired colors and labels
         ax.plot([], [], color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Within Piece', linewidth=5)
         ax.plot([], [], color=color2edge_meaning[INTER_PIECES_LINK_TYPE], label='Inter Piece', linewidth=5)
+        ax.plot([],[],marker="o",color='w', label=f'Example', markersize=10,markerfacecolor=free_loop_color)
+        ax.plot([],[],marker="o",color='w', label=f'Example', markersize=10,markerfacecolor=multiple_loop_color)
 
         # Create and show legend
         ax.legend(loc='upper left')
-        handles = [within_piece_patch,inter_piece_patch]
+        handles = [within_piece_patch,inter_piece_patch,free_loop_patch,multiple_loop_patch]
         ax.legend(handles=handles, loc='upper left')
         ax.axis('off')
