@@ -94,6 +94,60 @@ class Loop():
         link_reversed = (link[1],link[0])
         return link in self.links or link_reversed in self.links
 
+    def is_contained_all_pieces(self,loop):
+
+        if isinstance(loop,Loop):
+            unmutual_pieces = list(set(self.get_pieces_involved()) - set(loop.get_pieces_involved()))
+            return len(unmutual_pieces)==0 
+        
+    
+    def get_mutual_pieces(self,loop):
+        
+        if isinstance(loop,Loop):
+            self_pieces = self.get_pieces_involved()
+            loop_pieces = loop.get_pieces_involved()
+            return [piece for piece in loop_pieces if piece in self_pieces]
+    
+    def mating_conflict(self,loop):
+
+        if isinstance(loop,Loop):
+
+            for self_link in self.links:
+                self_attributes = self.graph_wrapper_ref.get_link_attributes(self.graph_name,self_link)
+
+                if self_attributes["type"] != INTER_PIECES_LINK_TYPE:
+                    continue
+
+                for other_link in loop.links:
+                    other_attributes = self.graph_wrapper_ref.get_link_attributes(self.graph_name,other_link)
+
+                    if other_attributes["type"] != INTER_PIECES_LINK_TYPE:
+                        continue
+                    
+                    # Test all permutation of two tuples
+
+                    if self_link[0] == other_link[1] and self_link[1] != other_link[0]:
+                        return (self_link,other_link)
+                    
+                    if self_link[1] == other_link[0] and self_link[0] != other_link[1]:
+                        return (self_link,other_link)
+                    
+                    if self_link[0] == other_link[0] and self_link[1] != other_link[1]:
+                        return (self_link,other_link)
+                    
+                    if self_link[1] == other_link[1] and self_link[0] != other_link[0]:
+                        return (self_link,other_link)
+                
+            return None
+                
+
+    def get_mutual_matings(self,loop):
+        self_matings = self.get_matings()
+        other_matings = loop.get_matings()
+
+        return [mating for mating in self_matings if mating in other_matings]
+
+
 def create_loop_from_single(piece_id,graph_name = "filtered_adjacency_graph"):
     piece = shared_variables.puzzle.id2piece[piece_id]
     nodes = [name_node(piece_id,edge_i) for edge_i in range(piece.get_num_coords())]
@@ -103,7 +157,45 @@ def create_loop_from_single(piece_id,graph_name = "filtered_adjacency_graph"):
 
     return Loop(graph_wrapper,links,graph_name=graph_name)
 
+class LoopMergeError(Exception):
+    pass
 
+class LoopMutualPiecesMergeError(LoopMergeError):
+    pass
+
+
+def merge(loop1:Loop,loop2:Loop):
+    
+    if loop1.is_contained_all_pieces(loop2) or loop2.is_contained_all_pieces(loop1):
+        mess = f"The merge of loop {repr(loop1)} and {repr(loop2)} does not results in a novel piece"
+        raise LoopMergeError(mess)
+    
+    mutual_pieces = loop1.get_mutual_pieces(loop2)
+        
+    if len(mutual_pieces) == 0:
+        mess = f"The loops {repr(loop1)} and {repr(loop2)} don't have mutual pieces"
+        raise LoopMutualPiecesMergeError(mess)
+    
+    problmatic_matings = loop1.mating_conflict(loop2)
+    if problmatic_matings is not None:
+        '''This should not happen when there is no noise'''
+        mess = f"Conflict while trying to merge between loop {repr(loop1)} and loop {repr(loop2)}."+\
+                f"The former loop assert the mating {repr(problmatic_matings[0])} " +\
+                f"while the latter {repr(problmatic_matings[1])}"
+        raise LoopMergeError(mess)
+    
+    mutual_matings = loop1.get_mutual_matings(loop2)
+    expected_num_matings = min(loop1.level,loop2.level) + 1
+
+    if len(mutual_matings) < expected_num_matings:
+        mess = f"Expected to have at least {expected_num_matings} mutual matings since "
+        mess = mess +  f"{loop1} is {loop1.level}-loop and {loop2} is {loop2.level}-loop"
+        raise LoopMergeError(mess)
+    
+    new_level = max(loop1.level,loop2.level) + 1
+    new_links = list(set(loop1.links + loop2.links))
+    
+    return Loop(loop1.graph_wrapper_ref,new_links,level=new_level,graph_name=loop1.graph_name)
 
         
 

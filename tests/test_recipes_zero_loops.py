@@ -2,15 +2,52 @@ import unittest
 from src.recipes import factory as recipes_factory
 from src.recipes.zero_loops import ZeroLoopsAroundVertex
 from src.mating_graphs import factory as graph_factory
+from src.local_assemblies.loops import merge
+from src.mating_graphs.drawer import MatchingGraphDrawer
+import matplotlib.pyplot as plt
+
 
 class TestZeroLoopsAroundVertex(unittest.TestCase):
 
     def test_SILENT_db_1_puzzle_19_noise_0(self):
-        zero_loops_recipe = ZeroLoopsAroundVertex(db=1,puzzle_num=19,puzzle_noise_level=0,
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+
+        gd_pairwise_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_pairwise_recipe.cook()
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+
+        noisy_puzzle_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
+                                                     puzzle_noise_level=puzzle_noise_level)
+        noisy_graph_wrapper = noisy_puzzle_recipe.cook()
+
+        fig,axs = plt.subplots(1,2)
+
+        drawer.draw_adjacency_graph(noisy_graph_wrapper.adjacency_graph,ax=axs[0])
+
+        zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
                                                 pairwise_recipe_name = "SD1Pairwise")
         zero_loops = zero_loops_recipe.cook(compatibility_threshold=0.38)
-
         assert len(zero_loops) == 5
+
+        graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
+        drawer.draw_filtered_adjacency_with_loops(graph,ax=axs[1])
+
+        fig2,ax = plt.subplots(1,1)
+        loop_0_1 = merge(zero_loops[4],zero_loops[1])
+        zero_loops[1].remove_from_graph()
+        zero_loops[4].remove_from_graph()
+
+        drawer.draw_filtered_adjacency_with_loops(graph,ax=ax)
+        # loop_1_2 = merge(zero_loops[3],zero_loops[2])
+
+        plt.show()
+
+
+
 
     
     def test_db_1_puzzle_19_noise_1(self):
