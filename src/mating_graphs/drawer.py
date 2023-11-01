@@ -284,7 +284,7 @@ class MatchingGraphDrawer():
         edges_color = [color2edge_meaning[link[2]["type"]] for link in graph.edges(data=True)]
 
         nodes_color = []
-        loops_color_pool = ["blue","green","red","pink","purple"]
+        loops_color_pool = ["blue","green","red","pink","purple","orange","magenta","yellow"]
         color_index = 0
         loop2color = {}
         free_loop_color = "gray"

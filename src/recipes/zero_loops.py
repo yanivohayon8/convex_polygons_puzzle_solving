@@ -33,7 +33,7 @@ class ZeroLoopsAroundVertex(Recipe):
         self.loops_scores = [loop.physical_assemble(mode=self.simulation_mode) for loop in loops]
         self.loops_ranked = [loop for _,loop in sorted(zip(self.loops_scores,loops))]
 
-    def _filter_best(self):
+    def _find_best_loops(self):
         self.best_loops = [self.loops_ranked[0]]
         
         for ii in range(1,len(self.loops_ranked),1):
@@ -45,10 +45,6 @@ class ZeroLoopsAroundVertex(Recipe):
 
             self.best_loops.append(self.loops_ranked[ii])
         
-        for loop in self.loops_ranked[len(self.best_loops):]:
-            # del loop
-            loop.remove_from_graph()
-
         return self.best_loops
 
     def _create_lonely_loops(self):
@@ -60,13 +56,22 @@ class ZeroLoopsAroundVertex(Recipe):
             self.best_loops.append(loop)
         
         return self.best_loops
+    
+    def _clear_useless_loops(self):
+        
+        for loop in self.loops_ranked[len(self.best_loops)-1:]:
+            # del loop
+            loop.remove_from_graph()
+
+        # self.graph_wrapper.clear_unassigned_inter_links(self.best_loops[0].graph_name)
 
     def cook(self,**kwargs):
         self._compute_graph_wrapper(**kwargs)
         loops = self._compute_loops_from_cycles(**kwargs)
         self._rank_loops(loops)
-        self._filter_best()
-        self._create_lonely_loops()        
+        self._find_best_loops()
+        self._create_lonely_loops()
+        self._clear_useless_loops()        
 
         return self.best_loops
     
