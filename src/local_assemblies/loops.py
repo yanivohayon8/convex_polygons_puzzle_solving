@@ -83,6 +83,12 @@ class Loop():
     def get_physics_score(self):
         return self.physics_score
                     
+    def remove_from_graph(self):
+        for node in self.nodes:
+            self.graph_wrapper_ref.dissociate_node(self.graph_name,node,self)
+    
+    # def __del__(self) -> None:
+    #     self.remove_from_graph(self)
 
 
 def create_loop_from_single(piece_id,graph_name = "filtered_adjacency_graph"):

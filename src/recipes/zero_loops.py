@@ -44,6 +44,10 @@ class ZeroLoopsAroundVertex(Recipe):
                 break
 
             self.best_loops.append(self.loops_ranked[ii])
+        
+        for loop in self.loops_ranked[len(self.best_loops):]:
+            # del loop
+            loop.remove_from_graph()
 
         return self.best_loops
 

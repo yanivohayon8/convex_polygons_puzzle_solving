@@ -116,6 +116,12 @@ class MatchingGraphWrapper():
         else:
             graph.nodes[node]["local_assembly"].append(local_assembly)
 
+    def dissociate_node(self,graph_name,node:str,local_assemly):
+        graph = getattr(self,graph_name)
+
+        if not graph.nodes[node]["local_assembly"] is None:
+            if local_assemly in graph.nodes[node]["local_assembly"]:
+                graph.nodes[node]["local_assembly"].remove(local_assemly)
 
     # def occupy_inter_piece_link(self,graph_name:str,node:str,mate_node:str):
     #     graph = getattr(self,graph_name)
