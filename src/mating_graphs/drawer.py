@@ -276,12 +276,7 @@ class MatchingGraphDrawer():
             fig, ax = plt.subplots()
 
 
-        color2edge_meaning = {
-            WITHIN_PIECE_LINK_TYPE:"black",
-            INTER_PIECES_LINK_TYPE: "gray"
-        }
-
-        edges_color = [color2edge_meaning[link[2]["type"]] for link in graph.edges(data=True)]
+        
 
         nodes_color = []
         loops_color_pool = ["blue","green","red","pink","purple","orange","magenta","yellow"]
@@ -289,23 +284,49 @@ class MatchingGraphDrawer():
         loop2color = {}
         free_loop_color = "gray"
         multiple_loop_color = "skyblue"
+        node2color = {}
 
         for node in graph.nodes(data=True):
             attributes = node[1]
+            node_name = node[0]
             
             if attributes["local_assembly"] is None:
                 nodes_color.append(free_loop_color)
+                node2color[node_name] = free_loop_color
             elif len(attributes["local_assembly"]) > 1:
                 nodes_color.append(multiple_loop_color)
+                node2color[node_name] = multiple_loop_color
             else:
                 ass_name = repr(attributes["local_assembly"])
                 
                 if not ass_name in loop2color.keys():
                     loop2color[ass_name] = loops_color_pool[color_index]
                     color_index= (color_index+1)%len(loops_color_pool)
-
+                
                 nodes_color.append(loop2color[ass_name])
-            
+                node2color[node_name] = loop2color[ass_name]
+        
+        color2edge_meaning = {
+            WITHIN_PIECE_LINK_TYPE:"black",
+            INTER_PIECES_LINK_TYPE: "gray"
+        }
+
+        # edges_color = [color2edge_meaning[link[2]["type"]] for link in graph.edges(data=True)]
+        edges_color = []
+
+        for link in graph.edges(data=True):
+            node1_color = node2color[link[0]]
+            node2_color = node2color[link[1]]
+
+            if node1_color == node2_color and node1_color != multiple_loop_color:
+                edges_color.append(node1_color)
+            elif node1_color == multiple_loop_color and (node2_color != multiple_loop_color and node2_color != free_loop_color):
+                edges_color.append(node2_color)
+            elif node2_color == multiple_loop_color and (node1_color != multiple_loop_color and node1_color != free_loop_color):
+                edges_color.append(node1_color)
+            else:
+                edges_color.append(color2edge_meaning[link[2]["type"]])
+
         nx.draw_networkx(graph,self.node2position,with_labels=True,node_color=nodes_color,
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
