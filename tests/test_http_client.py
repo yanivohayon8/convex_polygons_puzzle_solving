@@ -3,7 +3,7 @@ sys.path.append('./')
 
 import unittest
 #from src.my_http_client import HTTPClient
-from src.my_http_client import HTTPClient 
+from src.physics.my_http_client import HTTPClient 
 
 
 

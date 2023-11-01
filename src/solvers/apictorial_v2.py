@@ -5,7 +5,7 @@ from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_piece_name
 from src.mating import Mating,convert_mating_to_vertex_mating
 from src.data_structures.zero_loops import ZeroLoopTwoEdgesPerPiece,ZeroLoopAroundVertexLoader
 from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
-from src.my_http_client import HTTPClient
+from src.physics.my_http_client import HTTPClient
 from src.data_structures.physical_assember import PhysicalAssembler
 from src.data_structures.hierarchical_loops import get_loop_matings_as_csv
 from src.assembly import Assembly

@@ -11,7 +11,7 @@ from src.feature_extraction.pictorial import PixelEnviormnetExtractor
 import matplotlib.pyplot as plt
 #from src.feature_extraction.
 
-from src.my_http_client import HTTPClient
+from src.physics.my_http_client import HTTPClient
 
 CIRCLE_DEGREES = 360
 
