@@ -91,11 +91,8 @@ class TestZeroLoopsAroundVertex(unittest.TestCase):
 
 class TestLoopMerge(unittest.TestCase):
 
-    def test_db_1_puzzle_19_noise_0(self):
-        db = 1
-        puzzle_num = 19
-        puzzle_noise_level = 0
-
+    def _run(self,db,puzzle_num,puzzle_noise_level,
+             expected_num_zero_loops=-1,**kwargs):
         gd_pairwise_recipe = recipes_factory.create("SD1Pairwise",db=db,puzzle_num=puzzle_num,
                                                   puzzle_noise_level=0)
         gd_graph_wrapper = gd_pairwise_recipe.cook()
@@ -104,44 +101,70 @@ class TestLoopMerge(unittest.TestCase):
 
         zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
                                                 pairwise_recipe_name = "SD1Pairwise")
-        loops = zero_loops_recipe.cook(compatibility_threshold=0.38)
-        assert len(loops) == 5
+        zero_loops = zero_loops_recipe.cook(**kwargs)
+        
+        if expected_num_zero_loops != -1:
+            assert len(zero_loops) == expected_num_zero_loops
 
         merger = recipes_factory.create("ZeroLoopsMerge",
-                                        ranked_loops=loops,puzzle_num_pieces=10)
+                                        ranked_loops=zero_loops,puzzle_num_pieces=10)
         aggregates = merger.cook()
-        assert len(aggregates) == 1
-        assert len(aggregates[0].get_matings()) >= 13
 
         graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
         drawer.draw_filtered_adjacency_with_loops(graph)
 
         plt.show()
 
+        return aggregates,zero_loops
 
+    def test_db_1_puzzle_19_noise_0(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
 
+        aggregates,loops = self._run(db,puzzle_num,puzzle_noise_level,
+                                     expected_num_zero_loops=5,compatibility_threshold=0.38)
+
+        assert len(aggregates) == 1
+        assert len(aggregates[0].get_matings()) >= 13
+
+        
     
     def test_db_1_puzzle_19_noise_1(self):
-        zero_loops_recipe = ZeroLoopsAroundVertex(db=1,puzzle_num=19,puzzle_noise_level=1,
-                                                pairwise_recipe_name = "SD1Pairwise")
-        loops = zero_loops_recipe.cook()
+        # zero_loops_recipe = ZeroLoopsAroundVertex(db=1,puzzle_num=19,puzzle_noise_level=1,
+        #                                         pairwise_recipe_name = "SD1Pairwise")
+        # loops = zero_loops_recipe.cook()
 
-        puzzle_num_pieces = 10
-        merger = recipes_factory.create("ZeroLoopsMerge",
-                                        ranked_loops=loops,puzzle_num_pieces=puzzle_num_pieces)
-        aggregates = merger.cook()
+        # puzzle_num_pieces = 10
+        # merger = recipes_factory.create("ZeroLoopsMerge",
+        #                                 ranked_loops=loops,puzzle_num_pieces=puzzle_num_pieces)
+        # aggregates = merger.cook()
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 1
+
+        aggregates,loops = self._run(db,puzzle_num,puzzle_noise_level,expected_num_zero_loops=5)
+
         assert len(aggregates) == 1
-        assert len(aggregates[0].get_as_mating_list()) == 14
-        assert len(aggregates[0].get_pieces_invovled()) == puzzle_num_pieces
+        assert len(aggregates[0].get_matings()) == 14
+        assert len(aggregates[0].get_pieces_invovled()) == 10
 
     def test_db_1_puzzle_20_noise_0(self):
-        zero_loops_recipe = ZeroLoopsAroundVertex(db=1,puzzle_num=20,puzzle_noise_level=0,
-                                                pairwise_recipe_name = "SD1Pairwise")
-        loops = zero_loops_recipe.cook()
+        db = 1
+        puzzle_num = 20
+        puzzle_noise_level = 0
 
-        merger = recipes_factory.create("ZeroLoopsMerge",
-                                        ranked_loops=loops,puzzle_num_pieces=10)
-        aggregates = merger.cook()
+        aggregates,loops = self._run(db,puzzle_num,puzzle_noise_level,expected_num_zero_loops=6)
+
+        assert len(aggregates) == 3
+    
+    def test_db_1_puzzle_20_noise_1(self):
+        db = 1
+        puzzle_num = 20
+        puzzle_noise_level = 1
+
+        aggregates,loops = self._run(db,puzzle_num,puzzle_noise_level,expected_num_zero_loops=6)
+
         assert len(aggregates) == 3
 
 
