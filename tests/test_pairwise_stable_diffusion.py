@@ -295,7 +295,10 @@ class TestHistogram(unittest.TestCase):
         # Because we you use the normalized dot product
         min_edge_weight = -1
         max_edge_weight = 1
-        drawer.draw_graph_filtered_matching(noisy_graph_wrapper,ax=ax_matching,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
+        drawer.draw_graph_filtered_matching(noisy_graph_wrapper,ax=ax_matching,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight,
+                                            is_add_to_title_theshold=False)
+        fig4, ax_matching_2 = plt.subplots(1,1)
+        drawer.draw_graph_matching(noisy_graph_wrapper,ax=ax_matching_2,min_edge_weight=min_edge_weight,max_edge_weight=max_edge_weight)
 
         plt.show()
 
