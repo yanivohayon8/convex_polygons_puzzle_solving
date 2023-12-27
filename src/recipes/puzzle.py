@@ -11,9 +11,11 @@ class loadRegularPuzzle(Recipe):
         self.noise_level = noise_level
         self.puzzle = None
     
-    def cook(self,is_override_shared_vars=True):
+    def cook(self,is_override_shared_vars=True,is_load_extrapolation_data=True):
         puzzle_directory = f"../ConvexDrawingDataset/DB{self.db}/Puzzle{self.puzzle_num}/noise_{self.noise_level}"
         self.puzzle = Puzzle(puzzle_directory)
+        self.puzzle.is_load_extrapolation_data = is_load_extrapolation_data
+
         self.puzzle.load()
 
         if is_override_shared_vars:

@@ -35,13 +35,17 @@ class Puzzle():
         self.pieces2original_edges ={} # for example {P_0:[2,0,1]}
         self.bag_of_pieces = []
         self.id2piece = {}
+        self.is_load_extrapolation_data = True
 
     
     def load(self):
         self.df_solution_locations = pd.read_csv(self.groundtruth_location_path)
         self.df_solution_rels = pd.read_csv(self.groundtruth_rels_path)
         self.df_pieces = pd.read_csv(self.pieces_path)
-        self.df_raw_pieces = pd.read_csv(self.stable_diffusion_extrapolation_path+"/raw_pieces.csv")
+
+        if self.is_load_extrapolation_data:
+            self.df_raw_pieces = pd.read_csv(self.stable_diffusion_extrapolation_path+"/raw_pieces.csv")
+
         self._get_noise_on_puzzle()
     
     def _get_pieces2img_path(self,pieces):
@@ -135,10 +139,12 @@ class Puzzle():
         self.bag_of_pieces = self._pieces_pd2list(self.df_pieces,csv_conv=csv_conv)
         self._preprocess(self.bag_of_pieces)
         self._get_pieces2img_path(self.bag_of_pieces)
-        self._get_stabe_diffusion_extrapolation_img_path(self.bag_of_pieces)# self._get_pieces2extrapolated_img_path_old(pieces)
-        self._get_stabe_diffusion_original_img_path(self.bag_of_pieces)
-        self._get_raw_coordinates(self.bag_of_pieces)
-        self._get_extrapolation_details(self.bag_of_pieces)
+
+        if self.is_load_extrapolation_data:
+            self._get_stabe_diffusion_extrapolation_img_path(self.bag_of_pieces)# self._get_pieces2extrapolated_img_path_old(pieces)
+            self._get_stabe_diffusion_original_img_path(self.bag_of_pieces)
+            self._get_raw_coordinates(self.bag_of_pieces)
+            self._get_extrapolation_details(self.bag_of_pieces)
 
         self.id2piece = {}
 
