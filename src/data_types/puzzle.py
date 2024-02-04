@@ -132,7 +132,9 @@ class Puzzle():
             except Exception as e:
                 print("An error occurred:", str(e))
 
-        
+    def get_puzzle_json_details(self):
+        with open(self.puzzle_directory+"/puzzle_details.json", "r") as file:
+            return json.load(file)     
      
 
     def get_bag_of_pieces(self,csv_conv="Ofir"):
@@ -216,12 +218,18 @@ class Puzzle():
             org_coords = list(orignial_polygon.exterior.coords)[:-1]
             # org_indexes = [org_coords.index(org_index) for org_index in current_coords]
             curr_i2org_i = {}
+            org_i2curr_i = {}
+
             for i,curr in enumerate(current_coords):
                 # curr_i2org_i[i] = org_coords.index(curr)
                 curr_i2org_i[(i-1)%len(current_coords)] = org_coords.index(curr) # Tfira: I don't know why it is working
+                
+                org_i2curr_i[org_coords.index(curr)] = (i-1)%len(current_coords)
             
             self.pieces2original_edges[piece.id] = curr_i2org_i
             piece.ccw_edge2origin_edge = curr_i2org_i
+            
+            piece.origin_edge2ccw_edge = org_i2curr_i
 
             
     def get_final_rels(self,csv_conv="Ofir"):

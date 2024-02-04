@@ -73,6 +73,14 @@ class Piece():
         self_vertex_2 = np.array(self_coords_moved[self_edge_vertices_indecies[1]])
         other_vertex_2 = np.array(other_coords_moved[other_edge_vertices_indecies[1]])
         cos_angle = self_vertex_2.dot(other_vertex_2)/(np.linalg.norm(self_vertex_2)*np.linalg.norm(other_vertex_2))
+
+        # to make sure cos_angle is in [-1,1] (and not 1.00000002)
+        # so we won't get domain error on arccos
+        if cos_angle > 1:
+            cos_angle = 1.0
+        elif cos_angle < -1:
+            cos_angle = -1.0
+
         angle = np.degrees(np.arccos(cos_angle))
 
         origin = (0,0)
