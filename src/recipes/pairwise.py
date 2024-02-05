@@ -103,7 +103,11 @@ class SD1PairwiseBuilder():
 
 
 
+
+
 class SyntheticPairwise(GeometricPairwise):
+
+    DEFAULT_PERCENTANGE_FALSE_POSITIVES = 0.35
 
     def __init__(self, db, puzzle_num, puzzle_noise_level, 
                  puzzle_recipe_name="loadRegularPuzzle", add_geo_features=[],
@@ -117,7 +121,9 @@ class SyntheticPairwise(GeometricPairwise):
         puzzle = self.puzzle_recipe.puzzle
         pieces = puzzle.bag_of_pieces
 
-        synthesis_matchers = pairwise_pieces(pieces,["SynthesisMatcher"],puzzle=puzzle)
+        synthesis_matchers = pairwise_pieces(pieces,["SynthesisMatcher"],puzzle=puzzle,
+                                             min_positive_score=DEFAULT_COMPATIBILITY_THRESHOLD,
+                                             percentage_false_positives=self.DEFAULT_PERCENTANGE_FALSE_POSITIVES)
         self.matchers.update(synthesis_matchers)
 
         self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
