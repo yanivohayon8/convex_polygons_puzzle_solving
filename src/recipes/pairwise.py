@@ -103,5 +103,47 @@ class SD1PairwiseBuilder():
 
 
 
+class SyntheticPairwise(GeometricPairwise):
+
+    def __init__(self, db, puzzle_num, puzzle_noise_level, 
+                 puzzle_recipe_name="loadRegularPuzzle", add_geo_features=[],
+                 compatibility_threshold=DEFAULT_COMPATIBILITY_THRESHOLD) -> None:
+        super().__init__(db, puzzle_num, puzzle_noise_level, puzzle_recipe_name, add_geo_features)
+        self.compatibility_threshold = compatibility_threshold
+
+    def cook(self,is_override_shared_vars=True, **kwargs):
+        super().cook(**kwargs)
+
+        puzzle = self.puzzle_recipe.puzzle
+        pieces = puzzle.bag_of_pieces
+
+        synthesis_matchers = pairwise_pieces(pieces,["SynthesisMatcher"],puzzle=puzzle)
+        self.matchers.update(synthesis_matchers)
+
+        self.graph_wrapper = graphs_factory.create("MatchingGraphWrapper",
+                                                   pieces=puzzle.bag_of_pieces,id2piece=puzzle.id2piece,
+                                                   geometric_match_edges=self.matchers["EdgeMatcher"].match_edges,
+                                                   pictorial_matcher = self.matchers["SynthesisMatcher"])
+                                                   #compatibility_threshold=self.compatibility_threshold)
+        self.graph_wrapper.build_graph()
+
+        if is_override_shared_vars:
+            shared_variables.graph_wrapper = self.graph_wrapper
+
+        return self.graph_wrapper
+
+class SyntheticPairwiseBuilder():
+
+    def __call__(self, db,puzzle_num,puzzle_noise_level,
+                 puzzle_recipe_name="loadRegularPuzzle",
+                     **_ignored) -> Any:
+        return SyntheticPairwise(db,puzzle_num,puzzle_noise_level,
+                                 puzzle_recipe_name=puzzle_recipe_name)
+
+
+
+
+
 recipes_factory.register_builder(GeometricPairwise.__name__,GeometricPairwiseBuilder())
 recipes_factory.register_builder(SD1Pairwise.__name__,SD1PairwiseBuilder())
+recipes_factory.register_builder(SyntheticPairwise.__name__,SyntheticPairwiseBuilder())
