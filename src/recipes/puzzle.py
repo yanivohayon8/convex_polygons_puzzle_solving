@@ -1,3 +1,4 @@
+from typing import Any
 from src.recipes import Recipe,factory
 from src.data_types.puzzle import Puzzle
 from src.physics import assembler
@@ -25,7 +26,13 @@ class loadRegularPuzzle(Recipe):
         return self.puzzle.get_bag_of_pieces()
 
 
-factory.register_builder(loadRegularPuzzle.__name__,
-                         lambda db,puzzle_num,noise_level:loadRegularPuzzle(db,puzzle_num,noise_level))
+class loadRegularPuzzleBuilder():
+
+    def __call__(self, db,puzzle_num,noise_level,**_ignored) -> Any:
+        return loadRegularPuzzle(db,puzzle_num,noise_level)
+
+
+# factory.register_builder(loadRegularPuzzle.__name__,lambda db,puzzle_num,noise_level:loadRegularPuzzle(db,puzzle_num,noise_level))
+factory.register_builder(loadRegularPuzzle.__name__,loadRegularPuzzleBuilder())
 
 # TODO: a recipe for puzzles with missing pieces?
