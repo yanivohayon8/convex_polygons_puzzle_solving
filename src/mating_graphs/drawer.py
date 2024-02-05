@@ -227,7 +227,7 @@ class MatchingGraphDrawer():
                                      max_edge_weight = None,min_edge_weight = None):
         
         if is_add_to_title_theshold:
-            title = title + +f"( >{graph_wrapper.compatibility_threshold})"
+            title = title + f"( >{graph_wrapper.compatibility_threshold})"
 
         self._draw_graph_matching(graph_wrapper.filtered_potential_matings_graph,
                                   layout=layout,title=title,ax=ax,
