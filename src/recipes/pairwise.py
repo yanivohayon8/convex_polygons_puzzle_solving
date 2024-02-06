@@ -21,14 +21,19 @@ class GeometricPairwise(Recipe):
         self.matchers_keys = ["EdgeMatcher"]
         self.matchers = {}
         self.graph_wrapper = None
+        self.is_load_extrapolation_data=True
 
     def cook(self, **kwargs):
         self.puzzle_recipe = recipes_factory.create(self.puzzle_recipe_name,db=self.db,
-                                               puzzle_num=self.puzzle_num,noise_level=self.puzzle_noise_level)
+                                               puzzle_num=self.puzzle_num,noise_level=self.puzzle_noise_level,
+                                               is_load_extrapolation_data=self.is_load_extrapolation_data)
         self.puzzle_recipe.cook()
         puzzle = self.puzzle_recipe.puzzle
         bag_of_pieces = puzzle.bag_of_pieces
         extract_features(bag_of_pieces,self.geo_features,**kwargs)
+        # features_factory.create("EdgeLengthExtractor",pieces=bag_of_pieces).run()
+
+
         self.matchers = pairwise_pieces(bag_of_pieces,self.matchers_keys,
                                    confidence_interval=puzzle.matings_max_difference+1e-3,**kwargs)
 
@@ -114,6 +119,7 @@ class SyntheticPairwise(GeometricPairwise):
                  compatibility_threshold=DEFAULT_COMPATIBILITY_THRESHOLD) -> None:
         super().__init__(db, puzzle_num, puzzle_noise_level, puzzle_recipe_name, add_geo_features)
         self.compatibility_threshold = compatibility_threshold
+        self.is_load_extrapolation_data = False
 
     def cook(self,is_override_shared_vars=True, **kwargs):
         super().cook(**kwargs)

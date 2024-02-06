@@ -87,6 +87,36 @@ class TestSynthesisPairwise(unittest.TestCase):
         plt.show()
 
         print("compiled")
+    
+
+    def test_1_staged_db(self):
+        db = "1_staged"
+        puzzle_num = "12"
+        puzzle_noise_level = 1
+        
+        recipe = recipes_factory.create("SyntheticPairwise",db=db,puzzle_num=puzzle_num,
+                                        puzzle_noise_level=0)
+        gd_graph_wrapper = recipe.cook()
+        
+        recipe = recipes_factory.create("SyntheticPairwise",db=db,puzzle_num=puzzle_num,
+                                        puzzle_noise_level=puzzle_noise_level)
+        graph_wrapper = recipe.cook()
+
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+        # Because we you use the normalized dot product
+        min_edge_weight = -1
+        max_edge_weight = 1
+        drawer.draw_graph_filtered_matching(graph_wrapper,
+                                   min_edge_weight=min_edge_weight,
+                                   max_edge_weight=max_edge_weight)
+        drawer.draw_graph_matching(graph_wrapper,
+                                   min_edge_weight=min_edge_weight,
+                                   max_edge_weight=max_edge_weight)
+
+        plt.show()
+
+        print("compiled")
 
 if __name__ == "__main__":
     unittest.main()

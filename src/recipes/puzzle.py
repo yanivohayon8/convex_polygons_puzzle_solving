@@ -6,16 +6,17 @@ from src import shared_variables
 
 class loadRegularPuzzle(Recipe):
 
-    def __init__(self,db,puzzle_num,noise_level) -> None:
+    def __init__(self,db,puzzle_num,noise_level,is_load_extrapolation_data=True) -> None:
         self.db = db
         self.puzzle_num = puzzle_num
         self.noise_level = noise_level
         self.puzzle = None
+        self.is_load_extrapolation_data=is_load_extrapolation_data
     
-    def cook(self,is_override_shared_vars=True,is_load_extrapolation_data=True):
+    def cook(self,is_override_shared_vars=True):
         puzzle_directory = f"../ConvexDrawingDataset/DB{self.db}/Puzzle{self.puzzle_num}/noise_{self.noise_level}"
         self.puzzle = Puzzle(puzzle_directory)
-        self.puzzle.is_load_extrapolation_data = is_load_extrapolation_data
+        self.puzzle.is_load_extrapolation_data = self.is_load_extrapolation_data
 
         self.puzzle.load()
 
@@ -28,8 +29,8 @@ class loadRegularPuzzle(Recipe):
 
 class loadRegularPuzzleBuilder():
 
-    def __call__(self, db,puzzle_num,noise_level,**_ignored) -> Any:
-        return loadRegularPuzzle(db,puzzle_num,noise_level)
+    def __call__(self, db,puzzle_num,noise_level,is_load_extrapolation_data=True,**_ignored) -> Any:
+        return loadRegularPuzzle(db,puzzle_num,noise_level,is_load_extrapolation_data=is_load_extrapolation_data)
 
 
 # factory.register_builder(loadRegularPuzzle.__name__,lambda db,puzzle_num,noise_level:loadRegularPuzzle(db,puzzle_num,noise_level))

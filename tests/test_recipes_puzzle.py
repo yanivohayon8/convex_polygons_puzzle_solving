@@ -32,9 +32,9 @@ class TestloadRegularPuzzle(unittest.TestCase):
         puzzle_num  = 19
         puzzle_noise_level = 0
 
-        recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level)
+        recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level,is_load_extrapolation_data=False)
 
-        bag_of_pieces = recipe.cook(is_load_extrapolation_data=False)
+        bag_of_pieces = recipe.cook()
 
         gd_matings = recipe.puzzle.get_final_rels()
         gd_matings_as_preprocessed_edges = []

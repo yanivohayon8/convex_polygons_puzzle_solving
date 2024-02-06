@@ -25,9 +25,9 @@ db = args.DB
 puzzle_num  = args.puzzle_num #3
 puzzle_noise_level = args.noise_level# 0
 
-recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level)
+recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level,is_load_extrapolation_data=False)
 
-bag_of_pieces = recipe.cook(is_load_extrapolation_data=False)
+bag_of_pieces = recipe.cook()
 
 
 if args.is_no_erased_pieces_by_noise:
