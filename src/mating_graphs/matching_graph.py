@@ -273,7 +273,15 @@ class MatchingGraphWrapper():
 
         return agg_graph
 
+    def get_final_matings(self):
+        final_matings = []
 
+        for link in self.filtered_adjacency_graph.edges(data=True):
+
+            if link[2]["type"] == INTER_PIECES_LINK_TYPE: #or link[2]["type"] == INTER_AGGREGATE_LINK_TYPE:
+                final_matings.append(_link_to_mating((link[0],link[1])))
+        
+        return final_matings
 
 def get_piece_name(node_name:str):
     # edge_name P_4_E_2
@@ -300,6 +308,8 @@ def name_node(piece_name,edge_name):
         same as _name_node but not an instance function
     '''
     return f"P_{piece_name}_E_{edge_name}"
+
+
 
 
 def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None,compatibility_threshold=0.4):

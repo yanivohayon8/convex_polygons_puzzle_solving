@@ -77,7 +77,8 @@ class ZeroLoopsAroundVertex(Recipe):
     def get_num_piece_in_puzzle(self):
         return len(self.pairwise_recipe.puzzle_recipe.puzzle.bag_of_pieces)
 
-
+    def get_puzzle(self):
+        return self.pairwise_recipe.puzzle_recipe.puzzle
 
 class ZeroLoopsAroundVertexBuilder():
 
