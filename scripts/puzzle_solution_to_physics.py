@@ -10,6 +10,7 @@ from src.physics import assembler
 from PIL import Image
 
 import argparse
+import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser()
@@ -20,15 +21,18 @@ parser.add_argument("--is_stage",action=argparse.BooleanOptionalAction)
 parser.add_argument("--is_no_erased_pieces_by_noise",action=argparse.BooleanOptionalAction)
 args = parser.parse_args()
 
-db = args.DB 
-# db = "1"
-puzzle_num  = args.puzzle_num #3
-puzzle_noise_level = args.noise_level# 0
+try:
+    db = args.DB 
+    # db = "1"
+    puzzle_num  = args.puzzle_num #3
+    puzzle_noise_level = args.noise_level# 0
 
-recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level,is_load_extrapolation_data=False)
+    recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level,is_load_extrapolation_data=False)
 
-bag_of_pieces = recipe.cook()
-
+    bag_of_pieces = recipe.cook()
+except Exception as inalAbuk:
+    print(inalAbuk)
+    print("In inalAbuk")
 
 if args.is_no_erased_pieces_by_noise:
     puzzle_details = recipe.puzzle.get_puzzle_json_details()
@@ -42,25 +46,37 @@ if args.is_no_erased_pieces_by_noise:
 gd_matings = recipe.puzzle.get_final_rels()
 gd_matings_as_preprocessed_edges = []
 
-try:
-    csv = ""
+csv = ""
 
-    for mating in gd_matings:
-        piece1 = recipe.puzzle.id2piece[mating.piece_1]
-        edge1 = piece1.origin_edge2ccw_edge[mating.edge_1]
-        piece2 = recipe.puzzle.id2piece[mating.piece_2]
-        edge2 = piece2.origin_edge2ccw_edge[mating.edge_2]
-        
-        mating = Mating(piece_1=piece1.id,edge_1=edge1,piece_2=piece2.id,edge_2=edge2)
-        # gd_matings_as_preprocessed_edges.append(mating)
+for mating in gd_matings:
+    piece1 = recipe.puzzle.id2piece[mating.piece_1]
+    edge1 = piece1.origin_edge2ccw_edge[mating.edge_1]
+    piece2 = recipe.puzzle.id2piece[mating.piece_2]
+    edge2 = piece2.origin_edge2ccw_edge[mating.edge_2]
+    
+    mating = Mating(piece_1=piece1.id,edge_1=edge1,piece_2=piece2.id,edge_2=edge2)
+    # gd_matings_as_preprocessed_edges.append(mating)
 
+    try:
         vertex_mating = convert_mating_to_vertex_mating(mating,piece1,piece2)
         csv = csv + vertex_mating
+    except Exception as e:
+        print("load mating failed (convert_mating_to_vertex_mating)")
+        print(mating)
+        print("exit")
+        exit()
 
+
+sim_res = None
+try:
     sim_res = assembler.simulate(csv,screenshot_name="test_loading_solution")
     print(csv)
+except Exception as e:
+    print("assembler.simulate failed")
+
+try:
     # sampling a coordinate and hope it is not none
-    assert sim_res["piecesFinalCoords"][0]["coordinates"][0] != [None,None]
+    assert sim_res["piecesFinalCoords"][0]["coordinates"][0] != [None,None], "sampled a coordinate and it is none"
     # print(sim_res)
 
     postfix = f"Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
@@ -79,6 +95,16 @@ try:
             print("Exiting......")
             exit()
 
+        # fig ,ax = plt.subplots()
+        # ax.imshow(screenshot)
+        # ax.set_title("press a or r")
+        # plt.draw()
+        # plt.pause(1) # <-------
+        # answer = input("type a to accept or r to reject:\t")
+        # plt.close(fig)
+
+
+        
         print("staging...")
         dst_directory = f"../ConvexDrawingDataset/DB{db.split('_')[0]}_staged/{postfix}"
 
@@ -95,6 +121,6 @@ try:
 
 
 except Exception as e:
-    print("In exception")
-    # print(csv)
     print(e)
+    print("Post checking failed")
+    # print(csv)

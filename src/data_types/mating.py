@@ -61,17 +61,26 @@ def convert_mating_to_vertex_mating(mating:Mating,piece_1,piece_2):
         [piece_1_vertex_1, piece_1_vertex_2],
         [piece_2_vertex_2, piece_2_vertex_1])
 
-    epsilon = 1
+    # epsilon = 1
 
-    if (overlap_area > epsilon and overlap_area_opp > epsilon) or \
-        (overlap_area < epsilon and overlap_area_opp < epsilon):
-        raise("Problematic transformation")
+    # if (overlap_area > epsilon and overlap_area_opp > epsilon) or \
+    #     (overlap_area < epsilon and overlap_area_opp < epsilon):
+    #     raise("Problematic transformation")
 
-    if overlap_area < epsilon:
+    # if overlap_area < epsilon:
+    #     data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_1}\r\n"
+    #     data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_2}\r\n"
+    # else:
+    #     data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_2}\r\n"
+    #     data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_1}\r\n"
+
+    if overlap_area < overlap_area_opp:
         data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_1}\r\n"
         data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_2}\r\n"
     else:
         data += f"{mating.piece_1},{piece_1_vertex_1},{mating.piece_2},{piece_2_vertex_2}\r\n"
         data += f"{mating.piece_1},{piece_1_vertex_2},{mating.piece_2},{piece_2_vertex_1}\r\n"
+
+
 
     return data 

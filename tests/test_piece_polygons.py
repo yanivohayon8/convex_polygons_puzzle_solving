@@ -202,6 +202,33 @@ class TestTwoPolygonsAlign(unittest.TestCase):
         ax.scatter(xs,ys)
         ax.grid()
         plt.show()
+    
+    def test_debug_chris30(self):
+
+        polygon_2 = [(0.0,0.0),
+                    (739.4109191894531,3272.4129638671875),
+                    (966.202880859375,3169.4400634765625),
+                    (1000.8434143066406,3113.4510498046872)]
+        piece_2 = Piece(6,polygon_2)
+        polygon_17 = [(0.0,230.38671875),
+        (1491.2458190917969,311.04345703125),
+        (3106.0318908691406,0.0),
+        (226.79196166992188,242.608154296875)]
+        piece_17 = Piece(9,polygon_17)
+        edge6_vertices = [1, 2] # [1,2]
+        edge9_vertices = [3, 0]#[2, 1]
+
+        area,poly6,poly9 = piece_2.align_pieces_on_edge_and_compute_overlap_area(piece_17,edge6_vertices,edge9_vertices)
+
+        print("area",area)
+
+        ax = plt.subplot()
+        self._plot(ax,poly6,poly9)
+        xs = [poly6[edge6_vertices[0]][0],poly6[edge6_vertices[1]][0],poly9[edge9_vertices[0]][0],poly9[edge9_vertices[1]][0]]
+        ys = [poly6[edge6_vertices[0]][1],poly6[edge6_vertices[1]][1],poly9[edge9_vertices[0]][1],poly9[edge9_vertices[1]][1]]
+        ax.scatter(xs,ys)
+        ax.grid()
+        plt.show()
 
 class TestPolygonsOverlap(unittest.TestCase):
 

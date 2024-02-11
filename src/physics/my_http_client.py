@@ -34,7 +34,8 @@ class HTTPClient():
             "noise":self.target_puzzle_noise,
             "num":self.target_puzzle_num,
             "dataset":"ConvexDrawing",
-            "db":self.target_db
+            "db":self.target_db#,
+            #"debugVisibily":0
         }
 
         if screenshot_name !="":
