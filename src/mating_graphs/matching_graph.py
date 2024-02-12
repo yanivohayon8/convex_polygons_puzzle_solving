@@ -278,7 +278,7 @@ class MatchingGraphWrapper():
 
         for link in self.filtered_adjacency_graph.edges(data=True):
 
-            if link[2]["type"] == INTER_PIECES_LINK_TYPE: #or link[2]["type"] == INTER_AGGREGATE_LINK_TYPE:
+            if link[2]["type"] == INTER_PIECES_LINK_TYPE or link[2]["type"] == INTER_AGGREGATE_LINK_TYPE:
                 final_matings.append(_link_to_mating((link[0],link[1])))
         
         return final_matings

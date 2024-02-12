@@ -1,10 +1,11 @@
-from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name
+from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name,_link_to_mating
 from src.mating_graphs.matching_graph import INTER_AGGREGATE_LINK_TYPE,WITHIN_AGGREGATE_LINK_TYPE,WITHIN_PIECE_LINK_TYPE,INTER_PIECES_LINK_TYPE
 import numpy as np
 import networkx as nx
 import math
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from src import shared_variables
 
 
 class MatchingGraphDrawer():
@@ -139,7 +140,8 @@ class MatchingGraphDrawer():
         for edge in graph.edges:
             if get_piece_name(edge[0]) == get_piece_name(edge[1]):
                 edges_color.append(color2edge_meaning["intra_piece"])
-            elif edge in self.noiseless_ground_truth_wrapper.potential_matings_graph.edges:
+            # elif edge in self.noiseless_ground_truth_wrapper.potential_matings_graph.edges:
+            elif shared_variables.puzzle.is_ground_truth_mating(_link_to_mating(edge)):
                 edges_color.append(color2edge_meaning["ground_truth_edge"])
             else:
                 edges_color.append(color2edge_meaning["potential"])

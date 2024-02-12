@@ -4,6 +4,7 @@ from src.recipes import factory as recipes_factory
 from src.mating_graphs.drawer import MatchingGraphDrawer
 from src.data_types.assembly import Assembly
 from src.physics import assembler
+from src.pairwise_matchers.geometric import EdgeMatcher
 
 '''
 for factory to compile.....
@@ -19,32 +20,45 @@ from src.mating_graphs import cycle
 
 
 def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=False):
-    gd_pairwise_recipe = ZeroLoopsAroundVertex(db,puzzle_num,0,pairwise_recipe_name=pairwise_recipe_name)
-    gd_pairwise_recipe.cook()
-    drawer = MatchingGraphDrawer(gd_pairwise_recipe.graph_wrapper)
-    drawer.init()
+    
+    if is_debug_solver:
+      gd_pairwise_recipe = recipes_factory.create("GeometricPairwise",db=db,puzzle_num=puzzle_num,puzzle_noise_level=0,is_load_extrapolation_data=False)
+      gd_pairwise_recipe.cook()
+      drawer = MatchingGraphDrawer(gd_pairwise_recipe.graph_wrapper)
+      drawer.init()
 
+      
+      # drawer.draw_adjacency_graph(graph)
 
     zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,
                                               puzzle_noise_level=puzzle_noise_level,
                                                 pairwise_recipe_name = pairwise_recipe_name)
     zero_loops = zero_loops_recipe.cook()
     
-    # fig_before_merge, ax_before_merge = plt.subplots()
-    # drawer.draw_filtered_adjacency_with_loops(zero_loops_recipe.graph_wrapper.filtered_adjacency_graph,ax=ax_before_merge)
-    # fig_before_merge_2, ax_before_merge_2 = plt.subplots()
-    # drawer.draw_adjacency_graph(zero_loops_recipe.graph_wrapper.adjacency_graph,ax=ax_before_merge_2)
-    drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
+    if is_debug_solver:
+      graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
+      drawer.draw_filtered_adjacency_with_loops(graph)
+      drawer.draw_adjacency_graph(graph)
+      # drawer.draw_graph_matching(zero_loops_recipe.graph_wrapper)
+      # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
+
+      # plt.show()
+      # fig_before_merge, ax_before_merge = plt.subplots()
+      # drawer.draw_filtered_adjacency_with_loops(zero_loops_recipe.graph_wrapper.filtered_adjacency_graph,ax=ax_before_merge)
+      # fig_before_merge_2, ax_before_merge_2 = plt.subplots()
+      # drawer.draw_adjacency_graph(zero_loops_recipe.graph_wrapper.adjacency_graph,ax=ax_before_merge_2)
+      # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
 
     merger = ZeroLoopsMerge(zero_loops,zero_loops_recipe.get_num_piece_in_puzzle())
     aggregates = merger.cook()
 
-    graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
-    drawer.draw_filtered_adjacency_with_loops(graph)
-    drawer.draw_adjacency_graph(graph)
-    drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
-    
-    plt.show()
+    if is_debug_solver:
+      graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
+      drawer.draw_filtered_adjacency_with_loops(graph)
+      # drawer.draw_adjacency_graph(graph)
+      # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
+      
+      plt.show()
 
     final_matings = zero_loops_recipe.graph_wrapper.get_final_matings()
     response = assembler.simulate(final_matings)

@@ -297,8 +297,7 @@ class Puzzle():
 
             if new_mate in ground_truth_matings:
                 count_correct+=1
-        
-        
+         
         return count_correct/len(solver_matings)
 
     def evaluate_recall(self,solver_matings:list):
@@ -315,7 +314,6 @@ class Puzzle():
 
             if new_mate in ground_truth_matings:
                 count_correct+=1
-        
         
         return count_correct/len(ground_truth_matings)
 

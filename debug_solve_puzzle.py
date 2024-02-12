@@ -10,6 +10,9 @@ parser.add_argument("--db", default="1")
 parser.add_argument("--puzzle_num", default="19")
 parser.add_argument("--puzzle_noise_level", default="0")
 parser.add_argument("--pairwise_recipe_name", default="SyntheticPairwise")
+parser.add_argument('--debug', action='store_true')
+parser.add_argument('--no-debug', dest='debug', action='store_false')
+parser.set_defaults(debug=False)
 args = parser.parse_args()
 
 
@@ -36,7 +39,7 @@ if __name__ == "__main__":
             print("****************************")
             print(f"Solve {args.db}/{puzzle_num}/{args.puzzle_noise_level}")
             print("****************************")
-            solution,puzzle = solverV2.run(args.db,puzzle_num,args.puzzle_noise_level,pairwise_recipe_name=args.pairwise_recipe_name)
+            solution,puzzle = solverV2.run(args.db,puzzle_num,args.puzzle_noise_level,pairwise_recipe_name=args.pairwise_recipe_name,is_debug_solver=args.debug)
             precision = puzzle.evaluate_precision(solution.get_matings())
             print("\tmatings precision is ",precision)
             recall = puzzle.evaluate_recall(solution.get_matings())

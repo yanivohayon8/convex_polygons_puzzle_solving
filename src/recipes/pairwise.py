@@ -12,7 +12,8 @@ DEFAULT_COMPATIBILITY_THRESHOLD = 0.4
 
 class GeometricPairwise(Recipe):
 
-    def __init__(self,db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",add_geo_features=[]) -> None:
+    def __init__(self,db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",
+                 add_geo_features=[],is_load_extrapolation_data=True) -> None:
         self.db = db
         self.puzzle_num = puzzle_num
         self.puzzle_noise_level = puzzle_noise_level
@@ -21,7 +22,7 @@ class GeometricPairwise(Recipe):
         self.matchers_keys = ["EdgeMatcher"]
         self.matchers = {}
         self.graph_wrapper = None
-        self.is_load_extrapolation_data=True
+        self.is_load_extrapolation_data=is_load_extrapolation_data
 
     def cook(self, **kwargs):
         self.puzzle_recipe = recipes_factory.create(self.puzzle_recipe_name,db=self.db,
@@ -46,9 +47,10 @@ class GeometricPairwise(Recipe):
 
 class GeometricPairwiseBuilder():
 
-    def __call__(self, db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",add_geo_features=[],**_ignored) -> Any:
+    def __call__(self, db,puzzle_num,puzzle_noise_level,puzzle_recipe_name="loadRegularPuzzle",add_geo_features=[],
+                 is_load_extrapolation_data=True,**_ignored) -> Any:
         return GeometricPairwise(db,puzzle_num,puzzle_noise_level,
-                                 puzzle_recipe_name=puzzle_recipe_name,add_geo_features=add_geo_features)
+                                 puzzle_recipe_name=puzzle_recipe_name,add_geo_features=add_geo_features,is_load_extrapolation_data=is_load_extrapolation_data)
 
 
 
@@ -112,7 +114,7 @@ class SD1PairwiseBuilder():
 
 class SyntheticPairwise(GeometricPairwise):
 
-    DEFAULT_PERCENTANGE_FALSE_POSITIVES = 0.35
+    DEFAULT_PERCENTANGE_FALSE_POSITIVES =0.5 #0.8#0.35
 
     def __init__(self, db, puzzle_num, puzzle_noise_level, 
                  puzzle_recipe_name="loadRegularPuzzle", add_geo_features=[],
