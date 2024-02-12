@@ -27,18 +27,18 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
       drawer = MatchingGraphDrawer(gd_pairwise_recipe.graph_wrapper)
       drawer.init()
 
-      
+
       # drawer.draw_adjacency_graph(graph)
 
     zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,
                                               puzzle_noise_level=puzzle_noise_level,
                                                 pairwise_recipe_name = pairwise_recipe_name)
-    zero_loops = zero_loops_recipe.cook()
+    zero_loops = zero_loops_recipe.cook(is_debug=is_debug_solver)
     
-    if is_debug_solver:
-      graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
-      drawer.draw_filtered_adjacency_with_loops(graph)
-      drawer.draw_adjacency_graph(graph)
+    # if is_debug_solver:
+    #   graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
+    #   drawer.draw_filtered_adjacency_with_loops(graph)
+    #   drawer.draw_adjacency_graph(graph)
       # drawer.draw_graph_matching(zero_loops_recipe.graph_wrapper)
       # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
 
@@ -55,8 +55,8 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
     if is_debug_solver:
       graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
       drawer.draw_filtered_adjacency_with_loops(graph)
-      # drawer.draw_adjacency_graph(graph)
-      # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
+    #   # drawer.draw_adjacency_graph(graph)
+    #   # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
       
       plt.show()
 

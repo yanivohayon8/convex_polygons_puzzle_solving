@@ -5,6 +5,9 @@ from src.local_assemblies.loops import merge ,LoopMergeError,LoopMutualPiecesMer
 from src import shared_variables
 from src.local_assemblies.loops import Loop,create_loop_from_single
 from src.mating_graphs.algorithms import red_blue_cycle
+import matplotlib.pyplot as plt
+from src.mating_graphs.drawer import MatchingGraphDrawer
+
 
 MAX_DERIVATIVE = 50
 
@@ -64,13 +67,28 @@ class ZeroLoopsAroundVertex(Recipe):
     
 
 
-    def cook(self,**kwargs):
+    def cook(self,is_debug=False,**kwargs):
         self._compute_graph_wrapper(**kwargs)
+
+        if is_debug:
+            gd_pairwise_recipe = recipes_factory.create("GeometricPairwise",db=self.db,
+                                                        puzzle_num=self.puzzle_num,puzzle_noise_level=0,
+                                                        is_load_extrapolation_data=False)
+            gd_pairwise_recipe.cook()
+            drawer = MatchingGraphDrawer(gd_pairwise_recipe.graph_wrapper)
+            drawer.init()
+            drawer.draw_adjacency_graph(self.graph_wrapper.filtered_adjacency_graph,title="Adjacency graph before the loops creation")
+
+
         loops = self._compute_loops_from_cycles(**kwargs)
         self._rank_loops(loops)
         self._find_best_loops()
         self._create_lonely_loops()
         self.graph_wrapper.clear_unassigned_inter_links(self.best_loops[0].graph_name,self.best_loops)
+
+        if is_debug:
+            drawer.draw_filtered_adjacency_with_loops(self.graph_wrapper.filtered_adjacency_graph,title="Adjacency graph after loop creation (links removed)")
+            # plt.show()
 
         return self.best_loops
     

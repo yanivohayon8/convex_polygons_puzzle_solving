@@ -125,6 +125,7 @@ class MatchingGraphDrawer():
     def draw_adjacency_graph(self,graph,layout="kamada_kawai",title="Adjacency Graph",ax=None):
         if ax is None:
             fig, ax = plt.subplots()
+            ax.set_title(title)
 
 
         edges_color = []
@@ -276,13 +277,11 @@ class MatchingGraphDrawer():
         ax.axis('off')
     
 
-    def draw_filtered_adjacency_with_loops(self,graph:nx.Graph,ax=None):
+    def draw_filtered_adjacency_with_loops(self,graph:nx.Graph,ax=None,title="filtered_adjacency_with_loops"):
 
         if ax is None:
             fig, ax = plt.subplots()
-
-
-        
+            ax.set_title(title)
 
         nodes_color = []
         loops_color_pool = ["blue","green","red","pink","purple","orange","magenta","yellow"]
