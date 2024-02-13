@@ -290,10 +290,12 @@ class MatchingGraphDrawer():
         free_loop_color = "gray"
         multiple_loop_color = "skyblue"
         node2color = {}
+        node2att = {}
 
         for node in graph.nodes(data=True):
             attributes = node[1]
             node_name = node[0]
+            node2att[node_name] = attributes
             
             if attributes["local_assembly"] is None:
                 nodes_color.append(free_loop_color)
@@ -322,8 +324,20 @@ class MatchingGraphDrawer():
         for link in graph.edges(data=True):
             node1_color = node2color[link[0]]
             node2_color = node2color[link[1]]
+            att1 = node2att[link[0]]
+            att2 = node2att[link[1]]
+            has_common_assembly = True
 
-            if node1_color == node2_color and node1_color != multiple_loop_color:
+            if att2["local_assembly"] is None or att1["local_assembly"] is None:
+                has_common_assembly = False
+            else:
+                has_common_assembly = len([ass for ass in att1["local_assembly"] if ass in att2["local_assembly"]]) > 0 
+
+            if not has_common_assembly:
+                edges_color.append(color2edge_meaning[link[2]["type"]])
+                continue
+
+            if node1_color == node2_color:# and node1_color != multiple_loop_color:
                 edges_color.append(node1_color)
             elif node1_color == multiple_loop_color and (node2_color != multiple_loop_color and node2_color != free_loop_color):
                 edges_color.append(node2_color)
