@@ -130,33 +130,32 @@ class MatchingGraphWrapper():
         graph = getattr(self,graph_name)
         links_to_remove = []
 
-        for link in graph.edges(data=True):
-            
-            if link[2]["type"] != INTER_PIECES_LINK_TYPE:
+        for node,att in graph.nodes(data=True):
+            if att["local_assembly"]  is None:
                 continue
             
-            node1_assemblies = graph.nodes[link[0]]["local_assembly"]
-            adj1 = [neighbor for neighbor in graph.adj[link[0]] if graph.edges[link[0],neighbor]["type"] == INTER_PIECES_LINK_TYPE]
-            node2_assemblies = graph.nodes[link[1]]["local_assembly"]
-            adj2 = [neighbor for neighbor in graph.adj[link[1]] if graph.edges[link[1],neighbor]["type"] == INTER_PIECES_LINK_TYPE]
+            neighbors_of_loop = []
+            not_neighbors_of_loop = []
+            
+            for neighbor in graph.adj[node]:
+                neigh_att = graph.nodes[neighbor]
 
-            if node1_assemblies is None and node2_assemblies is None:
-                continue
-            elif node1_assemblies is None and len(node2_assemblies) == 1 and len(adj2) == 1:
-                continue
-            elif node2_assemblies is None and len(node1_assemblies) == 1 and len(adj1) == 1:
-                continue
-            else:
-                
-                is_to_remove = True
+                if graph.edges[node,neighbor]["type"] == INTER_PIECES_LINK_TYPE:
 
-                for loop in loops:
-                    if loop.is_link_present((link[0],link[1])):
-                        is_to_remove = False 
-                        break
-                
-                if is_to_remove:
-                    links_to_remove.append(link)
+                    if neigh_att["local_assembly"] is None:
+                        not_neighbors_of_loop.append(neighbor)
+                    else:
+                        common_assemblies = [ass for ass in att["local_assembly"] if ass in neigh_att["local_assembly"]]
+                        if len(common_assemblies)>0:
+                            neighbors_of_loop.append(neighbor)
+                        else:
+                            not_neighbors_of_loop.append(neighbor)
+            
+            if len(neighbors_of_loop) > 0:
+                for neigh in not_neighbors_of_loop:
+                    if not (node,neigh) in links_to_remove and not (neigh,node) in links_to_remove:
+                        links_to_remove.append((node,neigh))
+
     
         graph.remove_edges_from(links_to_remove)
 
