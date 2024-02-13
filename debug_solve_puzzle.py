@@ -7,7 +7,7 @@ import re
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--db", default="1")
-parser.add_argument("--puzzle_num", default="19")
+parser.add_argument("--puzzle_num", default="")
 parser.add_argument("--puzzle_noise_level", default="0")
 parser.add_argument("--pairwise_recipe_name", default="SyntheticPairwise")
 parser.add_argument('--debug', action='store_true')
@@ -17,7 +17,19 @@ args = parser.parse_args()
 
 
 
+
+
 if __name__ == "__main__":
+
+    if args.puzzle_num != "":
+        solution,puzzle = solverV2.run(args.db,args.puzzle_num,args.puzzle_noise_level,
+                                       pairwise_recipe_name=args.pairwise_recipe_name,is_debug_solver=args.debug)
+        precision = puzzle.evaluate_precision(solution.get_matings())
+        print("\tmatings precision is ",precision)
+        recall = puzzle.evaluate_recall(solution.get_matings())
+        print("\tmatings recall is ",recall)
+        exit()
+
     puzzles_dir = f"../ConvexDrawingDataset/DB{args.db}"
     puzzles_paths = glob.glob(puzzles_dir+"/*")
     sum_precision = 0
