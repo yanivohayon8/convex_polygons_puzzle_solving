@@ -189,6 +189,10 @@ class TestSolveMatingConflict(unittest.TestCase):
         # merger = recipes_factory.create("ZeroLoopsMerge",
         #                                 ranked_loops=zero_loops,puzzle_num_pieces=10)
         # aggregates = merger.cook()
+
+        graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
+        drawer.draw_filtered_adjacency_with_loops(graph)
+
         winning_aggr = zero_loops[1]
 
         for node in winning_aggr.get_nodes():
