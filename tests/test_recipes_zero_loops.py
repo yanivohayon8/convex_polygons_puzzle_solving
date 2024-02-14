@@ -168,5 +168,37 @@ class TestLoopMerge(unittest.TestCase):
         assert len(aggregates) == 3
 
 
+
+class TestSolveMatingConflict(unittest.TestCase):
+
+    def test_toy_example(self):
+        db = "chris_staged"
+        puzzle_num = "numPieces_32_rand_36317305"
+        puzzle_noise_level = 1
+
+        gd_pairwise_recipe = recipes_factory.create("SyntheticPairwise",db=db,puzzle_num=puzzle_num,
+                                                  puzzle_noise_level=0)
+        gd_graph_wrapper = gd_pairwise_recipe.cook()
+        drawer = MatchingGraphDrawer(gd_graph_wrapper)
+        drawer.init()
+
+        zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,puzzle_noise_level=puzzle_noise_level,
+                                                pairwise_recipe_name = "SyntheticPairwise")
+        zero_loops = zero_loops_recipe.cook()
+        
+        # merger = recipes_factory.create("ZeroLoopsMerge",
+        #                                 ranked_loops=zero_loops,puzzle_num_pieces=10)
+        # aggregates = merger.cook()
+        winning_aggr = zero_loops[1]
+
+        for node in winning_aggr.get_nodes():
+            zero_loops_recipe.graph_wrapper.solve_mating_conflicts("filtered_adjacency_graph",node,winning_aggr)
+        
+
+        graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
+        drawer.draw_filtered_adjacency_with_loops(graph)
+
+        plt.show()
+
 if __name__ == "__main__":
     unittest.main()
