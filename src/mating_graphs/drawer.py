@@ -1,5 +1,5 @@
-from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name,_link_to_mating
-from src.mating_graphs.matching_graph import INTER_AGGREGATE_LINK_TYPE,WITHIN_AGGREGATE_LINK_TYPE,WITHIN_PIECE_LINK_TYPE,INTER_PIECES_LINK_TYPE
+from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name,_link_to_mating,get_not_dead_links
+from src.mating_graphs.matching_graph import INTER_AGGREGATE_LINK_TYPE,WITHIN_AGGREGATE_LINK_TYPE,WITHIN_PIECE_LINK_TYPE,INTER_PIECES_LINK_TYPE,DEAD_INTER_PIECES_LINK_TYPE
 import numpy as np
 import networkx as nx
 import math
@@ -318,10 +318,10 @@ class MatchingGraphDrawer():
             INTER_PIECES_LINK_TYPE: "gray"
         }
 
-        # edges_color = [color2edge_meaning[link[2]["type"]] for link in graph.edges(data=True)]
         edges_color = []
+        not_dead_edges = get_not_dead_links(graph,is_data=True)
 
-        for link in graph.edges(data=True):
+        for link in graph.edges(data=True):# not_dead_edges:#
             node1_color = node2color[link[0]]
             node2_color = node2color[link[1]]
             att1 = node2att[link[0]]
@@ -346,7 +346,7 @@ class MatchingGraphDrawer():
             else:
                 edges_color.append(color2edge_meaning[link[2]["type"]])
 
-        nx.draw_networkx(graph,self.node2position,with_labels=True,node_color=nodes_color,
+        nx.draw_networkx(graph,self.node2position,with_labels=True,node_color=nodes_color,#edgelist=get_not_dead_links(graph,is_data=False),
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
 

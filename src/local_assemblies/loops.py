@@ -90,6 +90,10 @@ class Loop():
     # def __del__(self) -> None:
     #     self.remove_from_graph(self)
 
+    def win_conficts(self):
+        for node in self.get_nodes():
+            self.graph_wrapper_ref.solve_mating_conflicts(self.graph_name,node,self)
+
     def is_link_present(self,link):
         link_reversed = (link[1],link[0])
         return link in self.links or link_reversed in self.links
@@ -187,10 +191,10 @@ def merge(loop1:Loop,loop2:Loop):
     mutual_matings = loop1.get_mutual_matings(loop2)
     expected_num_matings = min(loop1.level,loop2.level) + 1
 
-    if len(mutual_matings) < expected_num_matings:
-        mess = f"Expected to have at least {expected_num_matings} mutual matings since "
-        mess = mess +  f"{loop1} is {loop1.level}-loop and {loop2} is {loop2.level}-loop"
-        raise LoopMergeError(mess)
+    # if len(mutual_matings) < expected_num_matings:
+    #     mess = f"Expected to have at least {expected_num_matings} mutual matings since "
+    #     mess = mess +  f"{loop1} is {loop1.level}-loop and {loop2} is {loop2.level}-loop"
+    #     raise LoopMergeError(mess)
     
     new_level = max(loop1.level,loop2.level) + 1
     new_links = list(set(loop1.links + loop2.links))

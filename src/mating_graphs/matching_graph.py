@@ -7,6 +7,7 @@ INTER_PIECES_LINK_TYPE = "inter_piece"
 WITHIN_PIECE_LINK_TYPE = "within_piece"
 INTER_AGGREGATE_LINK_TYPE = "inter_agg"
 WITHIN_AGGREGATE_LINK_TYPE = "within_agg"
+DEAD_INTER_PIECES_LINK_TYPE = "dead_inter_piece"
 
 class MatchingGraphWrapper():
 
@@ -158,6 +159,9 @@ class MatchingGraphWrapper():
 
     
         graph.remove_edges_from(links_to_remove)
+        
+        # for link in links_to_remove:
+        #     self.kill_inter_piece_link(graph_name,link)
 
 
     def solve_mating_conflicts(self,graph_name,node,preferred_loop):
@@ -184,7 +188,11 @@ class MatchingGraphWrapper():
                         self.dissociate_node(graph_name,node_loop_,loop)
         
 
-    
+    def kill_inter_piece_link(self,graph_name,link:tuple):
+        graph = getattr(self,graph_name)
+        graph.edges[link[0],link[1]]["type"] = DEAD_INTER_PIECES_LINK_TYPE
+        
+
     def get_mating(self,graph_name,node):
         '''
             deprecated
@@ -334,7 +342,18 @@ def name_node(piece_name,edge_name):
     return f"P_{piece_name}_E_{edge_name}"
 
 
+def get_not_dead_links(graph:nx.Graph,is_data=True):
+    alive_links = []
 
+    for link in graph.edges(data=True):
+        if link[2]["type"]!=DEAD_INTER_PIECES_LINK_TYPE:
+
+            if is_data:
+                alive_links.append(link)
+            else:
+                alive_links.append((link[0],link[1]))
+                
+    return alive_links
 
 def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None,compatibility_threshold=0.4):
     return MatchingGraphWrapper(pieces,id2piece,
