@@ -1,9 +1,9 @@
 from typing import Any
 from src.recipes import Recipe,factory as recipes_factory
 # from src.data_structures.loop_merger import BasicLoopMerger,LoopMutualPiecesMergeError,LoopMergeError
-from src.local_assemblies.loops import merge ,LoopMergeError,LoopMutualPiecesMergeError
+from src.local_assemblies import loops as loops_local_assemblies #import merge ,LoopMergeError,LoopMutualPiecesMergeError
 from src import shared_variables
-from src.local_assemblies.loops import Loop,create_loop_from_single
+# from src.local_assemblies.loops import Loop,create_loop_from_single
 from src.mating_graphs.algorithms import red_blue_cycle
 import matplotlib.pyplot as plt
 from src.mating_graphs.drawer import MatchingGraphDrawer
@@ -30,7 +30,7 @@ class ZeroLoopsAroundVertex(Recipe):
 
     def _compute_loops_from_cycles(self,**kwargs):
         cycles = red_blue_cycle.compute(self.graph_wrapper.filtered_adjacency_graph)
-        loops = [Loop(self.graph_wrapper,cycle.debug_graph_links) for cycle in cycles]
+        loops = [loops_local_assemblies.Loop(self.graph_wrapper,cycle.debug_graph_links) for cycle in cycles]
         return loops
     
     def _rank_loops(self,loops,**kwargs):
@@ -49,10 +49,6 @@ class ZeroLoopsAroundVertex(Recipe):
 
             self.best_loops.append(self.loops_ranked[ii])
         
-        for loop in self.loops_ranked[len(self.best_loops):]:
-            # del loop
-            loop.remove_from_graph()
-
         return self.best_loops
 
     def _create_lonely_loops(self):
@@ -60,7 +56,7 @@ class ZeroLoopsAroundVertex(Recipe):
         [pieces_not_own_loops.remove(piece_id) for loop in self.best_loops for piece_id in loop.get_pieces_involved() if piece_id in pieces_not_own_loops]
                     
         for piece_id in pieces_not_own_loops:
-            loop = create_loop_from_single(piece_id)
+            loop = loops_local_assemblies.create_loop_from_single(piece_id)
             self.best_loops.append(loop)
         
         return self.best_loops
@@ -83,6 +79,11 @@ class ZeroLoopsAroundVertex(Recipe):
         loops = self._compute_loops_from_cycles(**kwargs)
         self._rank_loops(loops)
         self._find_best_loops()
+
+        for loop in self.loops_ranked[len(self.best_loops):]:
+            # del loop
+            loop.remove_from_graph()
+
         self._create_lonely_loops()
         self.graph_wrapper.clear_unassigned_inter_links(self.best_loops[0].graph_name,self.best_loops)
 
@@ -130,18 +131,18 @@ class ZeroLoopsMerge():
                 for _ in range(queue_size):
                     lop = queued_loops.pop(0)
                     try:
-                        aggregated_loop = merge(aggregated_loop,lop)
+                        aggregated_loop = loops_local_assemblies.merge(aggregated_loop,lop)
                         is_changed = True
                         to_be_merge_loops.remove(lop)
-                    except (LoopMutualPiecesMergeError,LoopMergeError) as e:
+                    except (loops_local_assemblies.LoopMutualPiecesMergeError,loops_local_assemblies.LoopMergeError) as e:
                         if not lop in queued_loops:
                             queued_loops.append(lop)
 
                 try:
-                    aggregated_loop = merge(aggregated_loop,curr_loop)
+                    aggregated_loop = loops_local_assemblies.merge(aggregated_loop,curr_loop)
                     is_changed = True
                     to_be_merge_loops.remove(curr_loop)
-                except (LoopMutualPiecesMergeError,LoopMergeError) as e:
+                except (loops_local_assemblies.LoopMutualPiecesMergeError,loops_local_assemblies.LoopMergeError) as e:
                     if not curr_loop in queued_loops:
                         queued_loops.append(curr_loop)
                 
@@ -158,10 +159,65 @@ class ZeroLoopsMerge():
             aggregated_loop,queued_loops = self._merge(queued_loops)
             aggregates.append(aggregated_loop)
         
+
+        # for agg in aggregates:
+        #     try:
+        #         agg.win_conficts()
+        #     except ValueError:
+        #         pass
+
         return aggregates
             
+
+# class ZeroLoopsMergeUnion():
+
+#     def __init__(self,ranked_loops:list,puzzle_num_pieces) -> None:
+#         self.puzzle_num_pieces = puzzle_num_pieces
+#         self.ranked_loops = ranked_loops
+
+#     def _union(self,to_be_union_loops:list):
+#         next_level_loops = []
+#         successfully_union = []
+
+#         for i in range(to_be_union_loops[:-1]):
+#             for j in range(to_be_union_loops[i+1:]):
+#                 try:
+#                     new_loop = loops_local_assemblies.merge(to_be_union_loops[i],to_be_union_loops[j])
+#                     next_level_loops.append(new_loop)
+
+#                     if not to_be_union_loops[i] in successfully_union:
+#                         successfully_union.append(to_be_union_loops[i])
+                    
+#                     if not to_be_union_loops[j] in successfully_union:
+#                         successfully_union.append(to_be_union_loops[j])
+                
+#                 except (loops_local_assemblies.LoopMutualPiecesMergeError,loops_local_assemblies.LoopMergeError) as e:
+#                     pass
+        
+#         return next_level_loops,successfully_union
+
+                
+#     def cook(self):
+#         levels = []
+#         next_level_loops,successfully_union = self._union(self.ranked_loops)
+#         levels.append(next_level_loops)
+
+#         while len(successfully_union) > 0:
+#             next_level_loops,successfully_union = self._union(next_level_loops)
+#             levels.append(next_level_loops)
+        
+#         leves_ranked = []
+
+#         for lev_loops in levels:
+#             lev_loops_scores = [loop.physical_assemble(mode=self.simulation_mode) for loop in lev_loops]
+#             leves_ranked.append([loop for _,loop in sorted(zip(lev_loops_scores,lev_loops))])
+
+
+        
+#         return aggregates
 
 
 
 recipes_factory.register_builder(ZeroLoopsAroundVertex.__name__,ZeroLoopsAroundVertexBuilder())
+# recipes_factory.register_builder(ZeroLoopsMergeV0.__name__,lambda ranked_loops,puzzle_num_pieces: ZeroLoopsMergeV0(ranked_loops,puzzle_num_pieces))
 recipes_factory.register_builder(ZeroLoopsMerge.__name__,lambda ranked_loops,puzzle_num_pieces: ZeroLoopsMerge(ranked_loops,puzzle_num_pieces))
