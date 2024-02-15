@@ -158,10 +158,10 @@ class MatchingGraphWrapper():
                         links_to_remove.append((node,neigh))
 
     
-        graph.remove_edges_from(links_to_remove)
+        # graph.remove_edges_from(links_to_remove)
         
-        # for link in links_to_remove:
-        #     self.kill_inter_piece_link(graph_name,link)
+        for link in links_to_remove:
+            self.kill_inter_piece_link(graph_name,link)
 
 
     def solve_mating_conflicts(self,graph_name,node,preferred_loop):

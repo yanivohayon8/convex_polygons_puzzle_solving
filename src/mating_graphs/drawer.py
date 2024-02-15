@@ -132,18 +132,20 @@ class MatchingGraphDrawer():
         color2edge_meaning = {
             "intra_piece":"red",
             "ground_truth_edge":"blue",
-            "missed_edge":"black",
+            "dead":"purple",
             "potential":"orange"
         }
 
 
         # for edge in adjacency_with_potential_graph.edges:
-        for edge in graph.edges:
+        for edge in graph.edges(data=True):
             if get_piece_name(edge[0]) == get_piece_name(edge[1]):
                 edges_color.append(color2edge_meaning["intra_piece"])
             # elif edge in self.noiseless_ground_truth_wrapper.potential_matings_graph.edges:
-            elif shared_variables.puzzle.is_ground_truth_mating(_link_to_mating(edge)):
+            elif shared_variables.puzzle.is_ground_truth_mating(_link_to_mating((edge[0],edge[1]))):
                 edges_color.append(color2edge_meaning["ground_truth_edge"])
+            elif edge[2]["type"] == DEAD_INTER_PIECES_LINK_TYPE:
+                edges_color.append(color2edge_meaning["dead"])
             else:
                 edges_color.append(color2edge_meaning["potential"])
         
@@ -154,15 +156,17 @@ class MatchingGraphDrawer():
         red_patch = mpatches.Patch(color=color2edge_meaning["intra_piece"], label='Internal edge')
         blue_patch = mpatches.Patch(color=color2edge_meaning["ground_truth_edge"], label='Ground Truth edge')
         gray_patch = mpatches.Patch(color=color2edge_meaning["potential"], label='Potential edge')
+        purple_patch = mpatches.Patch(color=color2edge_meaning["dead"], label='Dead edge')
 
         # Plot empty lists with the desired colors and labels
         ax.plot([], [], color=color2edge_meaning["intra_piece"], label='Internal edge', linewidth=5)
         ax.plot([], [], color=color2edge_meaning["ground_truth_edge"], label='Ground Truth edge', linewidth=5)
         ax.plot([], [], color=color2edge_meaning["potential"], label='Potential edge', linewidth=5)
+        ax.plot([], [], color=color2edge_meaning["dead"], label='Dead edge', linewidth=5)
 
         # Create and show legend
         ax.legend(loc='upper left')
-        handles = [red_patch, blue_patch,gray_patch]
+        handles = [red_patch, blue_patch,gray_patch,purple_patch]
         ax.legend(handles=handles, loc='upper left')
         ax.axis('off')
 
@@ -321,7 +325,7 @@ class MatchingGraphDrawer():
         edges_color = []
         not_dead_edges = get_not_dead_links(graph,is_data=True)
 
-        for link in graph.edges(data=True):# not_dead_edges:#
+        for link in not_dead_edges:#graph.edges(data=True):# :#
             node1_color = node2color[link[0]]
             node2_color = node2color[link[1]]
             att1 = node2att[link[0]]
@@ -346,7 +350,8 @@ class MatchingGraphDrawer():
             else:
                 edges_color.append(color2edge_meaning[link[2]["type"]])
 
-        nx.draw_networkx(graph,self.node2position,with_labels=True,node_color=nodes_color,#edgelist=get_not_dead_links(graph,is_data=False),
+        nx.draw_networkx(graph,self.node2position,with_labels=True,node_color=nodes_color,
+                         edgelist=not_dead_edges,
                          edge_color=edges_color,font_size=10,ax=ax,width=1.5)
         
 
