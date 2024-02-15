@@ -114,7 +114,7 @@ class SD1PairwiseBuilder():
 
 class SyntheticPairwise(GeometricPairwise):
 
-    DEFAULT_PERCENTANGE_FALSE_POSITIVES =0.5 #0.8#0.35
+    DEFAULT_PERCENTANGE_FALSE_POSITIVES = 0.65 #0.65#0.5 #0.8#0.35
 
     def __init__(self, db, puzzle_num, puzzle_noise_level, 
                  puzzle_recipe_name="loadRegularPuzzle", add_geo_features=[],
