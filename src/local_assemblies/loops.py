@@ -86,6 +86,9 @@ class Loop():
     def remove_from_graph(self):
         for node in self.nodes:
             self.graph_wrapper_ref.dissociate_node(self.graph_name,node,self)
+        
+        # for link in self.links:
+        #     self.graph_wrapper_ref.kill_inter_piece_link(self.graph_name,link)
     
     # def __del__(self) -> None:
     #     self.remove_from_graph(self)

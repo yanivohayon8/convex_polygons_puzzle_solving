@@ -128,6 +128,9 @@ class MatchingGraphWrapper():
                     graph.nodes[node]["local_assembly"] = None
 
     def clear_unassigned_inter_links(self,graph_name,loops):
+        '''
+            If a node has at least one mating link belonging to a loop, then the function removes its other mating links that are not part of a loop.
+        '''
         graph = getattr(self,graph_name)
         links_to_remove = []
 

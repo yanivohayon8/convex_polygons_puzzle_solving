@@ -27,7 +27,6 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
       drawer = MatchingGraphDrawer(gd_pairwise_recipe.graph_wrapper)
       drawer.init()
 
-
       # drawer.draw_adjacency_graph(graph)
 
     zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,
@@ -35,20 +34,6 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
                                                 pairwise_recipe_name = pairwise_recipe_name)
     zero_loops = zero_loops_recipe.cook(is_debug=is_debug_solver)
     
-    # if is_debug_solver:
-    #   graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
-    #   drawer.draw_filtered_adjacency_with_loops(graph)
-    #   drawer.draw_adjacency_graph(graph)
-      # drawer.draw_graph_matching(zero_loops_recipe.graph_wrapper)
-      # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
-
-      # plt.show()
-      # fig_before_merge, ax_before_merge = plt.subplots()
-      # drawer.draw_filtered_adjacency_with_loops(zero_loops_recipe.graph_wrapper.filtered_adjacency_graph,ax=ax_before_merge)
-      # fig_before_merge_2, ax_before_merge_2 = plt.subplots()
-      # drawer.draw_adjacency_graph(zero_loops_recipe.graph_wrapper.adjacency_graph,ax=ax_before_merge_2)
-      # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
-
     merger = ZeroLoopsMerge(zero_loops,zero_loops_recipe.get_num_piece_in_puzzle())
     aggregates = merger.cook()
 
