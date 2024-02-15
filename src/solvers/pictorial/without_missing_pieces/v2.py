@@ -48,6 +48,21 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
       
       plt.show()
 
+    for agg in aggregates:
+       agg.win_conficts()
+      
+    
+    if is_debug_solver:
+      graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
+      drawer.draw_filtered_adjacency_with_loops(graph,title="After conflicts")
+
+      for agg in aggregates:
+         print(agg)
+    #   # drawer.draw_adjacency_graph(graph)
+    #   # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
+      
+      plt.show()
+
     final_matings = zero_loops_recipe.graph_wrapper.get_final_matings()
     response = assembler.simulate(final_matings)
     physical_score = assembler.score(response)

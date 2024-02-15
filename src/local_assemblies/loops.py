@@ -96,6 +96,7 @@ class Loop():
     def win_conficts(self):
         for node in self.get_nodes():
             self.graph_wrapper_ref.solve_mating_conflicts(self.graph_name,node,self)
+            # self.graph_wrapper_ref.update_node(self.graph_name,node,"local_assembly",[self])
 
     def is_link_present(self,link):
         link_reversed = (link[1],link[0])

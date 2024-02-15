@@ -124,8 +124,8 @@ class MatchingGraphWrapper():
             if local_assemly in graph.nodes[node]["local_assembly"]:
                 graph.nodes[node]["local_assembly"].remove(local_assemly)
 
-                if len(graph.nodes[node]["local_assembly"]) == 0:
-                    graph.nodes[node]["local_assembly"] = None
+                # if len(graph.nodes[node]["local_assembly"]) == 0:
+                #     graph.nodes[node]["local_assembly"] = None
 
     def clear_unassigned_inter_links(self,graph_name,loops):
         '''
@@ -180,7 +180,11 @@ class MatchingGraphWrapper():
             if neigh_att["local_assembly"] is None or not preferred_loop in neigh_att["local_assembly"]:
                 links_to_remove.append((node,neighbor))
 
-        graph.remove_edges_from(links_to_remove)
+        # graph.remove_edges_from(links_to_remove)
+        
+        for link in links_to_remove:
+            self.kill_inter_piece_link(graph_name,link)
+                
         loops_to_remove = [ass for ass in graph.nodes[node]["local_assembly"] if ass != preferred_loop]
 
         for node_loop_,att in graph.nodes(data=True):
