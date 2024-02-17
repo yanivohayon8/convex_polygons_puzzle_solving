@@ -212,10 +212,18 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
         graph_wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
 
         links = list(graph_wrapper.filtered_adjacency_graph.edges(data=True))
-        i = 5
-        print(links[i])
-        graph_wrapper.assign_link("filtered_adjacency_graph",links[i],"Loop Object")
-        print(links[i])
+        my_link = links[5]
+        print(my_link)
+        assert len(graph_wrapper.filtered_adjacency_graph.edges[my_link[0],my_link[1]]["loops"]) == 0
+        graph_wrapper.assign_link("filtered_adjacency_graph",my_link,"Loop Object1")
+        graph_wrapper.assign_link("filtered_adjacency_graph",my_link,"Loop Object2")
+        print(my_link)
+        assert len(graph_wrapper.filtered_adjacency_graph.edges[my_link[0],my_link[1]]["loops"]) == 2
+
+        graph_wrapper.dissociate_link("filtered_adjacency_graph",my_link,"Loop Object1")
+        print(my_link)
+        assert len(graph_wrapper.filtered_adjacency_graph.edges[my_link[0],my_link[1]]["loops"]) == 1
+
         
         
 

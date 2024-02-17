@@ -132,6 +132,13 @@ class MatchingGraphWrapper():
         graph = getattr(self,graph_name)
         graph.edges[link[0],link[1]]["loops"].append(loop)
 
+    def dissociate_link(self,graph_name,link:tuple,loop):
+        graph = getattr(self,graph_name)
+
+        if loop in graph.edges[link[0],link[1]]["loops"]:
+            graph.edges[link[0],link[1]]["loops"].remove(loop)
+
+
 
     def clear_unassigned_inter_links(self,graph_name,loops):
         '''
