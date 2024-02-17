@@ -182,17 +182,22 @@ class MatchingGraphWrapper():
 
         # graph.remove_edges_from(links_to_remove)
         
-        for link in links_to_remove:
-            self.kill_inter_piece_link(graph_name,link)
-                
         loops_to_remove = [ass for ass in graph.nodes[node]["local_assembly"] if ass != preferred_loop]
 
-        for node_loop_,att in graph.nodes(data=True):
+        for link in links_to_remove:
+            self.kill_inter_piece_link(graph_name,link)
+
+            # for lop in loops_to_remove:                
+            #     self.dissociate_node(graph_name,link[1],lop)
+
+                
+
+        # for node_loop_,att in graph.nodes(data=True):
             
-            if not att["local_assembly"] is None:
-                for loop in loops_to_remove:
-                    if loop in att["local_assembly"]:
-                        self.dissociate_node(graph_name,node_loop_,loop)
+        #     if not att["local_assembly"] is None:
+        #         for lop in loops_to_remove:
+        #             if lop in att["local_assembly"]:
+        #                 self.dissociate_node(graph_name,node_loop_,lop)
         
 
     def kill_inter_piece_link(self,graph_name,link:tuple):
