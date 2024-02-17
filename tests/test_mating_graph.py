@@ -203,6 +203,20 @@ class TestMatchingGraphAndSpanTree(unittest.TestCase):
 
         nodes = graph_wrapper.filtered_adjacency_graph.nodes(data=True)
         print(nodes["P_0_E_0"])
+    
+    def test_link_attributes(self):
+        db = 1
+        puzzle_num = 19
+        puzzle_noise_level = 0
+
+        graph_wrapper = self._bulid_graph_wrapper(db,puzzle_num,puzzle_noise_level)
+
+        links = list(graph_wrapper.filtered_adjacency_graph.edges(data=True))
+        i = 5
+        print(links[i])
+        graph_wrapper.assign_link("filtered_adjacency_graph",links[i],"Loop Object")
+        print(links[i])
+        
         
 
 if __name__ == "__main__":

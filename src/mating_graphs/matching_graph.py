@@ -94,7 +94,7 @@ class MatchingGraphWrapper():
         self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes,local_assembly=None)
         self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_LINK_TYPE)
         potential_matings = [edge for edge in self.filtered_potential_matings_graph.edges if not edge in self.pieces_only_graph]
-        self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_LINK_TYPE)
+        self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_LINK_TYPE,loops=list())
 
 
     def build_graph(self):
@@ -126,6 +126,12 @@ class MatchingGraphWrapper():
 
                 # if len(graph.nodes[node]["local_assembly"]) == 0:
                 #     graph.nodes[node]["local_assembly"] = None
+
+
+    def assign_link(self,graph_name:str,link:tuple,loop):
+        graph = getattr(self,graph_name)
+        graph.edges[link[0],link[1]]["loops"].append(loop)
+
 
     def clear_unassigned_inter_links(self,graph_name,loops):
         '''
