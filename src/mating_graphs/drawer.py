@@ -281,7 +281,7 @@ class MatchingGraphDrawer():
         ax.axis('off')
     
 
-    def draw_filtered_adjacency_with_loops(self,graph:nx.Graph,ax=None,title="filtered_adjacency_with_loops"):
+    def draw_filtered_adjacency_with_loops_deprecated(self,graph:nx.Graph,ax=None,title="filtered_adjacency_with_loops"):
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -370,4 +370,120 @@ class MatchingGraphDrawer():
         ax.legend(loc='upper left')
         handles = [within_piece_patch,inter_piece_patch,free_loop_patch,multiple_loop_patch]
         ax.legend(handles=handles, loc='upper left')
+        ax.axis('off')
+
+    def draw_filtered_adjacency_with_loops(self,graph:nx.Graph,ax=None,title="filtered_adjacency_with_loops"):
+
+        if ax is None:
+            fig, ax = plt.subplots()
+            ax.set_title(title)
+
+        nodes_color = []
+        loops_color_pool = ["blue","green","red","pink","purple","orange","magenta","yellow"]
+        color_index = 0
+        loop2color = {}
+        free_loop_color = "gray"
+        multiple_loop_color = "skyblue"
+        node2color = {}
+        node2att = {}
+        edges_color = []
+
+        color2edge_meaning = {
+            WITHIN_PIECE_LINK_TYPE:"black",
+            INTER_PIECES_LINK_TYPE: "gray"
+        }
+
+
+        for link in graph.edges(data=True):
+            attributes = link[2]
+            
+            if len(attributes["loops"]) == 0:
+                edges_color.append(color2edge_meaning[attributes["type"]])
+            elif len(attributes["loops"]) > 1:
+                edges_color.append(multiple_loop_color)
+            else:
+                ass_name = repr(attributes["loops"])
+                
+                if not ass_name in loop2color.keys():
+                    loop2color[ass_name] = loops_color_pool[color_index]
+                    color_index= (color_index+1)%len(loops_color_pool)
+                
+                edges_color.append(loop2color[ass_name])
+
+        
+        nx.draw_networkx(graph,self.node2position,with_labels=True,edge_color=edges_color,font_size=10,ax=ax,width=1.5)
+
+
+        #     attributes = node[1]
+        #     node_name = node[0]
+        #     node2att[node_name] = attributes
+            
+        #     if attributes["local_assembly"] is None:
+        #         nodes_color.append(free_loop_color)
+        #         node2color[node_name] = free_loop_color
+        #     elif len(attributes["local_assembly"]) > 1:
+        #         nodes_color.append(multiple_loop_color)
+        #         node2color[node_name] = multiple_loop_color
+        #     else:
+        #         ass_name = repr(attributes["local_assembly"])
+                
+        #         if not ass_name in loop2color.keys():
+        #             loop2color[ass_name] = loops_color_pool[color_index]
+        #             color_index= (color_index+1)%len(loops_color_pool)
+                
+        #         nodes_color.append(loop2color[ass_name])
+        #         node2color[node_name] = loop2color[ass_name]
+        
+        # color2edge_meaning = {
+        #     WITHIN_PIECE_LINK_TYPE:"black",
+        #     INTER_PIECES_LINK_TYPE: "gray"
+        # }
+
+        # not_dead_edges = get_not_dead_links(graph,is_data=True)
+
+        # for link in not_dead_edges:#graph.edges(data=True):# :#
+        #     node1_color = node2color[link[0]]
+        #     node2_color = node2color[link[1]]
+        #     att1 = node2att[link[0]]
+        #     att2 = node2att[link[1]]
+        #     has_common_assembly = True
+
+        #     if att2["local_assembly"] is None or att1["local_assembly"] is None:
+        #         has_common_assembly = False
+        #     else:
+        #         has_common_assembly = len([ass for ass in att1["local_assembly"] if ass in att2["local_assembly"]]) > 0 
+
+        #     if not has_common_assembly:
+        #         edges_color.append(color2edge_meaning[link[2]["type"]])
+        #         continue
+
+        #     if node1_color == node2_color:# and node1_color != multiple_loop_color:
+        #         edges_color.append(node1_color)
+        #     elif node1_color == multiple_loop_color and (node2_color != multiple_loop_color and node2_color != free_loop_color):
+        #         edges_color.append(node2_color)
+        #     elif node2_color == multiple_loop_color and (node1_color != multiple_loop_color and node1_color != free_loop_color):
+        #         edges_color.append(node1_color)
+        #     else:
+        #         edges_color.append(color2edge_meaning[link[2]["type"]])
+
+        # nx.draw_networkx(graph,self.node2position,with_labels=True,node_color=nodes_color,
+        #                  edgelist=not_dead_edges,
+        #                  edge_color=edges_color,font_size=10,ax=ax,width=1.5)
+        
+
+        # within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Within Piece')
+        # inter_piece_patch = mpatches.Patch(color=color2edge_meaning[INTER_PIECES_LINK_TYPE], label='Inter Piece')
+        # free_loop_patch = plt.Line2D([0], [0], marker='o', color='w', label=f'No loop', markersize=10,markerfacecolor=free_loop_color)
+        # multiple_loop_patch = plt.Line2D([0], [0], marker='o', color='w', label=f"Multiple Loops", markersize=10,markerfacecolor=multiple_loop_color)
+
+        # # Plot empty lists with the desired colors and labels
+        # ax.plot([], [], color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Within Piece', linewidth=5)
+        # ax.plot([], [], color=color2edge_meaning[INTER_PIECES_LINK_TYPE], label='Inter Piece', linewidth=5)
+        # ax.plot([],[],marker="o",color='w', label=f'Example', markersize=10,markerfacecolor=free_loop_color)
+        # ax.plot([],[],marker="o",color='w', label=f'Example', markersize=10,markerfacecolor=multiple_loop_color)
+
+        # # Create and show legend
+        # ax.legend(loc='upper left')
+        # handles = [within_piece_patch,inter_piece_patch,free_loop_patch,multiple_loop_patch]
+        # ax.legend(handles=handles, loc='upper left')
         ax.axis('off')

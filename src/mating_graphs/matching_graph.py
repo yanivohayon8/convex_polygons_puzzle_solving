@@ -92,7 +92,11 @@ class MatchingGraphWrapper():
     def _build_filtered_adjacency_graph(self):     
         self.filtered_adjacency_graph = nx.Graph()
         self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes,local_assembly=None)
-        self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges, type=WITHIN_PIECE_LINK_TYPE)
+        # self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges,type=WITHIN_PIECE_LINK_TYPE)
+
+        for link in self.pieces_only_graph.edges:
+            self.filtered_adjacency_graph.add_edge(link[0],link[1],type=WITHIN_PIECE_LINK_TYPE,loops=list())
+
         potential_matings = [edge for edge in self.filtered_potential_matings_graph.edges if not edge in self.pieces_only_graph]
         self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_LINK_TYPE,loops=list())
 
@@ -130,7 +134,9 @@ class MatchingGraphWrapper():
 
     def assign_link(self,graph_name:str,link:tuple,loop):
         graph = getattr(self,graph_name)
-        graph.edges[link[0],link[1]]["loops"].append(loop)
+
+        if not loop in graph.edges[link[0],link[1]]["loops"]:
+            graph.edges[link[0],link[1]]["loops"].append(loop)
 
     def dissociate_link(self,graph_name,link:tuple,loop):
         graph = getattr(self,graph_name)

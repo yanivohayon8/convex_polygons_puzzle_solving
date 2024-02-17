@@ -25,8 +25,11 @@ class Loop():
             self.nodes.add(link[0])
             self.nodes.add(link[1])
 
-        for node in self.nodes:
-            self.graph_wrapper_ref.assign_node(graph_name,node,self)
+        # for node in self.nodes:
+        #     self.graph_wrapper_ref.assign_node(graph_name,node,self)
+            
+        for link in self.links:
+            self.graph_wrapper_ref.assign_link(graph_name,(link[0],link[1]),self)
 
     def get_pieces_involved(self):
         return list(set([get_piece_name(node) for node in self.nodes]))
@@ -84,14 +87,14 @@ class Loop():
         return self.physics_score
                     
     def remove_from_graph(self):
-        for node in self.nodes:
-            self.graph_wrapper_ref.dissociate_node(self.graph_name,node,self)
+        # for node in self.nodes:
+        #     self.graph_wrapper_ref.dissociate_node(self.graph_name,node,self)
         
-        # for link in self.links:
-        #     self.graph_wrapper_ref.kill_inter_piece_link(self.graph_name,link)
-    
-    # def __del__(self) -> None:
-    #     self.remove_from_graph(self)
+        # # for link in self.links:
+        # #     self.graph_wrapper_ref.kill_inter_piece_link(self.graph_name,link)
+        
+        for link in self.links:
+            self.graph_wrapper_ref.dissociate_link(self.graph_name,(link[0],link[1]),self)
 
     def win_conficts(self):
         for node in self.get_nodes():
