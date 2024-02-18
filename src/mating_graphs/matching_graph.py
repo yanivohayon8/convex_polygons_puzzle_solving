@@ -94,11 +94,11 @@ class MatchingGraphWrapper():
         self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes,local_assembly=None)
         # self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges,type=WITHIN_PIECE_LINK_TYPE)
 
-        for link in self.pieces_only_graph.edges:
-            self.filtered_adjacency_graph.add_edge(link[0],link[1],type=WITHIN_PIECE_LINK_TYPE,loops=list())
+        for link in list(self.pieces_only_graph.edges()):
+            self.filtered_adjacency_graph.add_edge(link[0],link[1],type=WITHIN_PIECE_LINK_TYPE,loops=None)
 
         potential_matings = [edge for edge in self.filtered_potential_matings_graph.edges if not edge in self.pieces_only_graph]
-        self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_LINK_TYPE,loops=list())
+        self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_LINK_TYPE,loops=None)
 
 
     def build_graph(self):
@@ -135,6 +135,9 @@ class MatchingGraphWrapper():
     def assign_link(self,graph_name:str,link:tuple,loop):
         graph = getattr(self,graph_name)
 
+        if graph.edges[link[0],link[1]]["loops"] is None:
+            graph.edges[link[0],link[1]]["loops"] = list()
+
         if not loop in graph.edges[link[0],link[1]]["loops"]:
             graph.edges[link[0],link[1]]["loops"].append(loop)
 
@@ -143,6 +146,10 @@ class MatchingGraphWrapper():
 
         if loop in graph.edges[link[0],link[1]]["loops"]:
             graph.edges[link[0],link[1]]["loops"].remove(loop)
+
+    
+            
+
 
 
 
@@ -385,6 +392,21 @@ def get_not_dead_links(graph:nx.Graph,is_data=True):
                 alive_links.append((link[0],link[1]))
                 
     return alive_links
+
+def get_nodes_loop(graph,node):
+        node_loops = []
+
+        for neighbor in graph.adj[node]:
+            neighbor_loops = graph.edges[node,neighbor]["loops"]
+
+            if neighbor_loops is None:
+                continue
+
+            for lop in neighbor_loops:
+                if not lop in node_loops:
+                    node_loops.append(lop)
+        
+        return node_loops
 
 def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None,compatibility_threshold=0.4):
     return MatchingGraphWrapper(pieces,id2piece,
