@@ -46,20 +46,24 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
     #   # drawer.draw_adjacency_graph(graph)
     #   # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
       
-      plt.show()
+      # plt.show()
 
-    for agg in aggregates:
-       agg.win_conficts()
-      
-    
+    for i in range(len(aggregates)-1):
+       if aggregates[i+1].is_contained_all_pieces(aggregates[i]):
+          print(f"{aggregates[i+1]}  is_contained_all_pieces {aggregates[i]}")
+
+    aggregates[0].win_conficts()
+    stronger_aggregates = [aggregates[0]]
+
+    # if len(aggregates) > 1:
+    #   for agg in aggregates[1:]:
+    #     agg.win_conficts(stronger_loops=stronger_aggregates)
+    #     stronger_aggregates.append(agg)
+
+
     if is_debug_solver:
       graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
       drawer.draw_filtered_adjacency_with_loops(graph,title="After conflicts")
-
-      for agg in aggregates:
-         print(agg)
-    #   # drawer.draw_adjacency_graph(graph)
-    #   # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
       
       plt.show()
 

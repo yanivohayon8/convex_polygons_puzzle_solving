@@ -113,6 +113,10 @@ class MatchingGraphWrapper():
         graph = getattr(self,graph_name)
         graph.nodes[node][att] = val
 
+    def update_link(self,graph_name,link,att,val):
+        graph = getattr(self,graph_name)
+        graph.edges[link[0],link[1]][att] = val
+
     def assign_node(self,graph_name:str,node:str,local_assembly):
         graph = getattr(self,graph_name)
 
@@ -150,9 +154,11 @@ class MatchingGraphWrapper():
 
     
             
+    def get_nodes_links(self,graph_name,node):
+        graph = getattr(self,graph_name)
 
-
-
+        return [(node,neighbor) for neighbor in graph.adj[node]]
+    
 
     def clear_unassigned_inter_links(self,graph_name,loops):
         '''
@@ -411,20 +417,27 @@ def get_not_dead_links(graph:nx.Graph,is_data=True):
                 
     return alive_links
 
-def get_node_loops(graph,node):
-        node_loops = []
+def get_node_loops(graph,node,is_not_dead=True):
+    node_loops = []
 
-        for neighbor in graph.adj[node]:
-            neighbor_loops = graph.edges[node,neighbor]["loops"]
+    for neighbor in graph.adj[node]:
+        att = graph.edges[node,neighbor]
 
-            if neighbor_loops is None:
+        if is_not_dead:
+            if att["type"] == DEAD_INTER_PIECES_LINK_TYPE:
                 continue
 
-            for lop in neighbor_loops:
-                if not lop in node_loops:
-                    node_loops.append(lop)
-        
-        return node_loops
+        neighbor_loops = att["loops"]
+
+        if neighbor_loops is None:
+            continue
+
+
+        for lop in neighbor_loops:
+            if not lop in node_loops:
+                node_loops.append(lop)
+    
+    return node_loops
 
 def _construct_wrapper(pieces,id2piece:dict,geometric_match_edges=None,pictorial_matcher=None,compatibility_threshold=0.4):
     return MatchingGraphWrapper(pieces,id2piece,

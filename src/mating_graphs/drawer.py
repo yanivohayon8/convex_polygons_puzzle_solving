@@ -289,7 +289,7 @@ class MatchingGraphDrawer():
             ax.set_title(title)
 
         nodes_color = []
-        loops_color_pool = ["blue","green","pink","purple","orange","magenta","yellow"]
+        loops_color_pool = ["blue","green","red","pink","purple","orange","magenta","yellow","cyan"]
         color_index = 0
         loop2color = {}
         free_loop_color = "gray"
@@ -314,10 +314,11 @@ class MatchingGraphDrawer():
             elif len(attributes["loops"]) == 0:
                 edges_color.append(color2edge_meaning[attributes["type"]])
             elif len(attributes["loops"]) > 1:
-                if attributes["type"] == WITHIN_PIECE_LINK_TYPE:
-                    edges_color.append(color2edge_meaning[WITHIN_PIECE_LINK_TYPE])
-                else:
-                    edges_color.append(multiple_loop_color)
+                # if attributes["type"] == WITHIN_PIECE_LINK_TYPE:
+                #     edges_color.append(color2edge_meaning[WITHIN_PIECE_LINK_TYPE])
+                # else:
+                #     edges_color.append(multiple_loop_color)
+                edges_color.append(multiple_loop_color)
             else:
                 ass_name = repr(attributes["loops"])
                 
@@ -325,10 +326,11 @@ class MatchingGraphDrawer():
                     loop2color[ass_name] = loops_color_pool[color_index]
                     color_index= (color_index+1)%len(loops_color_pool)
                 
-                if attributes["type"] == WITHIN_PIECE_LINK_TYPE:
-                    edges_color.append(color2edge_meaning[WITHIN_PIECE_LINK_TYPE])
-                else:
-                    edges_color.append(loop2color[ass_name])
+                # if attributes["type"] == WITHIN_PIECE_LINK_TYPE:
+                #     edges_color.append(color2edge_meaning[WITHIN_PIECE_LINK_TYPE])
+                # else:
+                #     edges_color.append(loop2color[ass_name])
+                edges_color.append(loop2color[ass_name])
 
         nx.draw_networkx_edges(graph,self.node2position,edgelist=alive_links,edge_color=edges_color,width=1.5)    
 

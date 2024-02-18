@@ -29,7 +29,8 @@ class Loop():
         #     self.graph_wrapper_ref.assign_node(graph_name,node,self)
             
         for link in self.links:
-            self.graph_wrapper_ref.assign_link(graph_name,(link[0],link[1]),self)
+            if get_piece_name(link[0]) != get_piece_name(link[1]):
+                self.graph_wrapper_ref.assign_link(graph_name,(link[0],link[1]),self)
 
     def get_pieces_involved(self):
         return list(set([get_piece_name(node) for node in self.nodes]))
@@ -94,13 +95,37 @@ class Loop():
 
 
 
-    def win_conficts(self):
+    def win_conficts(self,stronger_loops:list=[]):
         for link in self.links:
             att = self.graph_wrapper_ref.get_link_attributes(self.graph_name,link)
 
             if not att["loops"] is None:
                 if len(att["loops"]) > 0:
-                    att["loops"] = [self]
+
+                    is_stronger_exist = False
+
+                    for lop in stronger_loops:
+                        if lop in att["loops"]:
+                            is_stronger_exist = True
+                            break
+                    
+                    if not is_stronger_exist:
+                        self.graph_wrapper_ref.update_link(self.graph_name,link,"loops",[self])
+
+                        node1_links = self.graph_wrapper_ref.get_nodes_links(self.graph_name,link[0])
+                        node2_links = self.graph_wrapper_ref.get_nodes_links(self.graph_name,link[1])
+                        both_nodes_links = node1_links+node2_links
+
+                        for other_link in both_nodes_links:
+                            other_attributes = self.graph_wrapper_ref.get_link_attributes(self.graph_name,other_link)
+                            if other_attributes["type"] == INTER_PIECES_LINK_TYPE:
+                                if  link != other_link and link!=(other_link[1],other_link[0]):
+                                    self.graph_wrapper_ref.kill_inter_piece_link(self.graph_name,other_link)
+                        
+
+                        
+
+
 
     def is_link_present(self,link):
         link_reversed = (link[1],link[0])
