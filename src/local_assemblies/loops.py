@@ -88,13 +88,11 @@ class Loop():
                     
     def remove_from_graph(self):
         # for node in self.nodes:
-        #     self.graph_wrapper_ref.dissociate_node(self.graph_name,node,self)
-        
-        # # for link in self.links:
-        # #     self.graph_wrapper_ref.kill_inter_piece_link(self.graph_name,link)
-        
+        #     self.graph_wrapper_ref.dissociate_node(self.graph_name,node,self)     
         for link in self.links:
             self.graph_wrapper_ref.dissociate_link(self.graph_name,(link[0],link[1]),self)
+
+
 
     def win_conficts(self):
         for node in self.get_nodes():

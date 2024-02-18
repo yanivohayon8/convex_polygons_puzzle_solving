@@ -91,11 +91,11 @@ class MatchingGraphWrapper():
     
     def _build_filtered_adjacency_graph(self):     
         self.filtered_adjacency_graph = nx.Graph()
-        self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes,local_assembly=None)
+        self.filtered_adjacency_graph.add_nodes_from(self.pieces_only_graph.nodes,local_assembly=None) # none is used instead of list() for solving a bug
         # self.filtered_adjacency_graph.add_edges_from(self.pieces_only_graph.edges,type=WITHIN_PIECE_LINK_TYPE)
 
         for link in list(self.pieces_only_graph.edges()):
-            self.filtered_adjacency_graph.add_edge(link[0],link[1],type=WITHIN_PIECE_LINK_TYPE,loops=None)
+            self.filtered_adjacency_graph.add_edge(link[0],link[1],type=WITHIN_PIECE_LINK_TYPE,loops=None) # none is used instead of list() for solving a bug
 
         potential_matings = [edge for edge in self.filtered_potential_matings_graph.edges if not edge in self.pieces_only_graph]
         self.filtered_adjacency_graph.add_edges_from(potential_matings, type=INTER_PIECES_LINK_TYPE,loops=None)
@@ -144,8 +144,9 @@ class MatchingGraphWrapper():
     def dissociate_link(self,graph_name,link:tuple,loop):
         graph = getattr(self,graph_name)
 
-        if loop in graph.edges[link[0],link[1]]["loops"]:
-            graph.edges[link[0],link[1]]["loops"].remove(loop)
+        if not graph.edges[link[0],link[1]]["loops"] is None:
+            if loop in graph.edges[link[0],link[1]]["loops"]:
+                graph.edges[link[0],link[1]]["loops"].remove(loop)
 
     
             
@@ -191,6 +192,58 @@ class MatchingGraphWrapper():
         
         for link in links_to_remove:
             self.kill_inter_piece_link(graph_name,link)
+
+
+    def kill_unlooped_matings_of_looped_nodes(self,graph_name):
+        graph = getattr(self,graph_name)
+        links_to_kill = []
+
+        for link in graph.edges(data=True):
+            node1 = link[0]
+            node2 = link[1]
+            attributes = link[2]
+
+            if not attributes["type"] == INTER_PIECES_LINK_TYPE:
+                continue
+            
+            if not attributes["loops"] is None:
+                if len(attributes["loops"]) > 0:
+                    continue
+
+            node1_loops = get_node_loops(graph,node1)
+            node2_loops = get_node_loops(graph,node2)
+
+            is_loop1_lonely = False
+
+            if not node1_loops is None:
+                is_loop1_lonely = len(node1_loops) == 1 and len(node1_loops[0].get_pieces_involved()) == 1
+            
+            is_loop2_lonely = False
+
+            if not node2_loops is None:
+                is_loop2_lonely = len(node2_loops) == 1 and len(node2_loops[0].get_pieces_involved()) == 1
+
+            if not node1_loops is None and len(node1_loops) > 0:
+                
+                # if it only connected to a lonely loop, keep the inter link connecting the lonely to the "outside space"
+                # but ensuring the other node in the mating is not already occupied
+                if is_loop1_lonely and (node2_loops is None or len(node2_loops) == 0):
+                    pass
+                else:
+                    links_to_kill.append((node1,node2))
+            elif not node2_loops is None and len(node2_loops) > 0:
+                # if it only connected to a lonely loop, keep the inter link connecting the lonely to the "outside space"
+                # but ensuring the other node in the mating is not already occupied
+                if is_loop2_lonely and (node1_loops is None or len(node1_loops) == 0):
+                    pass
+                else:
+                    links_to_kill.append((node1,node2))
+            
+        for link in links_to_kill:
+            self.kill_inter_piece_link(graph_name,link)
+
+
+            
 
 
     def solve_mating_conflicts(self,graph_name,node,preferred_loop):
@@ -393,7 +446,7 @@ def get_not_dead_links(graph:nx.Graph,is_data=True):
                 
     return alive_links
 
-def get_nodes_loop(graph,node):
+def get_node_loops(graph,node):
         node_loops = []
 
         for neighbor in graph.adj[node]:

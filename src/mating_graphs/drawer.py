@@ -1,4 +1,4 @@
-from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name,_link_to_mating,get_not_dead_links,get_nodes_loop
+from src.mating_graphs.matching_graph import MatchingGraphWrapper,get_edge_name,get_piece_name,_link_to_mating,get_not_dead_links,get_node_loops
 from src.mating_graphs.matching_graph import INTER_AGGREGATE_LINK_TYPE,WITHIN_AGGREGATE_LINK_TYPE,WITHIN_PIECE_LINK_TYPE,INTER_PIECES_LINK_TYPE,DEAD_INTER_PIECES_LINK_TYPE
 import numpy as np
 import networkx as nx
@@ -289,30 +289,37 @@ class MatchingGraphDrawer():
             ax.set_title(title)
 
         nodes_color = []
-        loops_color_pool = ["blue","green","red","pink","purple","orange","magenta","yellow"]
+        loops_color_pool = ["blue","green","pink","purple","orange","magenta","yellow"]
         color_index = 0
         loop2color = {}
         free_loop_color = "gray"
         multiple_loop_color = "skyblue"
-        node2color = {}
-        node2att = {}
+        alphas = []
         edges_color = []
 
         color2edge_meaning = {
             WITHIN_PIECE_LINK_TYPE:"black",
-            INTER_PIECES_LINK_TYPE: "gray"
+            INTER_PIECES_LINK_TYPE: "gray",
+            DEAD_INTER_PIECES_LINK_TYPE:"gray"
         }
 
+        alive_links = get_not_dead_links(graph,is_data=True)        
 
-        for link in graph.edges(data=True):
+        for link in alive_links:
             attributes = link[2]
+
+            
             
             if attributes["loops"] is None:
-                edges_color.append(free_loop_color)
+                edges_color.append(color2edge_meaning[attributes["type"]])
+                # edges_color.append(free_loop_color)
             elif len(attributes["loops"]) == 0:
                 edges_color.append(color2edge_meaning[attributes["type"]])
             elif len(attributes["loops"]) > 1:
-                edges_color.append(multiple_loop_color)
+                if attributes["type"] == WITHIN_PIECE_LINK_TYPE:
+                    edges_color.append(color2edge_meaning[WITHIN_PIECE_LINK_TYPE])
+                else:
+                    edges_color.append(multiple_loop_color)
             else:
                 ass_name = repr(attributes["loops"])
                 
@@ -320,12 +327,20 @@ class MatchingGraphDrawer():
                     loop2color[ass_name] = loops_color_pool[color_index]
                     color_index= (color_index+1)%len(loops_color_pool)
                 
-                edges_color.append(loop2color[ass_name])
+                if attributes["type"] == WITHIN_PIECE_LINK_TYPE:
+                    edges_color.append(color2edge_meaning[WITHIN_PIECE_LINK_TYPE])
+                else:
+                    edges_color.append(loop2color[ass_name])
+
+        nx.draw_networkx_edges(graph,self.node2position,edgelist=alive_links,edge_color=edges_color,width=1.5)    
 
         nodes_color = []
+        nodes_label = []
 
         for node in graph.nodes():
-            node_loops = get_nodes_loop(graph,node)
+            nodes_label.append(node)
+
+            node_loops = get_node_loops(graph,node)
 
             if len(node_loops) == 0:
                 nodes_color.append(free_loop_color)
@@ -334,10 +349,8 @@ class MatchingGraphDrawer():
             else:
                 nodes_color.append(multiple_loop_color)
 
-       
-        nx.draw_networkx(graph,self.node2position,with_labels=True,
-                         node_color= nodes_color,
-                         edge_color=edges_color,font_size=10,ax=ax,width=1.5)
+        nx.draw_networkx_nodes(graph,self.node2position,node_color=nodes_color)
+        nx.draw_networkx_labels(graph,self.node2position,font_size=10)
 
         within_piece_patch = mpatches.Patch(color=color2edge_meaning[WITHIN_PIECE_LINK_TYPE], label='Within Piece')
         inter_piece_patch = mpatches.Patch(color=color2edge_meaning[INTER_PIECES_LINK_TYPE], label='Inter Piece')
