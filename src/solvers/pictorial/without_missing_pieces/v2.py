@@ -59,7 +59,7 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
       
       plt.show()
 
-    print("\t Settle up")
+    print("\tSettle up")
     final_matings = zero_loops_recipe.graph_wrapper.get_final_matings()
     response = assembler.simulate(final_matings)
     physical_score = assembler.score(response)

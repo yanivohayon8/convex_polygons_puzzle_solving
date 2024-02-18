@@ -233,20 +233,22 @@ class MatchingGraphWrapper():
                 
                 # if it only connected to a lonely loop, keep the inter link connecting the lonely to the "outside space"
                 # but ensuring the other node in the mating is not already occupied
-                if is_loop1_lonely and (node2_loops is None or len(node2_loops) == 0):
-                    pass
-                else:
-                    links_to_kill.append((node1,node2))
+                # if is_loop1_lonely and (node2_loops is None or len(node2_loops) == 0):
+                #     pass
+                # else:
+                    # self.kill_inter_piece_link(graph_name,link)
+                self.kill_inter_piece_link(graph_name,(node1,node2))
             elif not node2_loops is None and len(node2_loops) > 0:
                 # if it only connected to a lonely loop, keep the inter link connecting the lonely to the "outside space"
                 # but ensuring the other node in the mating is not already occupied
-                if is_loop2_lonely and (node1_loops is None or len(node1_loops) == 0):
-                    pass
-                else:
-                    links_to_kill.append((node1,node2))
+                # if is_loop2_lonely and (node1_loops is None or len(node1_loops) == 0):
+                #     pass
+                # else:
+                #     links_to_kill.append((node1,node2))
+                self.kill_inter_piece_link(graph_name,(node1,node2))
             
-        for link in links_to_kill:
-            self.kill_inter_piece_link(graph_name,link)
+        # for link in links_to_kill:
+        #     self.kill_inter_piece_link(graph_name,link)
 
 
 
