@@ -1,6 +1,6 @@
 from src.mating_graphs.matching_graph import get_piece_name
 from functools import reduce
-from src.mating_graphs.matching_graph import MatchingGraphWrapper,_link_to_mating,INTER_PIECES_LINK_TYPE,name_node
+from src.mating_graphs.matching_graph import MatchingGraphWrapper,_link_to_mating,INTER_PIECES_LINK_TYPE,name_node,DEAD_INTER_PIECES_LINK_TYPE
 from src.physics import assembler
 from src import shared_variables
 from src.data_types.mating import convert_mating_to_vertex_mating
@@ -98,6 +98,9 @@ class Loop():
     def win_conficts(self,stronger_loops:list=[]):
         for link in self.links:
             att = self.graph_wrapper_ref.get_link_attributes(self.graph_name,link)
+
+            if att["type"] == DEAD_INTER_PIECES_LINK_TYPE:
+                continue
 
             if not att["loops"] is None:
                 if len(att["loops"]) > 0:

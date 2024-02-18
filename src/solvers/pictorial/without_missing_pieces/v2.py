@@ -28,12 +28,14 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
       drawer.init()
 
       # drawer.draw_adjacency_graph(graph)
-
+    print("\tCompute zero loops")
     zero_loops_recipe = ZeroLoopsAroundVertex(db=db,puzzle_num=puzzle_num,
                                               puzzle_noise_level=puzzle_noise_level,
                                                 pairwise_recipe_name = pairwise_recipe_name)
     zero_loops = zero_loops_recipe.cook(is_debug=is_debug_solver)
     
+
+    print("\tAggregate zero loops")
     merger = ZeroLoopsMerge(zero_loops,zero_loops_recipe.get_num_piece_in_puzzle())
     aggregates = merger.cook()
 
@@ -41,24 +43,14 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
       graph = zero_loops_recipe.graph_wrapper.filtered_adjacency_graph
       drawer.draw_filtered_adjacency_with_loops(graph)
 
-      for agg in aggregates:
-         print(agg)
-    #   # drawer.draw_adjacency_graph(graph)
-    #   # drawer.draw_graph_filtered_matching(zero_loops_recipe.graph_wrapper)
-      
-      # plt.show()
-
-    for i in range(len(aggregates)-1):
-       if aggregates[i+1].is_contained_all_pieces(aggregates[i]):
-          print(f"{aggregates[i+1]}  is_contained_all_pieces {aggregates[i]}")
-
+    print("\tSolving conflicts")
     aggregates[0].win_conficts()
     stronger_aggregates = [aggregates[0]]
 
-    # if len(aggregates) > 1:
-    #   for agg in aggregates[1:]:
-    #     agg.win_conficts(stronger_loops=stronger_aggregates)
-    #     stronger_aggregates.append(agg)
+    if len(aggregates) > 1:
+      for agg in aggregates[1:]:
+        agg.win_conficts(stronger_loops=stronger_aggregates)
+        stronger_aggregates.append(agg)
 
 
     if is_debug_solver:
@@ -67,6 +59,7 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
       
       plt.show()
 
+    print("\t Settle up")
     final_matings = zero_loops_recipe.graph_wrapper.get_final_matings()
     response = assembler.simulate(final_matings)
     physical_score = assembler.score(response)
