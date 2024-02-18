@@ -243,41 +243,6 @@ class MatchingGraphWrapper():
             self.kill_inter_piece_link(graph_name,link)
 
 
-            
-
-
-    def solve_mating_conflicts(self,graph_name,node,preferred_loop):
-        graph = getattr(self,graph_name)
-        links_to_remove = []
-
-        for neighbor in graph.adj[node]:
-            neigh_att = graph.nodes[neighbor]
-
-            if graph.edges[node,neighbor]["type"] != INTER_PIECES_LINK_TYPE:
-                continue
-
-            if neigh_att["local_assembly"] is None or not preferred_loop in neigh_att["local_assembly"]:
-                links_to_remove.append((node,neighbor))
-
-        # graph.remove_edges_from(links_to_remove)
-        
-        loops_to_remove = [ass for ass in graph.nodes[node]["local_assembly"] if ass != preferred_loop]
-
-        for link in links_to_remove:
-            self.kill_inter_piece_link(graph_name,link)
-
-            # for lop in loops_to_remove:                
-            #     self.dissociate_node(graph_name,link[1],lop)
-
-                
-
-        # for node_loop_,att in graph.nodes(data=True):
-            
-        #     if not att["local_assembly"] is None:
-        #         for lop in loops_to_remove:
-        #             if lop in att["local_assembly"]:
-        #                 self.dissociate_node(graph_name,node_loop_,lop)
-        
 
     def kill_inter_piece_link(self,graph_name,link:tuple):
         graph = getattr(self,graph_name)

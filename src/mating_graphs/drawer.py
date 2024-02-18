@@ -308,8 +308,6 @@ class MatchingGraphDrawer():
         for link in alive_links:
             attributes = link[2]
 
-            
-            
             if attributes["loops"] is None:
                 edges_color.append(color2edge_meaning[attributes["type"]])
                 # edges_color.append(free_loop_color)
