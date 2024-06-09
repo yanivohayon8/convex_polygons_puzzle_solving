@@ -32,7 +32,7 @@ if __name__ == "__main__":
         exit()
 
     puzzles_dir = f"../ConvexDrawingDataset/DB{args.db}"
-    puzzles_paths = glob.glob(puzzles_dir+"/*")
+    puzzles_paths = glob.glob(puzzles_dir+f"/*/noise_{args.puzzle_noise_level}")
     sum_precision = 0
     sum_recall = 0
     sum_overlapping = 0
@@ -41,17 +41,17 @@ if __name__ == "__main__":
 
     for puzzle_i,puzzle_path in enumerate(puzzles_paths):
         name = os.path.basename(puzzle_path)
-        puzzle_num = puzzle_path.split("\\")[-1]
-        expected_path_with_noise = os.path.join(puzzle_path,f"noise_{args.puzzle_noise_level}")
+        puzzle_num = puzzle_path.split("\\")[-2]
+        # expected_path_with_noise = os.path.join(puzzle_path,f"noise_{args.puzzle_noise_level}")
 
-        if not os.path.exists(expected_path_with_noise):
-            continue
+        # # if not os.path.exists(expected_path_with_noise):
+        # #     continue
 
         puzzle_num = puzzle_num[len("Puzzle"):]
 
         try:
             print("****************************")
-            print(f"Solve {args.db}/{puzzle_num}/{args.puzzle_noise_level} ({puzzle_i+1}/{len(puzzles_paths)})") 
+            print(f"Solve {args.db}/{puzzle_num}/{args.puzzle_noise_level} ({puzzle_i+1}/{len(puzzles_paths)}) ()") 
             print("****************************")
             solution,puzzle = solverV2.run(args.db,puzzle_num,args.puzzle_noise_level,pairwise_recipe_name=args.pairwise_recipe_name,is_debug_solver=args.debug)
             precision = puzzle.evaluate_precision(solution.get_matings())
