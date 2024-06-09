@@ -5,6 +5,7 @@ from src.evaluator import AreaOverlappingEvaluator
 import glob
 import os
 import re
+import datetime
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--db", default="1")
@@ -51,7 +52,7 @@ if __name__ == "__main__":
 
         try:
             print("****************************")
-            print(f"Solve {args.db}/{puzzle_num}/{args.puzzle_noise_level} ({puzzle_i+1}/{len(puzzles_paths)}) ()") 
+            print(f"Solve {args.db}/{puzzle_num}/{args.puzzle_noise_level} ({puzzle_i+1}/{len(puzzles_paths)}) {datetime.datetime.now().time()}") 
             print("****************************")
             solution,puzzle = solverV2.run(args.db,puzzle_num,args.puzzle_noise_level,pairwise_recipe_name=args.pairwise_recipe_name,is_debug_solver=args.debug)
             precision = puzzle.evaluate_precision(solution.get_matings())
