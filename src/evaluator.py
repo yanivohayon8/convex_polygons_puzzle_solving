@@ -1,5 +1,4 @@
 import numpy as np
-from src.data_types.piece import Piece
 from functools import reduce
 from shapely import affinity
 

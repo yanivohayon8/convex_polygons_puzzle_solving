@@ -1,4 +1,8 @@
 import unittest 
+
+import sys
+sys.path.append("./")
+
 from src.recipes import global_opt_loops
 from src.recipes import factory as recipes_factory
 from src.recipes.zero_loops import ZeroLoopsAroundVertex

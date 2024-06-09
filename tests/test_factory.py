@@ -1,4 +1,8 @@
 import unittest
+
+import sys
+sys.path.append("./")
+
 from src.recipes.puzzle import loadRegularPuzzle
 from src.recipes import factory as recipes_factory
 
