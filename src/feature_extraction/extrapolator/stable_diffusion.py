@@ -37,9 +37,19 @@ class SDEdgeImageExtractor(Extractor):
             
             edge_width = int(np.sqrt((edge_col-next_edge_col)**2 + (edge_row-next_edge_row)**2)) #abs(curr_col-next_col)
             non_background_indices = np.argwhere(np.any(translated_img != [0,0,0],axis=2))
-            max_row,max_col = np.max(non_background_indices,axis=0)
-            min_row,min_col = np.min(non_background_indices,axis=0)
+
+            # If the extrapolation is failed all the image is black
+            if non_background_indices.size == 0:
+                min_row = 0
+                max_row = self.crop_num_rows + 1 # random number which would be enough big for the cropping (heuristiced and should be verified)
+            else:
+                max_row,max_col = np.max(non_background_indices,axis=0)
+                min_row,min_col = np.min(non_background_indices,axis=0)
+
             cropped_img = translated_img[min_row:max_row,:edge_width]
+
+            if cropped_img.shape[0] < self.crop_num_rows:
+                cropped_img = np.pad(cropped_img,((self.crop_num_rows-cropped_img.shape[0],0),(0,0),(0,0)))
             
             piece.features[self.feature_name].append(cropped_img)
 
