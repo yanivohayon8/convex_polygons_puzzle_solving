@@ -75,7 +75,7 @@ if __name__ == "__main__":
             print(f"error: could not complete solving puzzle {args.db}/{puzzle_num}: {e}")
             problematic_puzzles.append(puzzle_num)
     
-    print(f"Succeed to run on {counted_puzzles} puzzles")
+    print(f"Succeed to run on ({counted_puzzles}/{len(puzzles_paths)})puzzles")
     print(f"Precision Mean: {sum_precision/(counted_puzzles+1e-5)}")
     print(f"Recall Mean: {sum_recall/(counted_puzzles+1e-5)}")
     print(f"Overlapping Mean: {sum_overlapping/(counted_puzzles+1e-5)}")
