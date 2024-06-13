@@ -18,9 +18,6 @@ parser.set_defaults(debug=False)
 args = parser.parse_args()
 
 
-
-
-
 if __name__ == "__main__":
 
     if args.puzzle_num != "":
@@ -30,6 +27,10 @@ if __name__ == "__main__":
         print("\tmatings precision is ",precision)
         recall = puzzle.evaluate_recall(solution.get_matings())
         print("\tmatings recall is ",recall)
+        ground_truth_polygons = puzzle.get_ground_truth_puzzle()
+        evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
+        overlapping_score = evaluator.evaluate(solution.get_polygons())
+        print("\tOverlapping with GT score is ", overlapping_score)
         exit()
 
     puzzles_dir = f"../ConvexDrawingDataset/DB{args.db}"
