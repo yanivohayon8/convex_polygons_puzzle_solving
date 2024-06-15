@@ -47,11 +47,11 @@ class TestLeastSquareRigidBody(unittest.TestCase):
         weights = np.array([1,1,1,1])
 
         R,t = least_square_rigid_motion_svd(points,ground_truth,weights)
-        assert np.array_equal(t,np.array([0,0]))
         assert np.array_equal(R,np.array([
             [0,1],
             [-1,0]
         ]))
+        assert np.array_equal(t,np.array([0,0]))
 
 
 class TestAreaOverlappingEvaluator(unittest.TestCase):
