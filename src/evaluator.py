@@ -71,17 +71,25 @@ class AreaOverlappingEvaluator():
     def _score(self):
         score_sum = 0
 
+        total_area= sum(map(lambda p: p.area,self.transfomed_polygons_solution))
+
         for poly_index in range(len(self.transfomed_polygons_solution)):                                
             solution_poly = self.transfomed_polygons_solution[poly_index]
             ground_truth_poly = self.ground_truth_polygons[poly_index]
             intersection_area = solution_poly.intersection(ground_truth_poly).area
-            score_sum += intersection_area/(solution_poly.area+1e-5)
+            
+            # Actually we could just divide the intersection area with sum_area, but to avoid dividing small numbers by large numbers, 
+            # I wrote piece_weight explicitly
+            piece_weight = solution_poly.area/(total_area+1e-5)
+            score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
         
         return score_sum # score_num/len()
 
     def evaluate(self,solution_polygons,excluded_pieces=[]):
-        bag_of_pieces = shared_variables.puzzle.bag_of_pieces
-        self.ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,self.ground_truth_polygons) if piece.id not in excluded_pieces]
+
+        if len(excluded_pieces) != 0:
+            bag_of_pieces = shared_variables.puzzle.bag_of_pieces
+            self.ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,self.ground_truth_polygons) if piece.id not in excluded_pieces]
 
         self._compute_weights()
         self._compute_transformation(solution_polygons)
