@@ -29,7 +29,7 @@ if __name__ == "__main__":
         print("\tmatings recall is ",recall)
         ground_truth_polygons = puzzle.get_ground_truth_puzzle()
         evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
-        overlapping_score = evaluator.evaluate(solution.get_polygons())
+        overlapping_score = evaluator.evaluate(solution.get_polygons(),excluded_pieces=solution.excluded_pieces)
         print("\tOverlapping with GT score is ", overlapping_score)
 
         return precision, recall,overlapping_score

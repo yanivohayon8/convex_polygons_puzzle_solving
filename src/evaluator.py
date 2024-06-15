@@ -1,6 +1,7 @@
 import numpy as np
 from functools import reduce
 from shapely import affinity
+from src import shared_variables
 
 def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_weights:np.array):
     '''
@@ -78,7 +79,10 @@ class AreaOverlappingEvaluator():
         
         return score_sum # score_num/len()
 
-    def evaluate(self,solution_polygons):
+    def evaluate(self,solution_polygons,excluded_pieces=[]):
+        bag_of_pieces = shared_variables.puzzle.bag_of_pieces
+        self.ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,self.ground_truth_polygons) if piece.id not in excluded_pieces]
+
         self._compute_weights()
         self._compute_transformation(solution_polygons)
         self._transform_solution_polygons(solution_polygons)

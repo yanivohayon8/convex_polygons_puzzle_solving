@@ -5,6 +5,8 @@ from shapely import Polygon
 from src.data_types.mating import Mating,convert_mating_to_vertex_mating
 from src import shared_variables
 from functools import reduce
+import numpy as np
+
 
 db_ = -1
 puzzle_num_ = -1
@@ -46,4 +48,21 @@ def score(assemly_response,area_weight=0.5):
     return area_weight*overalap_area +  (1-area_weight)*sum_springs_length
 
 def get_final_coordinates_as_polygons(response):
-    return [Polygon(piece_json["coordinates"]) for piece_json in response["piecesFinalCoords"] ]
+    bag_of_pieces = shared_variables.puzzle.bag_of_pieces
+    polygons = []
+    excluded_pieces = []
+
+    for piece in bag_of_pieces:
+        is_involved = False
+
+        for piece_json in response["piecesFinalCoords"]:
+
+            if piece_json["pieceId"] == piece.id:
+                is_involved = True
+                polygons.append(Polygon(piece_json["coordinates"]))
+                break
+        
+        if not is_involved:
+            excluded_pieces.append(piece.id)
+
+    return polygons,excluded_pieces
