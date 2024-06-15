@@ -20,8 +20,8 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
 
-    if args.puzzle_num != "":
-        solution,puzzle = solverV2.run(args.db,args.puzzle_num,args.puzzle_noise_level,
+    def solve_puzzle(puzzle_num):
+        solution,puzzle = solverV2.run(args.db,puzzle_num,args.puzzle_noise_level,
                                        pairwise_recipe_name=args.pairwise_recipe_name,is_debug_solver=args.debug)
         precision = puzzle.evaluate_precision(solution.get_matings())
         print("\tmatings precision is ",precision)
@@ -31,6 +31,11 @@ if __name__ == "__main__":
         evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
         overlapping_score = evaluator.evaluate(solution.get_polygons())
         print("\tOverlapping with GT score is ", overlapping_score)
+
+        return precision, recall,overlapping_score
+
+    if args.puzzle_num != "":
+        precision, recall,overlapping_score = solve_puzzle(args.puzzle_num)
         exit()
 
     puzzles_dir = f"../ConvexDrawingDataset/DB{args.db}"
@@ -55,17 +60,7 @@ if __name__ == "__main__":
             print("****************************")
             print(f"Solve {args.db}/{puzzle_num}/{args.puzzle_noise_level} ({puzzle_i+1}/{len(puzzles_paths)}) {datetime.datetime.now().time()}") 
             print("****************************")
-            solution,puzzle = solverV2.run(args.db,puzzle_num,args.puzzle_noise_level,pairwise_recipe_name=args.pairwise_recipe_name,is_debug_solver=args.debug)
-            precision = puzzle.evaluate_precision(solution.get_matings())
-            print("\tmatings precision is ",precision)
-            recall = puzzle.evaluate_recall(solution.get_matings())
-            print("\tmatings recall is ",recall)   
-
-            ground_truth_polygons = puzzle.get_ground_truth_puzzle()
-            evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
-            overlapping_score = evaluator.evaluate(solution.get_polygons())
-            print("\tOverlapping with GT score is ", overlapping_score)
-
+            precision, recall,overlapping_score = solve_puzzle(puzzle_num)
             counted_puzzles +=1
             sum_precision +=precision
             sum_recall +=recall
