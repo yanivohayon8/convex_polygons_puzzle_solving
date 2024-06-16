@@ -124,6 +124,7 @@ class ZeroLoopsMerge():
         
         while is_changed:
             is_changed = False
+            to_remove = []
 
             for i,curr_loop in enumerate(to_be_merge_loops[1:]):
                 queue_size = len(queued_loops)
@@ -133,7 +134,7 @@ class ZeroLoopsMerge():
                     try:
                         aggregated_loop = loops_local_assemblies.merge(aggregated_loop,lop)
                         is_changed = True
-                        to_be_merge_loops.remove(lop)
+                        to_remove.append(lop)# to_be_merge_loops.remove(lop)
                     except (loops_local_assemblies.LoopMutualPiecesMergeError,loops_local_assemblies.LoopMergeError) as e:
                         if not lop in queued_loops:
                             queued_loops.append(lop)
@@ -141,13 +142,15 @@ class ZeroLoopsMerge():
                 try:
                     aggregated_loop = loops_local_assemblies.merge(aggregated_loop,curr_loop)
                     is_changed = True
-                    to_be_merge_loops.remove(curr_loop)
+                    to_remove.append(curr_loop) #to_be_merge_loops.remove(curr_loop)
                 except (loops_local_assemblies.LoopMutualPiecesMergeError,loops_local_assemblies.LoopMergeError) as e:
                     if not curr_loop in queued_loops:
                         queued_loops.append(curr_loop)
                 
                 if len(aggregated_loop.get_pieces_involved()) == self.puzzle_num_pieces:
                     return aggregated_loop,list() #queued_loops
+            
+            [to_be_merge_loops.remove(lop) for lop in to_remove]
         
         return aggregated_loop,queued_loops
                 
