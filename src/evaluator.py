@@ -1,11 +1,11 @@
 import numpy as np
 from functools import reduce
-from shapely import affinity
+from shapely import affinity,MultiPolygon
 from src import shared_variables
 
 def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_weights:np.array):
     '''
-        implementation of https://vincentqin.gitee.io/blogresource-3/slam-common-issues-ICP/svd_rot.pdf
+        implementation of https://igl.ethz.ch/projects/ARAP/svd_rot.pdf
     '''
     assert points.shape == ground_truth.shape
     assert points.shape[0] == points_weights.shape[0]
@@ -22,6 +22,7 @@ def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_w
     S = X@W@Y.T
 
     U,sigma, V = np.linalg.svd(S)
+    V = V.T
 
     diag_d = np.identity(X.shape[0])
     diag_d[-1,-1] = np.linalg.det(V@U.T)
@@ -62,9 +63,16 @@ class AreaOverlappingEvaluator():
     def _transform_solution_polygons(self,solution_polygons):
         self.transfomed_polygons_solution = []
         transformation_params = [self.R[0,0],self.R[0,1],self.R[1,0],self.R[1,1],self.t[0],self.t[1]]
+        
+        fixed_point = MultiPolygon(solution_polygons).centroid #solution_polygons[0].centroid
 
         for polygon in solution_polygons:
             self.transfomed_polygons_solution.append(affinity.affine_transform(polygon,transformation_params))
+        
+            # # polygon_transformed = affinity.rotate(polygon,np.arccos(self.R[0,0]),use_radians=True)
+            # polygon_transformed = affinity.rotate(polygon,np.arccos(self.R[0,0]),use_radians=True,origin=fixed_point)
+            # polygon_transformed = affinity.translate(polygon_transformed,self.t[0],self.t[1])
+            # self.transfomed_polygons_solution.append(polygon_transformed)
         
         return self.transfomed_polygons_solution
     
@@ -72,6 +80,7 @@ class AreaOverlappingEvaluator():
         score_sum = 0
 
         total_area= sum(map(lambda p: p.area,self.transfomed_polygons_solution))
+        raise("The total area shold include also the excluded points")
 
         for poly_index in range(len(self.transfomed_polygons_solution)):                                
             solution_poly = self.transfomed_polygons_solution[poly_index]
@@ -100,3 +109,40 @@ class AreaOverlappingEvaluator():
         
     
 
+def registration_only_one_piece(solution_polygons,ground_truth_polygons,excluded_pieces=[]):
+
+    if len(excluded_pieces) != 0:
+        bag_of_pieces = shared_variables.puzzle.bag_of_pieces
+        ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,ground_truth_polygons) if piece.id not in excluded_pieces]
+
+    
+    pieces_areas = list(map(lambda p: p.area,ground_truth_polygons))
+    largest_piece_index = pieces_areas.index(max(pieces_areas))
+    solution_largest_polygon = solution_polygons[largest_piece_index]
+    ground_truth_largest_polygon = ground_truth_polygons[largest_piece_index]
+
+    ground_truth_coords = np.array(solution_largest_polygon.exterior.coords)
+    ground_truth_truth_coords = np.array(ground_truth_largest_polygon.exterior.coords)
+
+    R,_ = least_square_rigid_motion_svd(ground_truth_coords,ground_truth_truth_coords,np.ones(ground_truth_coords.shape[0]))
+    t = ground_truth_largest_polygon.centroid - solution_largest_polygon.centroid
+        
+    translated_polygons = [affinity.translate(polygon,t.x,t.y) for polygon in solution_polygons]
+    center_of_all = MultiPolygon(translated_polygons).centroid
+    angle = np.arccos(R[0,0])
+    rotated_polygons = [affinity.rotate(polygon,-angle,use_radians=True,origin=center_of_all) for polygon in translated_polygons]
+
+    q_pos = 0
+
+    return q_pos,translated_polygons,rotated_polygons
+    
+
+    # for solution_poly,ground_truth_poly in zip(solution_polygons,ground_truth_polygons):                                
+
+    #     transformed_solution_poly    
+    #     intersection_area = solution_poly.intersection(ground_truth_poly).area
+        
+    #     # Actually we could just divide the intersection area with sum_area, but to avoid dividing small numbers by large numbers, 
+    #     # I wrote piece_weight explicitly
+    #     piece_weight = solution_poly.area/(total_area+1e-5)
+    #     score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
