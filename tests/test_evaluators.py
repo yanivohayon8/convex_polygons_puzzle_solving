@@ -4004,7 +4004,7 @@ class TestQpos(unittest.TestCase):
         puzzle_directory = f"../ConvexDrawingDataset/DB{db}/Puzzle{puzzle_num}/noise_{puzzle_noise_level}"
         puzzle = Puzzle(puzzle_directory)
         ground_truth_polygons = puzzle.get_ground_truth_puzzle()
-        ground_truth_polygons = ground_truth_polygons[:3]
+        ground_truth_polygons = ground_truth_polygons#[:num_pieces_observed]
 
         response = {
         
@@ -5658,9 +5658,20 @@ class TestQpos(unittest.TestCase):
     ]
 }
 
+        
+
         scale =1/3 
-        solution_polygons = [Polygon([(p[0]*scale, p[1]*scale) for p in piece_json["coordinates"]]) for piece_json in response["piecesFinalCoords"]]
-        solution_polygons = solution_polygons[:3]
+        solution_polygons = []
+        solution_ids = []
+
+        for piece_json in response["piecesFinalCoords"]:#[:num_pieces_observed]:
+            solution_polygons.append(Polygon([(p[0]*scale, p[1]*scale) for p in piece_json["coordinates"]]))
+            solution_ids.append(int(piece_json["pieceId"]))
+
+
+        solution_polygons_aranged_by_id_ = [solution_polygons[id_] for id_ in solution_ids]
+        solution_polygons = solution_polygons_aranged_by_id_
+
         evaluator = Qpos(ground_truth_polygons)
         overlapping_score = evaluator.evaluate(solution_polygons)
 
@@ -5670,7 +5681,7 @@ class TestQpos(unittest.TestCase):
         self.plot(evaluator.ground_truth_polygons,axs[0])
         self.plot(evaluator.translated_solution_polygons,axs[1])
         self.plot(evaluator.ground_truth_polygons,axs[2])
-        self.plot(evaluator.translated_solution_polygons,axs[2])
+        self.plot(evaluator.translated_solution_polygons,axs[2],seed=8)
 
         plt.show()
 

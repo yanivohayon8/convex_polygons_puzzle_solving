@@ -165,7 +165,7 @@ class Qpos():
         '''
             solution_polygons - list of polygons
         '''
-        center_of_solution = MultiPolygon(solution_polygons).centroid
+        # center_of_solution = MultiPolygon(solution_polygons).centroid
         
         # dont change pivot_piece_index=0
         # This probabliy because of a bug, but setting this variable to 0 works 
@@ -179,22 +179,21 @@ class Qpos():
         R,t = least_square_rigid_motion_svd(solution_coords,ground_truth_truth_coords,weights)
 
         angle = np.arccos(R[0,0])
-        self.translated_solution_polygons = [affinity.rotate(polygon,-angle,use_radians=True,origin=center_of_solution) for polygon in solution_polygons]
+        self.translated_solution_polygons = [affinity.rotate(polygon,-angle,use_radians=True) for polygon in solution_polygons]
         tx = ground_truth_pivot_polygon.centroid.x-self.translated_solution_polygons[pivot_piece_index].centroid.x
         ty = ground_truth_pivot_polygon.centroid.y-self.translated_solution_polygons[pivot_piece_index].centroid.y
         self.translated_solution_polygons = [affinity.translate(polygon,tx,ty) for polygon in self.translated_solution_polygons]
 
         score_sum = 0
 
-        for poly_index in range(len(self.translated_solution_polygons)):                                
-            solution_poly = self.translated_solution_polygons[poly_index]
-            ground_truth_poly = self.ground_truth_polygons[poly_index]
-            intersection_area = solution_poly.intersection(ground_truth_poly).area
-            
-            # Actually we could just divide the intersection area with sum_area, but to avoid dividing small numbers by large numbers, 
-            # I wrote piece_weight explicitly
-            piece_weight = solution_poly.area/(self.total_gd_area+1e-5)
-            score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
+        for solution_poly in self.translated_solution_polygons:
+            for ground_truth_poly in self.ground_truth_polygons:
+                intersection_area = solution_poly.intersection(ground_truth_poly).area
+                
+                # Actually we could just divide the intersection area with sum_area, but to avoid dividing small numbers by large numbers, 
+                # I wrote piece_weight explicitly
+                piece_weight = solution_poly.area/(self.total_gd_area+1e-5)
+                score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
         
         return score_sum # score_num/len()
 
