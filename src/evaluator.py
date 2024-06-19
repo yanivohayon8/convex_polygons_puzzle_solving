@@ -146,3 +146,55 @@ def registration_only_one_piece(solution_polygons,ground_truth_polygons,excluded
     #     # I wrote piece_weight explicitly
     #     piece_weight = solution_poly.area/(total_area+1e-5)
     #     score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
+
+
+
+class Qpos():
+
+    def __init__(self,ground_truth_polygons:list,excluded_pieces:list=[]) -> None:
+        self.ground_truth_polygons = ground_truth_polygons
+        self.total_gd_area = sum(map(lambda p: p.area,self.ground_truth_polygons))
+
+        if len(excluded_pieces) != 0:
+            bag_of_pieces = shared_variables.puzzle.bag_of_pieces
+            self.ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,self.ground_truth_polygons) if piece.id not in excluded_pieces]
+            
+        
+
+    def evaluate(self,solution_polygons,pivot_piece_index=0):
+        '''
+            solution_polygons - list of polygons
+        '''
+        center_of_solution = MultiPolygon(solution_polygons).centroid
+        
+        # dont change pivot_piece_index=0
+        # This probabliy because of a bug, but setting this variable to 0 works 
+        # TODO: debug it later
+        
+        solution_pivot_polygon = solution_polygons[pivot_piece_index]
+        ground_truth_pivot_polygon = self.ground_truth_polygons[pivot_piece_index]
+        solution_coords = np.array(solution_pivot_polygon.exterior.coords)[:-1]
+        ground_truth_truth_coords = np.array(ground_truth_pivot_polygon.exterior.coords)[:-1]
+        weights = np.ones(solution_coords.shape[0])
+        R,t = least_square_rigid_motion_svd(solution_coords,ground_truth_truth_coords,weights)
+
+        angle = np.arccos(R[0,0])
+        self.translated_solution_polygons = [affinity.rotate(polygon,-angle,use_radians=True,origin=center_of_solution) for polygon in solution_polygons]
+        tx = ground_truth_pivot_polygon.centroid.x-self.translated_solution_polygons[pivot_piece_index].centroid.x
+        ty = ground_truth_pivot_polygon.centroid.y-self.translated_solution_polygons[pivot_piece_index].centroid.y
+        self.translated_solution_polygons = [affinity.translate(polygon,tx,ty) for polygon in self.translated_solution_polygons]
+
+        score_sum = 0
+
+        for poly_index in range(len(self.translated_solution_polygons)):                                
+            solution_poly = self.translated_solution_polygons[poly_index]
+            ground_truth_poly = self.ground_truth_polygons[poly_index]
+            intersection_area = solution_poly.intersection(ground_truth_poly).area
+            
+            # Actually we could just divide the intersection area with sum_area, but to avoid dividing small numbers by large numbers, 
+            # I wrote piece_weight explicitly
+            piece_weight = solution_poly.area/(self.total_gd_area+1e-5)
+            score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
+        
+        return score_sum # score_num/len()
+
