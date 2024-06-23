@@ -5660,20 +5660,20 @@ class TestQpos(unittest.TestCase):
 
         
 
-        scale =1/3 
-        solution_polygons = []
-        solution_ids = []
+        # scale =1/3 
+        # solution_polygons = []
+        # solution_ids = []
 
-        for piece_json in response["piecesFinalCoords"]:#[:num_pieces_observed]:
-            solution_polygons.append(Polygon([(p[0]*scale, p[1]*scale) for p in piece_json["coordinates"]]))
-            solution_ids.append(int(piece_json["pieceId"]))
+        # for piece_json in response["piecesFinalCoords"]:#[:num_pieces_observed]:
+        #     solution_polygons.append(Polygon([(p[0]*scale, p[1]*scale) for p in piece_json["coordinates"]]))
+        #     solution_ids.append(int(piece_json["pieceId"]))
 
 
-        solution_polygons_aranged_by_id_ = [solution_polygons[id_] for id_ in solution_ids]
-        solution_polygons = solution_polygons_aranged_by_id_
+        # solution_polygons_aranged_by_id_ = [solution_polygons[id_] for id_ in solution_ids]
+        # solution_polygons = solution_polygons_aranged_by_id_
 
-        evaluator = Qpos(ground_truth_polygons)
-        overlapping_score = evaluator.evaluate(solution_polygons)
+        evaluator = Qpos(ground_truth_polygons,response)
+        overlapping_score = evaluator.evaluate()
 
         print(overlapping_score)
 

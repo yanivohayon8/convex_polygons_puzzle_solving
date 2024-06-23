@@ -1,11 +1,13 @@
 import argparse
 from src.solvers.pictorial.without_missing_pieces import v2 as solverV2
 from src.recipes import factory as recipes_factory
-from src.evaluator import AreaOverlappingEvaluator
+from src.evaluator import AreaOverlappingEvaluator,Qpos
 import glob
 import os
 import re
 import datetime
+import random
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--db", default="1")
@@ -20,6 +22,19 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
 
+    def plot_final_polygons(polygons, ax = None,seed = 10):
+
+        if ax is None:
+            _,ax = plt.subplots()
+        
+        random.seed(seed)
+
+        for poly in polygons:
+            xs,ys = poly.exterior.xy
+            ax.fill(xs,ys, alpha=0.5,fc=(random.random(),random.random(),random.random()),ec="black")
+
+        ax.set_aspect("equal")
+
     def solve_puzzle(puzzle_num):
         solution,puzzle = solverV2.run(args.db,puzzle_num,args.puzzle_noise_level,
                                        pairwise_recipe_name=args.pairwise_recipe_name,is_debug_solver=args.debug)
@@ -27,10 +42,19 @@ if __name__ == "__main__":
         print("\tmatings precision is ",precision)
         recall = puzzle.evaluate_recall(solution.get_matings())
         print("\tmatings recall is ",recall)
+        overlapping_score  = 0 
         ground_truth_polygons = puzzle.get_ground_truth_puzzle()
-        evaluator = AreaOverlappingEvaluator(ground_truth_polygons)
-        overlapping_score = evaluator.evaluate(solution.get_polygons(),excluded_pieces=solution.excluded_pieces)
+        evaluator = Qpos(ground_truth_polygons,solution.simulation_response)
+        overlapping_score = evaluator.evaluate()
         print("\tOverlapping with GT score is ", overlapping_score)
+
+
+        # if True:
+        if args.debug:
+            _, axs = plt.subplots()
+            plot_final_polygons(evaluator.translated_solution_polygons,axs)
+            plot_final_polygons(ground_truth_polygons,axs)
+            plt.show()
 
         return precision, recall,overlapping_score
 

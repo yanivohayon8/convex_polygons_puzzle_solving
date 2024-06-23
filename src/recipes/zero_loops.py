@@ -84,6 +84,10 @@ class ZeroLoopsAroundVertex(Recipe):
             loop.remove_from_graph()
 
         self._create_lonely_loops()
+
+        if is_debug:
+            drawer.draw_filtered_adjacency_with_loops(self.graph_wrapper.filtered_adjacency_graph,title="Adjacency graph after loop creation (BEFORE links removed)")
+
         # self.graph_wrapper.clear_unassigned_inter_links(self.best_loops[0].graph_name,self.best_loops)
         self.graph_wrapper.kill_unlooped_matings_of_looped_nodes(self.best_loops[0].graph_name)
 

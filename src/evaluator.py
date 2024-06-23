@@ -1,6 +1,6 @@
 import numpy as np
 from functools import reduce
-from shapely import affinity,MultiPolygon
+from shapely import affinity,MultiPolygon,Polygon
 from src import shared_variables
 
 def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_weights:np.array):
@@ -151,17 +151,27 @@ def registration_only_one_piece(solution_polygons,ground_truth_polygons,excluded
 
 class Qpos():
 
-    def __init__(self,ground_truth_polygons:list,excluded_pieces:list=[]) -> None:
+    def __init__(self,ground_truth_polygons:list,simulation_response,solution_scale=1/3) -> None:
+        # solution_scale - refer in fix_dataset project...
+        
         self.ground_truth_polygons = ground_truth_polygons
         self.total_gd_area = sum(map(lambda p: p.area,self.ground_truth_polygons))
 
-        if len(excluded_pieces) != 0:
-            bag_of_pieces = shared_variables.puzzle.bag_of_pieces
-            self.ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,self.ground_truth_polygons) if piece.id not in excluded_pieces]
+        self.simulation_response = simulation_response
+
+        self.solution_polygons = []
+        self.solution_ids = []
+
+        for piece_json in self.simulation_response["piecesFinalCoords"]:#[:num_pieces_observed]:
+            self.solution_polygons.append(Polygon([(p[0]*solution_scale, p[1]*solution_scale) for p in piece_json["coordinates"]]))
+            self.solution_ids.append(int(piece_json["pieceId"]))
+        # if len(excluded_pieces) != 0:
+        #     bag_of_pieces = shared_variables.puzzle.bag_of_pieces
+        #     self.ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,self.ground_truth_polygons) if piece.id not in excluded_pieces]
             
         
 
-    def evaluate(self,solution_polygons,pivot_piece_index=0):
+    def evaluate(self,pivot_piece_index=0):
         '''
             solution_polygons - list of polygons
         '''
@@ -171,7 +181,7 @@ class Qpos():
         # This probabliy because of a bug, but setting this variable to 0 works 
         # TODO: debug it later
         
-        solution_pivot_polygon = solution_polygons[pivot_piece_index]
+        solution_pivot_polygon = self.solution_polygons[pivot_piece_index]
         ground_truth_pivot_polygon = self.ground_truth_polygons[pivot_piece_index]
         solution_coords = np.array(solution_pivot_polygon.exterior.coords)[:-1]
         ground_truth_truth_coords = np.array(ground_truth_pivot_polygon.exterior.coords)[:-1]
@@ -179,21 +189,21 @@ class Qpos():
         R,t = least_square_rigid_motion_svd(solution_coords,ground_truth_truth_coords,weights)
 
         angle = np.arccos(R[0,0])
-        self.translated_solution_polygons = [affinity.rotate(polygon,-angle,use_radians=True) for polygon in solution_polygons]
+        self.translated_solution_polygons = [affinity.rotate(polygon,-angle,use_radians=True) for polygon in self.solution_polygons]
         tx = ground_truth_pivot_polygon.centroid.x-self.translated_solution_polygons[pivot_piece_index].centroid.x
         ty = ground_truth_pivot_polygon.centroid.y-self.translated_solution_polygons[pivot_piece_index].centroid.y
         self.translated_solution_polygons = [affinity.translate(polygon,tx,ty) for polygon in self.translated_solution_polygons]
 
         score_sum = 0
 
-        for solution_poly in self.translated_solution_polygons:
-            for ground_truth_poly in self.ground_truth_polygons:
-                intersection_area = solution_poly.intersection(ground_truth_poly).area
+        for solution_poly,poly_id in zip(self.translated_solution_polygons,self.solution_ids):
+            ground_truth_poly = self.ground_truth_polygons[poly_id]
+            intersection_area = solution_poly.intersection(ground_truth_poly).area
                 
-                # Actually we could just divide the intersection area with sum_area, but to avoid dividing small numbers by large numbers, 
-                # I wrote piece_weight explicitly
-                piece_weight = solution_poly.area/(self.total_gd_area+1e-5)
-                score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
+            # Actually we could just divide the intersection area with sum_area, but to avoid dividing small numbers by large numbers, 
+            # I wrote piece_weight explicitly
+            piece_weight = solution_poly.area/(self.total_gd_area+1e-5)
+            score_sum += piece_weight * intersection_area/(solution_poly.area+1e-5) 
         
         return score_sum # score_num/len()
 
