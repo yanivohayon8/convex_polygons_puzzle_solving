@@ -2173,26 +2173,13 @@ class TestToy(unittest.TestCase):
 
         ax = plt.subplot()
 
-        # indxes = [trans_json["pieceId"] for trans_json in self.response_15DBPAST1staged["piecesFinalTransformation"]]
-
-        # sorted_transformations 
-
         img,positions = restore_assembly_img.restore_final_assembly_image(self.response_15DBPAST1staged,bag_of_pieces,
-                                                                          background_size=(8000,8000))
+                                                                                  background_size=(6000,6000))
         ax.imshow(img)
 
-        xs = [pos[0] for pos in positions]
-        ys = [pos[1] for pos in positions]
-        ax.scatter(xs,ys,marker="x",color="red")
-
-        # polygons = [Polygon(piece_json["coordinates"]) for piece in bag_of_pieces for piece_json in self.response_15DBPAST1staged["piecesFinalCoords"] if piece.id == piece_json["pieceId"]]
-        # polygons = [affinity.translate(poly,) for piece in zipbag_of_pieces for piece_json in self.response_15DBPAST1staged["piecesFinalTransformation"] if piece.id == piece_json["pieceId"]]
-        # plot_polygons(polygons,ax=ax)
-
-        
-        # for piece,pos in zip(bag_of_pieces,positions):
-        #     xs,ys = affinity.rotate(piece.polygon.exterior
-        #     ax.plot(xs,ys)
+        # xs = [pos[0] for pos in positions]
+        # ys = [pos[1] for pos in positions]
+        # ax.scatter(xs,ys,marker="x",color="red")
 
         plt.show()
 

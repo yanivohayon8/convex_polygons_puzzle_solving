@@ -120,27 +120,32 @@ def rotate_pieces_img_final_assembly_image(assembly_json,bag_of_pieces):
 
 def restore_final_assembly_image(assembly_json,bag_of_pieces,background_size=(3000,3000),scaled=1/3):
     background_img = Image.new("RGB",background_size,color=0)
-
-    drawer = ImageDraw.Draw(background_img)
-    
-    # positions = position_final_assembly_image(assembly_json,bag_of_pieces,background_size=background_size)
-    # masks = mask_final_assembly_image(assembly_json,bag_of_pieces)
-    # rotated_images = rotate_pieces_img_final_assembly_image(assembly_json,bag_of_pieces)
-
-    # for img,(mask,pos) in zip(rotated_images,zip(masks,positions)):
-    #     background_img.paste(img,box=pos,mask=mask)
-
     screen_center_x = background_size[0]//2
     screen_center_y = background_size[1]//2
-    first_piece_offset_x = 0#None
-    first_piece_offset_y = 0#None
     debug_positions = []
 
-    # for transformation in assembly_json[f"piecesFinalTransformation"]:
-    #     if transformation["rotationRadians"] == 0 and transformation["translateVectorX"] == 0 and transformation["translateVectorY"] == 0:
-    #         first_piece_offset_x = transformation["translateVectorX"]
+    def find_center(piece_polygon):
+        # mass_x,mass_y = center_of_mass(piece_polygon)
+        mass_x,mass_y = (piece_polygon.centroid.x,piece_polygon.centroid.y)
+        mass_x*=scaled
+        mass_y*=scaled
 
-    for trans_indx,transformation in enumerate(assembly_json[f"piecesFinalTransformation"]):
+        return mass_x,mass_y
+
+    # Since we need to find the scaled transformation, but for pin (in the middle) piece scaled*0=0
+    pinned_piece_mass_x = None
+    pinned_piece_mass_y = None
+    pinned_piece_id = None
+
+    for transformation in assembly_json[f"piecesFinalTransformation"]:
+        if transformation["rotationRadians"] == 0 and transformation["translateVectorX"] == 0 and transformation["translateVectorY"] == 0:
+            for piece in bag_of_pieces:
+                if str(piece.id) == transformation["pieceId"]:
+                    pinned_piece_mass_x,pinned_piece_mass_y = find_center(piece.polygon)
+                    pinned_piece_id = transformation["pieceId"]
+
+    # Finding the transformation
+    for transformation in assembly_json[f"piecesFinalTransformation"]:
         for piece in bag_of_pieces:
             if str(piece.id) == transformation["pieceId"]:
 
@@ -158,12 +163,8 @@ def restore_final_assembly_image(assembly_json,bag_of_pieces,background_size=(30
                 rot_degrees = rot_degrees * -1
 
                 piece_polygon = piece.polygon
-                # piece_polygon = affinity.scale(piece_polygon,xfact=scaled,yfact=scaled)
 
-                # mass_x,mass_y = center_of_mass(piece_polygon)
-                mass_x,mass_y = (piece_polygon.centroid.x,piece_polygon.centroid.y)
-                mass_x*=scaled
-                mass_y*=scaled
+                mass_x,mass_y = find_center(piece_polygon)
 
                 rotated_mask = piece_mask.rotate(rot_degrees,center=(mass_x,mass_y))
 
@@ -171,30 +172,24 @@ def restore_final_assembly_image(assembly_json,bag_of_pieces,background_size=(30
                 rotated_img = piece_img.rotate(rot_degrees,center=(mass_x,mass_y))
 
                 '''Position'''
-                # tx,ty = int(transformation["translateVectorX"]),int(transformation["translateVectorY"])
                 tx,ty = transformation["translateVectorX"],transformation["translateVectorY"]
                 tx*=scaled
                 ty*=scaled
 
-                # if first_piece_offset_x is None:
-                #     first_piece_offset_x = tx
-                #     first_piece_offset_y = ty
-                
-                tx = tx - first_piece_offset_x
-                ty = ty - first_piece_offset_y
-
                 # Because the origin is in the top-left corner
                 pos_x = int(screen_center_x + tx - mass_x)
                 pos_y = int(screen_center_y + ty - mass_y)
+
+                # Because the pinned piece position is at 0.0 and scaled*0 =0
+                if pinned_piece_id != transformation["pieceId"]:
+                    pos_x-=int(pinned_piece_mass_x)
+                    pos_y-=int(pinned_piece_mass_y)
+
                 final_pos = (pos_x,pos_y)
                 debug_positions.append(final_pos)
 
                 background_img.paste(rotated_img,box=final_pos,mask=rotated_mask)
 
-                # debug_poly = affinity.scale(piece.polygon,xfact=scaled,yfact=scaled)
-                # debug_poly = affinity.rotate(debug_poly,rot_degrees,origin=(mass_x,mass_y))
-                # debug_poly = affinity.translate(debug_poly,pos_x,pos_y)
-                # drawer.polygon(list(debug_poly.exterior.coords),fill="orange",outline="orange",width=4)
                 
     
     return background_img,debug_positions
