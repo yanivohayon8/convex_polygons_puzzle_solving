@@ -2098,7 +2098,8 @@ class TestToy(unittest.TestCase):
         polygons = [Polygon(piece_json["coordinates"]) for piece_json in self.response_15DBPAST1staged["piecesFinalCoords"]]
 
         ax = plt.subplot()
-        plot_polygons(polygons,ax=ax)
+        seed = 10
+        plot_polygons(polygons,ax=ax,seed=seed)
         ax.invert_yaxis()
 
         plt.show()
@@ -2123,7 +2124,7 @@ class TestToy(unittest.TestCase):
 
 
     def test_center_mask(self):
-        piece_i =12
+        piece_i =11
         coords = self.response_15DBPAST1staged["piecesFinalCoords"][piece_i]["coordinates"]
         poly = Polygon(coords)
         mass_x, mass_y = restore_assembly_img.center_of_mass(poly)
@@ -2148,6 +2149,10 @@ class TestToy(unittest.TestCase):
         ax.scatter([img_mass_x],[img_mass_y],color="red",marker="X")
         ax.scatter([bag_of_pieces[piece_i].img.shape[1]//2],[bag_of_pieces[piece_i].img.shape[0]//2],color="yellow",marker="X")
 
+        centroid_x = bag_of_pieces[piece_i].polygon.centroid.x*1/3
+        centroid_y = bag_of_pieces[piece_i].polygon.centroid.y*1/3
+        ax.scatter([centroid_x],[centroid_y],color="purple",marker="o")
+
         plt.show()
 
         # print
@@ -2162,12 +2167,18 @@ class TestToy(unittest.TestCase):
         # bag_of_pieces = bag_of_pieces[3:5]
         # bag_of_pieces = bag_of_pieces[0:3]
         # bag_of_pieces = bag_of_pieces[10:]
+        # bag_of_pieces = bag_of_pieces[11:]
 
         [piece.load_image() for piece in bag_of_pieces]
 
         ax = plt.subplot()
 
-        img,positions = restore_assembly_img.restore_final_assembly_image(self.response_15DBPAST1staged,bag_of_pieces,background_size=(5000,5000))
+        # indxes = [trans_json["pieceId"] for trans_json in self.response_15DBPAST1staged["piecesFinalTransformation"]]
+
+        # sorted_transformations 
+
+        img,positions = restore_assembly_img.restore_final_assembly_image(self.response_15DBPAST1staged,bag_of_pieces,
+                                                                          background_size=(8000,8000))
         ax.imshow(img)
 
         xs = [pos[0] for pos in positions]
@@ -2177,6 +2188,11 @@ class TestToy(unittest.TestCase):
         # polygons = [Polygon(piece_json["coordinates"]) for piece in bag_of_pieces for piece_json in self.response_15DBPAST1staged["piecesFinalCoords"] if piece.id == piece_json["pieceId"]]
         # polygons = [affinity.translate(poly,) for piece in zipbag_of_pieces for piece_json in self.response_15DBPAST1staged["piecesFinalTransformation"] if piece.id == piece_json["pieceId"]]
         # plot_polygons(polygons,ax=ax)
+
+        
+        # for piece,pos in zip(bag_of_pieces,positions):
+        #     xs,ys = affinity.rotate(piece.polygon.exterior
+        #     ax.plot(xs,ys)
 
         plt.show()
 
