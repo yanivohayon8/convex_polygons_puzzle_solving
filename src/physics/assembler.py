@@ -25,14 +25,14 @@ def init(db,puzzle_num,puzzle_noise_level):
     puzzle_noise_level = puzzle_noise_level
     http_ = HTTPClient(db,puzzle_num,puzzle_noise_level)
 
-def simulate(body,screenshot_name=""):
+def simulate(body,screenshot_name="",is_debug_visibility=False):
     if type(body[0]) == Mating:
         id2piece = shared_variables.puzzle.id2piece
         csv_body = reduce(lambda acc,mat: acc+convert_mating_to_vertex_mating(mat,id2piece[mat.piece_1],id2piece[mat.piece_2]),body,"")
-        return http_.send_reconstruct_request(csv_body,screenshot_name=screenshot_name)
+        return http_.send_reconstruct_request(csv_body,screenshot_name=screenshot_name,is_debug_visibility=is_debug_visibility)
     
     elif type(body) == str:
-        return http_.send_reconstruct_request(body,screenshot_name=screenshot_name)
+        return http_.send_reconstruct_request(body,screenshot_name=screenshot_name,is_debug_visibility=is_debug_visibility)
 
 def score(assemly_response,area_weight=0.5):
     '''

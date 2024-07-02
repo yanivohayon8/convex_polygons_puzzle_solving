@@ -28,15 +28,17 @@ class HTTPClient():
         return response.data.decode('utf-8')
         
 
-    def send_reconstruct_request(self,body,screenshot_name="", api_version="v0"):
+    def send_reconstruct_request(self,body,screenshot_name="", api_version="v0",is_debug_visibility=False):
 
         query_parameters = {
             "noise":self.target_puzzle_noise,
             "num":self.target_puzzle_num,
             "dataset":"ConvexDrawing",
-            "db":self.target_db#,
-            #"debugVisibily":0
+            "db":self.target_db
         }
+
+        if is_debug_visibility:
+            query_parameters["debugVisibily"]=1
 
         if screenshot_name !="":
             query_parameters["screenShotName"] = screenshot_name
