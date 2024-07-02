@@ -2174,7 +2174,7 @@ class TestToy(unittest.TestCase):
         ax = plt.subplot()
 
         img,positions = restore_assembly_img.restore_final_assembly_image(self.response_15DBPAST1staged,bag_of_pieces,
-                                                                                  background_size=(6000,6000))
+                                                                                  background_size=(4800,4800))
         ax.imshow(img)
 
         # xs = [pos[0] for pos in positions]
