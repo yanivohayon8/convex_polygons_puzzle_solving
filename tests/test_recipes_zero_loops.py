@@ -118,6 +118,14 @@ class TestLoopMerge(unittest.TestCase):
         return aggregates,zero_loops
 
     def test_db_1_puzzle_19_noise_0(self):
+
+        # graph_cycles = [
+        #     ['P_2_E_1', 'P_2_E_2', 'P_3_E_0', 'P_3_E_1', 'P_5_E_2', 'P_5_E_3'],
+        #     ['P_3_E_1', 'P_3_E_2', 'P_4_E_0', 'P_4_E_1', 'P_6_E_2', 'P_6_E_0', 'P_5_E_1', 'P_5_E_2'],
+        #     ['P_7_E_1', 'P_7_E_2', 'P_8_E_0', 'P_8_E_1', 'P_9_E_3', 'P_9_E_0'],
+        #     ['P_0_E_2', 'P_0_E_3', 'P_1_E_0', 'P_1_E_1', 'P_2_E_0', 'P_2_E_1', 'P_5_E_3', 'P_5_E_0'],
+        #     ['P_0_E_1', 'P_0_E_2', 'P_5_E_0', 'P_5_E_1', 'P_6_E_0', 'P_6_E_1', 'P_9_E_2', 'P_9_E_3', 'P_8_E_1', 'P_8_E_2']
+        # ]
         db = 1
         puzzle_num = 19
         puzzle_noise_level = 0
