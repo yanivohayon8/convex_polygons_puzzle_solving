@@ -1,5 +1,5 @@
 import argparse
-from src.solvers.pictorial.without_missing_pieces import v2 as solverV2
+from src.solvers import v2 as solverV2
 from src.recipes import factory as recipes_factory
 from src.evaluator import AreaOverlappingEvaluator,Qpos
 from src.physics import restore_assembly_img 
