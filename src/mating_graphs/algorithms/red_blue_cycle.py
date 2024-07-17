@@ -30,7 +30,7 @@ def compute(graph:nxGraph):
     return cycles 
 
 def _compute_from(graph:nxGraph,visited, curr_node,
-                    computed_cycles:list, visited_pieces=[],max_num_visited=20):
+                    computed_cycles:list, visited_pieces=[],max_num_visited=14):
     '''
         TODO: fill this documentation...
         start_node: like P_7_E_1, from where to start the search
