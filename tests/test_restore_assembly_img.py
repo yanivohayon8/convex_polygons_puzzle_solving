@@ -2184,5 +2184,2441 @@ class TestToy(unittest.TestCase):
         plt.show()
 
 
+
+    def test_draw_solution_gloria(self):
+        response = {
+    "AfterEnableCollision": {
+        "springs": [
+            {
+                "firstPieceId": "0",
+                "firstPieceVertex": 2,
+                "secondPieceId": "33",
+                "secondPieceVertex": 4,
+                "snapshotedLength": 392.3402099609375
+            },
+            {
+                "firstPieceId": "0",
+                "firstPieceVertex": 3,
+                "secondPieceId": "33",
+                "secondPieceVertex": 3,
+                "snapshotedLength": 323.60736083984375
+            },
+            {
+                "firstPieceId": "0",
+                "firstPieceVertex": 1,
+                "secondPieceId": "15",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 1248.386474609375
+            },
+            {
+                "firstPieceId": "0",
+                "firstPieceVertex": 2,
+                "secondPieceId": "15",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 1546.234130859375
+            },
+            {
+                "firstPieceId": "0",
+                "firstPieceVertex": 0,
+                "secondPieceId": "1",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 933.78955078125
+            },
+            {
+                "firstPieceId": "0",
+                "firstPieceVertex": 1,
+                "secondPieceId": "1",
+                "secondPieceVertex": 3,
+                "snapshotedLength": 971.8310546875
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 2,
+                "secondPieceId": "14",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 2543.594482421875
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 3,
+                "secondPieceId": "14",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 3311.35693359375
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 2,
+                "secondPieceId": "15",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 1506.6644287109375
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 3,
+                "secondPieceId": "15",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 1315.379150390625
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 1,
+                "secondPieceId": "16",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 908.4593505859375
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 2,
+                "secondPieceId": "16",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 861.9580688476563
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 0,
+                "secondPieceId": "2",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 1099.86572265625
+            },
+            {
+                "firstPieceId": "1",
+                "firstPieceVertex": 1,
+                "secondPieceId": "2",
+                "secondPieceVertex": 3,
+                "snapshotedLength": 1085.8349609375
+            },
+            {
+                "firstPieceId": "2",
+                "firstPieceVertex": 2,
+                "secondPieceId": "16",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 184.96351623535156
+            },
+            {
+                "firstPieceId": "2",
+                "firstPieceVertex": 3,
+                "secondPieceId": "16",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 182.4475555419922
+            },
+            {
+                "firstPieceId": "2",
+                "firstPieceVertex": 1,
+                "secondPieceId": "27",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 227.07749938964844
+            },
+            {
+                "firstPieceId": "2",
+                "firstPieceVertex": 2,
+                "secondPieceId": "27",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 227.19073486328125
+            },
+            {
+                "firstPieceId": "2",
+                "firstPieceVertex": 0,
+                "secondPieceId": "3",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 317.1300048828125
+            },
+            {
+                "firstPieceId": "2",
+                "firstPieceVertex": 1,
+                "secondPieceId": "3",
+                "secondPieceVertex": 3,
+                "snapshotedLength": 275.63751220703125
+            },
+            {
+                "firstPieceId": "3",
+                "firstPieceVertex": 2,
+                "secondPieceId": "29",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 768.3653564453125
+            },
+            {
+                "firstPieceId": "3",
+                "firstPieceVertex": 3,
+                "secondPieceId": "29",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 757.9497680664063
+            },
+            {
+                "firstPieceId": "3",
+                "firstPieceVertex": 0,
+                "secondPieceId": "4",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 154.20864868164063
+            },
+            {
+                "firstPieceId": "3",
+                "firstPieceVertex": 1,
+                "secondPieceId": "4",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 131.81056213378906
+            },
+            {
+                "firstPieceId": "4",
+                "firstPieceVertex": 1,
+                "secondPieceId": "26",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 119.38037872314453
+            },
+            {
+                "firstPieceId": "4",
+                "firstPieceVertex": 2,
+                "secondPieceId": "26",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 118.30621337890625
+            },
+            {
+                "firstPieceId": "4",
+                "firstPieceVertex": 0,
+                "secondPieceId": "5",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 99.68753814697266
+            },
+            {
+                "firstPieceId": "4",
+                "firstPieceVertex": 1,
+                "secondPieceId": "5",
+                "secondPieceVertex": 3,
+                "snapshotedLength": 39.31767654418945
+            },
+            {
+                "firstPieceId": "5",
+                "firstPieceVertex": 2,
+                "secondPieceId": "26",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 134.7532501220703
+            },
+            {
+                "firstPieceId": "5",
+                "firstPieceVertex": 3,
+                "secondPieceId": "26",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 98.06596374511719
+            },
+            {
+                "firstPieceId": "5",
+                "firstPieceVertex": 1,
+                "secondPieceId": "34",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 285.5046081542969
+            },
+            {
+                "firstPieceId": "5",
+                "firstPieceVertex": 2,
+                "secondPieceId": "34",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 164.37582397460938
+            },
+            {
+                "firstPieceId": "5",
+                "firstPieceVertex": 0,
+                "secondPieceId": "6",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 24.760805130004883
+            },
+            {
+                "firstPieceId": "5",
+                "firstPieceVertex": 1,
+                "secondPieceId": "6",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 47.66613006591797
+            },
+            {
+                "firstPieceId": "6",
+                "firstPieceVertex": 1,
+                "secondPieceId": "24",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 36.608070373535156
+            },
+            {
+                "firstPieceId": "6",
+                "firstPieceVertex": 2,
+                "secondPieceId": "24",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 56.408355712890625
+            },
+            {
+                "firstPieceId": "6",
+                "firstPieceVertex": 0,
+                "secondPieceId": "7",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 11.832366943359375
+            },
+            {
+                "firstPieceId": "6",
+                "firstPieceVertex": 1,
+                "secondPieceId": "7",
+                "secondPieceVertex": 3,
+                "snapshotedLength": 9.983080863952637
+            },
+            {
+                "firstPieceId": "7",
+                "firstPieceVertex": 2,
+                "secondPieceId": "25",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 11.84190559387207
+            },
+            {
+                "firstPieceId": "7",
+                "firstPieceVertex": 3,
+                "secondPieceId": "25",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 19.154605865478516
+            },
+            {
+                "firstPieceId": "7",
+                "firstPieceVertex": 1,
+                "secondPieceId": "22",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 8.828548431396484
+            },
+            {
+                "firstPieceId": "7",
+                "firstPieceVertex": 2,
+                "secondPieceId": "22",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 11.465388298034668
+            },
+            {
+                "firstPieceId": "7",
+                "firstPieceVertex": 0,
+                "secondPieceId": "8",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 10.139047622680664
+            },
+            {
+                "firstPieceId": "7",
+                "firstPieceVertex": 1,
+                "secondPieceId": "8",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 8.939743995666504
+            },
+            {
+                "firstPieceId": "8",
+                "firstPieceVertex": 1,
+                "secondPieceId": "22",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 9.85622787475586
+            },
+            {
+                "firstPieceId": "8",
+                "firstPieceVertex": 2,
+                "secondPieceId": "22",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 11.035956382751465
+            },
+            {
+                "firstPieceId": "9",
+                "firstPieceVertex": 1,
+                "secondPieceId": "19",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 8.813992500305176
+            },
+            {
+                "firstPieceId": "9",
+                "firstPieceVertex": 2,
+                "secondPieceId": "19",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 9.959501266479492
+            },
+            {
+                "firstPieceId": "9",
+                "firstPieceVertex": 0,
+                "secondPieceId": "10",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 9.881643295288086
+            },
+            {
+                "firstPieceId": "9",
+                "firstPieceVertex": 1,
+                "secondPieceId": "10",
+                "secondPieceVertex": 4,
+                "snapshotedLength": 11.091161727905273
+            },
+            {
+                "firstPieceId": "10",
+                "firstPieceVertex": 3,
+                "secondPieceId": "20",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 9.8673734664917
+            },
+            {
+                "firstPieceId": "10",
+                "firstPieceVertex": 4,
+                "secondPieceId": "20",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 10.671050071716309
+            },
+            {
+                "firstPieceId": "10",
+                "firstPieceVertex": 2,
+                "secondPieceId": "32",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 54.583099365234375
+            },
+            {
+                "firstPieceId": "10",
+                "firstPieceVertex": 3,
+                "secondPieceId": "32",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 60.32255554199219
+            },
+            {
+                "firstPieceId": "10",
+                "firstPieceVertex": 1,
+                "secondPieceId": "11",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 24.479970932006836
+            },
+            {
+                "firstPieceId": "10",
+                "firstPieceVertex": 2,
+                "secondPieceId": "11",
+                "secondPieceVertex": 3,
+                "snapshotedLength": 28.392162322998047
+            },
+            {
+                "firstPieceId": "11",
+                "firstPieceVertex": 2,
+                "secondPieceId": "32",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 90.11803436279297
+            },
+            {
+                "firstPieceId": "11",
+                "firstPieceVertex": 3,
+                "secondPieceId": "32",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 82.95804595947266
+            },
+            {
+                "firstPieceId": "11",
+                "firstPieceVertex": 1,
+                "secondPieceId": "30",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 168.96817016601563
+            },
+            {
+                "firstPieceId": "11",
+                "firstPieceVertex": 2,
+                "secondPieceId": "30",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 189.1004638671875
+            },
+            {
+                "firstPieceId": "11",
+                "firstPieceVertex": 0,
+                "secondPieceId": "12",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 308.4625244140625
+            },
+            {
+                "firstPieceId": "11",
+                "firstPieceVertex": 1,
+                "secondPieceId": "12",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 283.11712646484375
+            },
+            {
+                "firstPieceId": "12",
+                "firstPieceVertex": 1,
+                "secondPieceId": "23",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 130.84381103515625
+            },
+            {
+                "firstPieceId": "12",
+                "firstPieceVertex": 2,
+                "secondPieceId": "23",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 160.8664093017578
+            },
+            {
+                "firstPieceId": "12",
+                "firstPieceVertex": 0,
+                "secondPieceId": "13",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 323.81072998046875
+            },
+            {
+                "firstPieceId": "12",
+                "firstPieceVertex": 1,
+                "secondPieceId": "13",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 356.6547546386719
+            },
+            {
+                "firstPieceId": "13",
+                "firstPieceVertex": 1,
+                "secondPieceId": "18",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 242.33689880371094
+            },
+            {
+                "firstPieceId": "13",
+                "firstPieceVertex": 2,
+                "secondPieceId": "18",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 111.89544677734375
+            },
+            {
+                "firstPieceId": "13",
+                "firstPieceVertex": 0,
+                "secondPieceId": "14",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 185.11233520507813
+            },
+            {
+                "firstPieceId": "13",
+                "firstPieceVertex": 1,
+                "secondPieceId": "14",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 264.6000061035156
+            },
+            {
+                "firstPieceId": "14",
+                "firstPieceVertex": 0,
+                "secondPieceId": "15",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 1607.66015625
+            },
+            {
+                "firstPieceId": "14",
+                "firstPieceVertex": 1,
+                "secondPieceId": "15",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 639.116455078125
+            },
+            {
+                "firstPieceId": "16",
+                "firstPieceVertex": 1,
+                "secondPieceId": "23",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 90.8294906616211
+            },
+            {
+                "firstPieceId": "16",
+                "firstPieceVertex": 2,
+                "secondPieceId": "23",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 178.6611785888672
+            },
+            {
+                "firstPieceId": "17",
+                "firstPieceVertex": 2,
+                "secondPieceId": "18",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 126.14356994628906
+            },
+            {
+                "firstPieceId": "17",
+                "firstPieceVertex": 3,
+                "secondPieceId": "18",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 103.7656478881836
+            },
+            {
+                "firstPieceId": "17",
+                "firstPieceVertex": 1,
+                "secondPieceId": "23",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 152.05963134765625
+            },
+            {
+                "firstPieceId": "17",
+                "firstPieceVertex": 2,
+                "secondPieceId": "23",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 74.15473175048828
+            },
+            {
+                "firstPieceId": "19",
+                "firstPieceVertex": 0,
+                "secondPieceId": "20",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 9.746318817138672
+            },
+            {
+                "firstPieceId": "19",
+                "firstPieceVertex": 1,
+                "secondPieceId": "20",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 10.002448081970215
+            },
+            {
+                "firstPieceId": "20",
+                "firstPieceVertex": 1,
+                "secondPieceId": "21",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 9.753242492675781
+            },
+            {
+                "firstPieceId": "20",
+                "firstPieceVertex": 2,
+                "secondPieceId": "21",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 10.547063827514648
+            },
+            {
+                "firstPieceId": "22",
+                "firstPieceVertex": 1,
+                "secondPieceId": "31",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 9.360956192016602
+            },
+            {
+                "firstPieceId": "22",
+                "firstPieceVertex": 2,
+                "secondPieceId": "31",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 10.101561546325684
+            },
+            {
+                "firstPieceId": "24",
+                "firstPieceVertex": 1,
+                "secondPieceId": "36",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 315.1536560058594
+            },
+            {
+                "firstPieceId": "24",
+                "firstPieceVertex": 2,
+                "secondPieceId": "36",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 294.9503173828125
+            },
+            {
+                "firstPieceId": "24",
+                "firstPieceVertex": 0,
+                "secondPieceId": "25",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 15.242585182189941
+            },
+            {
+                "firstPieceId": "24",
+                "firstPieceVertex": 1,
+                "secondPieceId": "25",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 14.348396301269531
+            },
+            {
+                "firstPieceId": "25",
+                "firstPieceVertex": 1,
+                "secondPieceId": "31",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 10.813782691955566
+            },
+            {
+                "firstPieceId": "25",
+                "firstPieceVertex": 2,
+                "secondPieceId": "31",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 9.62606430053711
+            },
+            {
+                "firstPieceId": "26",
+                "firstPieceVertex": 1,
+                "secondPieceId": "33",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 200.987060546875
+            },
+            {
+                "firstPieceId": "26",
+                "firstPieceVertex": 2,
+                "secondPieceId": "33",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 380.0284423828125
+            },
+            {
+                "firstPieceId": "27",
+                "firstPieceVertex": 1,
+                "secondPieceId": "30",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 66.20027160644531
+            },
+            {
+                "firstPieceId": "27",
+                "firstPieceVertex": 2,
+                "secondPieceId": "30",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 149.26513671875
+            },
+            {
+                "firstPieceId": "27",
+                "firstPieceVertex": 0,
+                "secondPieceId": "28",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 284.280029296875
+            },
+            {
+                "firstPieceId": "27",
+                "firstPieceVertex": 1,
+                "secondPieceId": "28",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 248.8850860595703
+            },
+            {
+                "firstPieceId": "28",
+                "firstPieceVertex": 1,
+                "secondPieceId": "30",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 368.23431396484375
+            },
+            {
+                "firstPieceId": "28",
+                "firstPieceVertex": 2,
+                "secondPieceId": "30",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 313.7090759277344
+            },
+            {
+                "firstPieceId": "28",
+                "firstPieceVertex": 0,
+                "secondPieceId": "29",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 438.757080078125
+            },
+            {
+                "firstPieceId": "28",
+                "firstPieceVertex": 1,
+                "secondPieceId": "29",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 552.695556640625
+            },
+            {
+                "firstPieceId": "29",
+                "firstPieceVertex": 1,
+                "secondPieceId": "33",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 575.6041259765625
+            },
+            {
+                "firstPieceId": "29",
+                "firstPieceVertex": 2,
+                "secondPieceId": "33",
+                "secondPieceVertex": 4,
+                "snapshotedLength": 1022.815185546875
+            },
+            {
+                "firstPieceId": "32",
+                "firstPieceVertex": 1,
+                "secondPieceId": "35",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 1394.390625
+            },
+            {
+                "firstPieceId": "32",
+                "firstPieceVertex": 2,
+                "secondPieceId": "35",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 356.57965087890625
+            },
+            {
+                "firstPieceId": "33",
+                "firstPieceVertex": 3,
+                "secondPieceId": "35",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 770.7720336914063
+            },
+            {
+                "firstPieceId": "33",
+                "firstPieceVertex": 4,
+                "secondPieceId": "35",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 716.6930541992188
+            },
+            {
+                "firstPieceId": "33",
+                "firstPieceVertex": 2,
+                "secondPieceId": "34",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 140.74545288085938
+            },
+            {
+                "firstPieceId": "33",
+                "firstPieceVertex": 3,
+                "secondPieceId": "34",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 84.19673156738281
+            },
+            {
+                "firstPieceId": "34",
+                "firstPieceVertex": 1,
+                "secondPieceId": "37",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 115.81373596191406
+            },
+            {
+                "firstPieceId": "34",
+                "firstPieceVertex": 2,
+                "secondPieceId": "37",
+                "secondPieceVertex": 2,
+                "snapshotedLength": 84.71394348144531
+            },
+            {
+                "firstPieceId": "36",
+                "firstPieceVertex": 1,
+                "secondPieceId": "37",
+                "secondPieceVertex": 1,
+                "snapshotedLength": 177.84051513671875
+            },
+            {
+                "firstPieceId": "36",
+                "firstPieceVertex": 2,
+                "secondPieceId": "37",
+                "secondPieceVertex": 0,
+                "snapshotedLength": 217.3974151611328
+            }
+        ],
+        "sumSpringsLength": 38033.0
+    },
+    "piecesBeforeEnableCollision": [
+        {
+            "coordinates": [
+                [
+                    -4633.18603515625,
+                    1605.697509765625
+                ],
+                [
+                    -3875.245849609375,
+                    1758.2606201171875
+                ],
+                [
+                    779.3178100585938,
+                    201.1527862548828
+                ],
+                [
+                    1024.8603515625,
+                    86.16255950927734
+                ]
+            ],
+            "pieceId": "0"
+        },
+        {
+            "coordinates": [
+                [
+                    -5564.46044921875,
+                    1537.20654296875
+                ],
+                [
+                    -5104.09912109375,
+                    1522.5943603515625
+                ],
+                [
+                    -1383.3350830078125,
+                    1231.6092529296875
+                ],
+                [
+                    -4795.978515625,
+                    1447.2769775390625
+                ]
+            ],
+            "pieceId": "1"
+        },
+        {
+            "coordinates": [
+                [
+                    -2978.89697265625,
+                    -1001.2835693359375
+                ],
+                [
+                    -3076.8125,
+                    -765.369384765625
+                ],
+                [
+                    1212.6292724609375,
+                    7.734298229217529
+                ],
+                [
+                    3130.168701171875,
+                    -237.23410034179688
+                ],
+                [
+                    -2139.392822265625,
+                    -1376.3541259765625
+                ]
+            ],
+            "pieceId": "10"
+        },
+        {
+            "coordinates": [
+                [
+                    -3052.40234375,
+                    -763.5230712890625
+                ],
+                [
+                    159.24453735351563,
+                    1255.397705078125
+                ],
+                [
+                    3257.270751953125,
+                    668.1995239257813
+                ],
+                [
+                    1239.19287109375,
+                    17.75360107421875
+                ]
+            ],
+            "pieceId": "11"
+        },
+        {
+            "coordinates": [
+                [
+                    -2744.21484375,
+                    -750.4996948242188
+                ],
+                [
+                    -619.8863525390625,
+                    1037.77685546875
+                ],
+                [
+                    439.889892578125,
+                    1292.74365234375
+                ]
+            ],
+            "pieceId": "12"
+        },
+        {
+            "coordinates": [
+                [
+                    -2421.310302734375,
+                    -726.2916259765625
+                ],
+                [
+                    -1632.919189453125,
+                    1153.9287109375
+                ],
+                [
+                    -263.8130187988281,
+                    1017.3854370117188
+                ]
+            ],
+            "pieceId": "13"
+        },
+        {
+            "coordinates": [
+                [
+                    -2246.39306640625,
+                    -665.7066040039063
+                ],
+                [
+                    -3612.005126953125,
+                    2457.53857421875
+                ],
+                [
+                    -1369.216796875,
+                    1175.6820068359375
+                ]
+            ],
+            "pieceId": "14"
+        },
+        {
+            "coordinates": [
+                [
+                    -731.7256469726563,
+                    -126.86156463623047
+                ],
+                [
+                    -4852.15185546875,
+                    2535.510986328125
+                ],
+                [
+                    -3535.407958984375,
+                    1823.0284423828125
+                ]
+            ],
+            "pieceId": "15"
+        },
+        {
+            "coordinates": [
+                [
+                    -5927.62939453125,
+                    1906.1259765625
+                ],
+                [
+                    415.8840026855469,
+                    1531.623779296875
+                ],
+                [
+                    -2239.953857421875,
+                    1327.3829345703125
+                ]
+            ],
+            "pieceId": "16"
+        },
+        {
+            "coordinates": [
+                [
+                    -5383.19580078125,
+                    2592.17431640625
+                ],
+                [
+                    -2095.5810546875,
+                    1616.9241943359375
+                ],
+                [
+                    -442.53155517578125,
+                    989.4160766601563
+                ],
+                [
+                    -4327.2568359375,
+                    1525.81591796875
+                ]
+            ],
+            "pieceId": "17"
+        },
+        {
+            "coordinates": [
+                [
+                    -4242.40869140625,
+                    1585.54638671875
+                ],
+                [
+                    -355.8349304199219,
+                    1081.0469970703125
+                ],
+                [
+                    -1728.4354248046875,
+                    931.2095336914063
+                ]
+            ],
+            "pieceId": "18"
+        },
+        {
+            "coordinates": [
+                [
+                    -2137.18408203125,
+                    -1384.7559814453125
+                ],
+                [
+                    -97.4464340209961,
+                    -1913.7496337890625
+                ],
+                [
+                    -895.6450805664063,
+                    -2482.9462890625
+                ]
+            ],
+            "pieceId": "19"
+        },
+        {
+            "coordinates": [
+                [
+                    -6570.6748046875,
+                    1981.3193359375
+                ],
+                [
+                    -1335.353759765625,
+                    1969.1046142578125
+                ],
+                [
+                    231.607421875,
+                    1515.6973876953125
+                ],
+                [
+                    -6107.22509765625,
+                    1938.257080078125
+                ]
+            ],
+            "pieceId": "2"
+        },
+        {
+            "coordinates": [
+                [
+                    -2129.12939453125,
+                    -1379.2667236328125
+                ],
+                [
+                    3130.5732421875,
+                    -227.37501525878906
+                ],
+                [
+                    -87.98407745361328,
+                    -1910.5128173828125
+                ]
+            ],
+            "pieceId": "20"
+        },
+        {
+            "coordinates": [
+                [
+                    -882.0704956054688,
+                    -2464.1435546875
+                ],
+                [
+                    -87.50342559814453,
+                    -1899.9747314453125
+                ],
+                [
+                    3138.98828125,
+                    -222.44451904296875
+                ]
+            ],
+            "pieceId": "21"
+        },
+        {
+            "coordinates": [
+                [
+                    -4889.99365234375,
+                    2947.944580078125
+                ],
+                [
+                    -2011.3505859375,
+                    4335.54443359375
+                ],
+                [
+                    -2494.4248046875,
+                    3477.84033203125
+                ]
+            ],
+            "pieceId": "22"
+        },
+        {
+            "coordinates": [
+                [
+                    -2192.264404296875,
+                    1499.561279296875
+                ],
+                [
+                    460.1745300292969,
+                    1452.3238525390625
+                ],
+                [
+                    -512.06396484375,
+                    963.6497192382813
+                ]
+            ],
+            "pieceId": "23"
+        },
+        {
+            "coordinates": [
+                [
+                    -3760.173583984375,
+                    3008.701171875
+                ],
+                [
+                    -118.0610580444336,
+                    3946.536865234375
+                ],
+                [
+                    770.6260375976563,
+                    3202.903564453125
+                ]
+            ],
+            "pieceId": "24"
+        },
+        {
+            "coordinates": [
+                [
+                    -3759.107421875,
+                    2993.491943359375
+                ],
+                [
+                    -2486.3662109375,
+                    3483.112060546875
+                ],
+                [
+                    -132.33566284179688,
+                    3945.08349609375
+                ]
+            ],
+            "pieceId": "25"
+        },
+        {
+            "coordinates": [
+                [
+                    -3111.755126953125,
+                    2534.042236328125
+                ],
+                [
+                    226.81234741210938,
+                    2981.040771484375
+                ],
+                [
+                    512.4568481445313,
+                    2337.21533203125
+                ]
+            ],
+            "pieceId": "26"
+        },
+        {
+            "coordinates": [
+                [
+                    -1448.106689453125,
+                    2166.2099609375
+                ],
+                [
+                    -641.8113403320313,
+                    1823.076171875
+                ],
+                [
+                    13.359068870544434,
+                    1452.5755615234375
+                ]
+            ],
+            "pieceId": "27"
+        },
+        {
+            "coordinates": [
+                [
+                    -1589.118896484375,
+                    2413.051513671875
+                ],
+                [
+                    2711.959716796875,
+                    554.7752075195313
+                ],
+                [
+                    -881.8473510742188,
+                    1888.8453369140625
+                ]
+            ],
+            "pieceId": "28"
+        },
+        {
+            "coordinates": [
+                [
+                    -1986.4425048828125,
+                    2599.17431640625
+                ],
+                [
+                    394.1192321777344,
+                    1517.6695556640625
+                ],
+                [
+                    2170.982177734375,
+                    441.5321044921875
+                ]
+            ],
+            "pieceId": "29"
+        },
+        {
+            "coordinates": [
+                [
+                    -6847.50927734375,
+                    2136.0244140625
+                ],
+                [
+                    759.0369873046875,
+                    2375.266845703125
+                ],
+                [
+                    1002.2086791992188,
+                    1987.3656005859375
+                ],
+                [
+                    -1609.607666015625,
+                    1941.5396728515625
+                ]
+            ],
+            "pieceId": "3"
+        },
+        {
+            "coordinates": [
+                [
+                    -583.6219482421875,
+                    1791.5037841796875
+                ],
+                [
+                    3070.457275390625,
+                    638.8778686523438
+                ],
+                [
+                    -2.5348660945892334,
+                    1304.1590576171875
+                ]
+            ],
+            "pieceId": "30"
+        },
+        {
+            "coordinates": [
+                [
+                    -2496.10888671875,
+                    3487.80419921875
+                ],
+                [
+                    -2009.7769775390625,
+                    4344.77197265625
+                ],
+                [
+                    -139.27078247070313,
+                    3938.40771484375
+                ]
+            ],
+            "pieceId": "31"
+        },
+        {
+            "coordinates": [
+                [
+                    1160.7779541015625,
+                    -9.317398071289063
+                ],
+                [
+                    3167.4306640625,
+                    661.1251220703125
+                ],
+                [
+                    3070.3046875,
+                    -244.65940856933594
+                ]
+            ],
+            "pieceId": "32"
+        },
+        {
+            "coordinates": [
+                [
+                    0.0,
+                    1937.181396484375
+                ],
+                [
+                    136.11221313476563,
+                    2390.0107421875
+                ],
+                [
+                    422.3270263671875,
+                    3027.6220703125
+                ],
+                [
+                    1336.7862548828125,
+                    0.0
+                ],
+                [
+                    1170.7496337890625,
+                    227.8079833984375
+                ]
+            ],
+            "pieceId": "33"
+        },
+        {
+            "coordinates": [
+                [
+                    282.1597900390625,
+                    3040.366943359375
+                ],
+                [
+                    881.6318359375,
+                    3053.951171875
+                ],
+                [
+                    1384.2333984375,
+                    69.55337524414063
+                ]
+            ],
+            "pieceId": "34"
+        },
+        {
+            "coordinates": [
+                [
+                    2784.92333984375,
+                    -30.866621017456055
+                ],
+                [
+                    1880.0810546875,
+                    125.34903717041016
+                ],
+                [
+                    2002.3306884765625,
+                    388.7672119140625
+                ]
+            ],
+            "pieceId": "35"
+        },
+        {
+            "coordinates": [
+                [
+                    160.63497924804688,
+                    4093.67724609375
+                ],
+                [
+                    1886.53369140625,
+                    644.38818359375
+                ],
+                [
+                    554.229736328125,
+                    3002.487060546875
+                ]
+            ],
+            "pieceId": "36"
+        },
+        {
+            "coordinates": [
+                [
+                    765.8290405273438,
+                    3052.352783203125
+                ],
+                [
+                    1754.2838134765625,
+                    525.4859619140625
+                ],
+                [
+                    1459.339111328125,
+                    108.74365997314453
+                ]
+            ],
+            "pieceId": "37"
+        },
+        {
+            "coordinates": [
+                [
+                    -6970.697265625,
+                    2228.790283203125
+                ],
+                [
+                    -2998.126953125,
+                    2497.4365234375
+                ],
+                [
+                    627.7179565429688,
+                    2363.872314453125
+                ]
+            ],
+            "pieceId": "4"
+        },
+        {
+            "coordinates": [
+                [
+                    -7008.30029296875,
+                    2321.113525390625
+                ],
+                [
+                    739.509521484375,
+                    3301.56689453125
+                ],
+                [
+                    315.2313232421875,
+                    2879.3525390625
+                ],
+                [
+                    -3031.841064453125,
+                    2477.203369140625
+                ]
+            ],
+            "pieceId": "5"
+        },
+        {
+            "coordinates": [
+                [
+                    -6999.83935546875,
+                    2344.383056640625
+                ],
+                [
+                    -3775.220703125,
+                    2975.326416015625
+                ],
+                [
+                    759.13232421875,
+                    3258.125244140625
+                ]
+            ],
+            "pieceId": "6"
+        },
+        {
+            "coordinates": [
+                [
+                    -6988.44482421875,
+                    2347.575927734375
+                ],
+                [
+                    -4890.46826171875,
+                    2939.128662109375
+                ],
+                [
+                    -2496.580078125,
+                    3489.101318359375
+                ],
+                [
+                    -3765.239501953125,
+                    2975.341552734375
+                ]
+            ],
+            "pieceId": "7"
+        },
+        {
+            "coordinates": [
+                [
+                    -6982.86767578125,
+                    2339.103515625
+                ],
+                [
+                    -2007.348876953125,
+                    4344.546875
+                ],
+                [
+                    -4881.66796875,
+                    2940.700439453125
+                ]
+            ],
+            "pieceId": "8"
+        },
+        {
+            "coordinates": [
+                [
+                    -2971.807373046875,
+                    -1008.1691284179688
+                ],
+                [
+                    -2145.982666015625,
+                    -1385.2786865234375
+                ],
+                [
+                    -900.3295288085938,
+                    -2491.7353515625
+                ]
+            ],
+            "pieceId": "9"
+        }
+    ],
+    "piecesFinalCoords": [
+        {
+            "coordinates": [
+                [
+                    -4633.18603515625,
+                    1605.697509765625
+                ],
+                [
+                    -3875.245849609375,
+                    1758.2606201171875
+                ],
+                [
+                    779.3178100585938,
+                    201.1527862548828
+                ],
+                [
+                    1024.8603515625,
+                    86.16255950927734
+                ]
+            ],
+            "pieceId": "0"
+        },
+        {
+            "coordinates": [
+                [
+                    -5564.46044921875,
+                    1537.20654296875
+                ],
+                [
+                    -5104.09912109375,
+                    1522.5943603515625
+                ],
+                [
+                    -1383.3350830078125,
+                    1231.6092529296875
+                ],
+                [
+                    -4795.978515625,
+                    1447.2769775390625
+                ]
+            ],
+            "pieceId": "1"
+        },
+        {
+            "coordinates": [
+                [
+                    -2978.89697265625,
+                    -1001.2835693359375
+                ],
+                [
+                    -3076.8125,
+                    -765.369384765625
+                ],
+                [
+                    1212.6292724609375,
+                    7.734298229217529
+                ],
+                [
+                    3130.168701171875,
+                    -237.23410034179688
+                ],
+                [
+                    -2139.392822265625,
+                    -1376.3541259765625
+                ]
+            ],
+            "pieceId": "10"
+        },
+        {
+            "coordinates": [
+                [
+                    -3052.40234375,
+                    -763.5230712890625
+                ],
+                [
+                    159.24453735351563,
+                    1255.397705078125
+                ],
+                [
+                    3257.270751953125,
+                    668.1995239257813
+                ],
+                [
+                    1239.19287109375,
+                    17.75360107421875
+                ]
+            ],
+            "pieceId": "11"
+        },
+        {
+            "coordinates": [
+                [
+                    -2744.21484375,
+                    -750.4996948242188
+                ],
+                [
+                    -619.8863525390625,
+                    1037.77685546875
+                ],
+                [
+                    439.889892578125,
+                    1292.74365234375
+                ]
+            ],
+            "pieceId": "12"
+        },
+        {
+            "coordinates": [
+                [
+                    -2421.310302734375,
+                    -726.2916259765625
+                ],
+                [
+                    -1632.919189453125,
+                    1153.9287109375
+                ],
+                [
+                    -263.8130187988281,
+                    1017.3854370117188
+                ]
+            ],
+            "pieceId": "13"
+        },
+        {
+            "coordinates": [
+                [
+                    -2246.39306640625,
+                    -665.7066040039063
+                ],
+                [
+                    -3612.005126953125,
+                    2457.53857421875
+                ],
+                [
+                    -1369.216796875,
+                    1175.6820068359375
+                ]
+            ],
+            "pieceId": "14"
+        },
+        {
+            "coordinates": [
+                [
+                    -731.7256469726563,
+                    -126.86156463623047
+                ],
+                [
+                    -4852.15185546875,
+                    2535.510986328125
+                ],
+                [
+                    -3535.407958984375,
+                    1823.0284423828125
+                ]
+            ],
+            "pieceId": "15"
+        },
+        {
+            "coordinates": [
+                [
+                    -5927.62939453125,
+                    1906.1259765625
+                ],
+                [
+                    415.8840026855469,
+                    1531.623779296875
+                ],
+                [
+                    -2239.953857421875,
+                    1327.3829345703125
+                ]
+            ],
+            "pieceId": "16"
+        },
+        {
+            "coordinates": [
+                [
+                    -5383.19580078125,
+                    2592.17431640625
+                ],
+                [
+                    -2095.5810546875,
+                    1616.9241943359375
+                ],
+                [
+                    -442.53155517578125,
+                    989.4160766601563
+                ],
+                [
+                    -4327.2568359375,
+                    1525.81591796875
+                ]
+            ],
+            "pieceId": "17"
+        },
+        {
+            "coordinates": [
+                [
+                    -4242.40869140625,
+                    1585.54638671875
+                ],
+                [
+                    -355.8349304199219,
+                    1081.0469970703125
+                ],
+                [
+                    -1728.4354248046875,
+                    931.2095336914063
+                ]
+            ],
+            "pieceId": "18"
+        },
+        {
+            "coordinates": [
+                [
+                    -2137.18408203125,
+                    -1384.7559814453125
+                ],
+                [
+                    -97.4464340209961,
+                    -1913.7496337890625
+                ],
+                [
+                    -895.6450805664063,
+                    -2482.9462890625
+                ]
+            ],
+            "pieceId": "19"
+        },
+        {
+            "coordinates": [
+                [
+                    -6570.6748046875,
+                    1981.3193359375
+                ],
+                [
+                    -1335.353759765625,
+                    1969.1046142578125
+                ],
+                [
+                    231.607421875,
+                    1515.6973876953125
+                ],
+                [
+                    -6107.22509765625,
+                    1938.257080078125
+                ]
+            ],
+            "pieceId": "2"
+        },
+        {
+            "coordinates": [
+                [
+                    -2129.12939453125,
+                    -1379.2667236328125
+                ],
+                [
+                    3130.5732421875,
+                    -227.37501525878906
+                ],
+                [
+                    -87.98407745361328,
+                    -1910.5128173828125
+                ]
+            ],
+            "pieceId": "20"
+        },
+        {
+            "coordinates": [
+                [
+                    -882.0704956054688,
+                    -2464.1435546875
+                ],
+                [
+                    -87.50342559814453,
+                    -1899.9747314453125
+                ],
+                [
+                    3138.98828125,
+                    -222.44451904296875
+                ]
+            ],
+            "pieceId": "21"
+        },
+        {
+            "coordinates": [
+                [
+                    -4889.99365234375,
+                    2947.944580078125
+                ],
+                [
+                    -2011.3505859375,
+                    4335.54443359375
+                ],
+                [
+                    -2494.4248046875,
+                    3477.84033203125
+                ]
+            ],
+            "pieceId": "22"
+        },
+        {
+            "coordinates": [
+                [
+                    -2192.264404296875,
+                    1499.561279296875
+                ],
+                [
+                    460.1745300292969,
+                    1452.3238525390625
+                ],
+                [
+                    -512.06396484375,
+                    963.6497192382813
+                ]
+            ],
+            "pieceId": "23"
+        },
+        {
+            "coordinates": [
+                [
+                    -3760.173583984375,
+                    3008.701171875
+                ],
+                [
+                    -118.0610580444336,
+                    3946.536865234375
+                ],
+                [
+                    770.6260375976563,
+                    3202.903564453125
+                ]
+            ],
+            "pieceId": "24"
+        },
+        {
+            "coordinates": [
+                [
+                    -3759.107421875,
+                    2993.491943359375
+                ],
+                [
+                    -2486.3662109375,
+                    3483.112060546875
+                ],
+                [
+                    -132.33566284179688,
+                    3945.08349609375
+                ]
+            ],
+            "pieceId": "25"
+        },
+        {
+            "coordinates": [
+                [
+                    -3111.755126953125,
+                    2534.042236328125
+                ],
+                [
+                    226.81234741210938,
+                    2981.040771484375
+                ],
+                [
+                    512.4568481445313,
+                    2337.21533203125
+                ]
+            ],
+            "pieceId": "26"
+        },
+        {
+            "coordinates": [
+                [
+                    -1448.106689453125,
+                    2166.2099609375
+                ],
+                [
+                    -641.8113403320313,
+                    1823.076171875
+                ],
+                [
+                    13.359068870544434,
+                    1452.5755615234375
+                ]
+            ],
+            "pieceId": "27"
+        },
+        {
+            "coordinates": [
+                [
+                    -1589.118896484375,
+                    2413.051513671875
+                ],
+                [
+                    2711.959716796875,
+                    554.7752075195313
+                ],
+                [
+                    -881.8473510742188,
+                    1888.8453369140625
+                ]
+            ],
+            "pieceId": "28"
+        },
+        {
+            "coordinates": [
+                [
+                    -1986.4425048828125,
+                    2599.17431640625
+                ],
+                [
+                    394.1192321777344,
+                    1517.6695556640625
+                ],
+                [
+                    2170.982177734375,
+                    441.5321044921875
+                ]
+            ],
+            "pieceId": "29"
+        },
+        {
+            "coordinates": [
+                [
+                    -6847.50927734375,
+                    2136.0244140625
+                ],
+                [
+                    759.0369873046875,
+                    2375.266845703125
+                ],
+                [
+                    1002.2086791992188,
+                    1987.3656005859375
+                ],
+                [
+                    -1609.607666015625,
+                    1941.5396728515625
+                ]
+            ],
+            "pieceId": "3"
+        },
+        {
+            "coordinates": [
+                [
+                    -583.6219482421875,
+                    1791.5037841796875
+                ],
+                [
+                    3070.457275390625,
+                    638.8778686523438
+                ],
+                [
+                    -2.5348660945892334,
+                    1304.1590576171875
+                ]
+            ],
+            "pieceId": "30"
+        },
+        {
+            "coordinates": [
+                [
+                    -2496.10888671875,
+                    3487.80419921875
+                ],
+                [
+                    -2009.7769775390625,
+                    4344.77197265625
+                ],
+                [
+                    -139.27078247070313,
+                    3938.40771484375
+                ]
+            ],
+            "pieceId": "31"
+        },
+        {
+            "coordinates": [
+                [
+                    1160.7779541015625,
+                    -9.317398071289063
+                ],
+                [
+                    3167.4306640625,
+                    661.1251220703125
+                ],
+                [
+                    3070.3046875,
+                    -244.65940856933594
+                ]
+            ],
+            "pieceId": "32"
+        },
+        {
+            "coordinates": [
+                [
+                    0.0,
+                    1937.181396484375
+                ],
+                [
+                    136.11221313476563,
+                    2390.0107421875
+                ],
+                [
+                    422.3270263671875,
+                    3027.6220703125
+                ],
+                [
+                    1336.7862548828125,
+                    0.0
+                ],
+                [
+                    1170.7496337890625,
+                    227.8079833984375
+                ]
+            ],
+            "pieceId": "33"
+        },
+        {
+            "coordinates": [
+                [
+                    282.1597900390625,
+                    3040.366943359375
+                ],
+                [
+                    881.6318359375,
+                    3053.951171875
+                ],
+                [
+                    1384.2333984375,
+                    69.55337524414063
+                ]
+            ],
+            "pieceId": "34"
+        },
+        {
+            "coordinates": [
+                [
+                    2784.92333984375,
+                    -30.866621017456055
+                ],
+                [
+                    1880.0810546875,
+                    125.34903717041016
+                ],
+                [
+                    2002.3306884765625,
+                    388.7672119140625
+                ]
+            ],
+            "pieceId": "35"
+        },
+        {
+            "coordinates": [
+                [
+                    160.63497924804688,
+                    4093.67724609375
+                ],
+                [
+                    1886.53369140625,
+                    644.38818359375
+                ],
+                [
+                    554.229736328125,
+                    3002.487060546875
+                ]
+            ],
+            "pieceId": "36"
+        },
+        {
+            "coordinates": [
+                [
+                    765.8290405273438,
+                    3052.352783203125
+                ],
+                [
+                    1754.2838134765625,
+                    525.4859619140625
+                ],
+                [
+                    1459.339111328125,
+                    108.74365997314453
+                ]
+            ],
+            "pieceId": "37"
+        },
+        {
+            "coordinates": [
+                [
+                    -6970.697265625,
+                    2228.790283203125
+                ],
+                [
+                    -2998.126953125,
+                    2497.4365234375
+                ],
+                [
+                    627.7179565429688,
+                    2363.872314453125
+                ]
+            ],
+            "pieceId": "4"
+        },
+        {
+            "coordinates": [
+                [
+                    -7008.30029296875,
+                    2321.113525390625
+                ],
+                [
+                    739.509521484375,
+                    3301.56689453125
+                ],
+                [
+                    315.2313232421875,
+                    2879.3525390625
+                ],
+                [
+                    -3031.841064453125,
+                    2477.203369140625
+                ]
+            ],
+            "pieceId": "5"
+        },
+        {
+            "coordinates": [
+                [
+                    -6999.83935546875,
+                    2344.383056640625
+                ],
+                [
+                    -3775.220703125,
+                    2975.326416015625
+                ],
+                [
+                    759.13232421875,
+                    3258.125244140625
+                ]
+            ],
+            "pieceId": "6"
+        },
+        {
+            "coordinates": [
+                [
+                    -6988.44482421875,
+                    2347.575927734375
+                ],
+                [
+                    -4890.46826171875,
+                    2939.128662109375
+                ],
+                [
+                    -2496.580078125,
+                    3489.101318359375
+                ],
+                [
+                    -3765.239501953125,
+                    2975.341552734375
+                ]
+            ],
+            "pieceId": "7"
+        },
+        {
+            "coordinates": [
+                [
+                    -6982.86767578125,
+                    2339.103515625
+                ],
+                [
+                    -2007.348876953125,
+                    4344.546875
+                ],
+                [
+                    -4881.66796875,
+                    2940.700439453125
+                ]
+            ],
+            "pieceId": "8"
+        },
+        {
+            "coordinates": [
+                [
+                    -2971.807373046875,
+                    -1008.1691284179688
+                ],
+                [
+                    -2145.982666015625,
+                    -1385.2786865234375
+                ],
+                [
+                    -900.3295288085938,
+                    -2491.7353515625
+                ]
+            ],
+            "pieceId": "9"
+        }
+    ],
+    "piecesFinalTransformation": [
+        {
+            "pieceId": "0",
+            "rotationRadians": 1.3085418939590454,
+            "translateVectorX": -2367.279052734375,
+            "translateVectorY": 1117.0196533203125
+        },
+        {
+            "pieceId": "1",
+            "rotationRadians": 0.9867603182792664,
+            "translateVectorX": -3951.621826171875,
+            "translateVectorY": 1414.417236328125
+        },
+        {
+            "pieceId": "10",
+            "rotationRadians": 0.5715035796165466,
+            "translateVectorX": -336.9998779296875,
+            "translateVectorY": -631.4773559570313
+        },
+        {
+            "pieceId": "11",
+            "rotationRadians": 0.569705069065094,
+            "translateVectorX": 168.1136932373047,
+            "translateVectorY": 333.1222229003906
+        },
+        {
+            "pieceId": "12",
+            "rotationRadians": 0.579066276550293,
+            "translateVectorX": -974.7371215820313,
+            "translateVectorY": 526.6742553710938
+        },
+        {
+            "pieceId": "13",
+            "rotationRadians": 0.5585509538650513,
+            "translateVectorX": -1439.34814453125,
+            "translateVectorY": 481.6741638183594
+        },
+        {
+            "pieceId": "14",
+            "rotationRadians": 0.5072117447853088,
+            "translateVectorX": -2409.204345703125,
+            "translateVectorY": 989.1700439453125
+        },
+        {
+            "pieceId": "15",
+            "rotationRadians": 1.0569162368774414,
+            "translateVectorX": -3039.762451171875,
+            "translateVectorY": 1410.55859375
+        },
+        {
+            "pieceId": "16",
+            "rotationRadians": 0.9094825387001038,
+            "translateVectorX": -2583.900390625,
+            "translateVectorY": 1588.376953125
+        },
+        {
+            "pieceId": "17",
+            "rotationRadians": 0.7607741951942444,
+            "translateVectorX": -3301.04052734375,
+            "translateVectorY": 1705.86962890625
+        },
+        {
+            "pieceId": "18",
+            "rotationRadians": 0.7687143683433533,
+            "translateVectorX": -2108.892333984375,
+            "translateVectorY": 1199.268310546875
+        },
+        {
+            "pieceId": "19",
+            "rotationRadians": 0.5734511017799377,
+            "translateVectorX": -1043.424560546875,
+            "translateVectorY": -1927.150634765625
+        },
+        {
+            "pieceId": "2",
+            "rotationRadians": 0.9029754400253296,
+            "translateVectorX": -2608.5947265625,
+            "translateVectorY": 1821.71435546875
+        },
+        {
+            "pieceId": "20",
+            "rotationRadians": 0.5731024146080017,
+            "translateVectorX": 304.4872131347656,
+            "translateVectorY": -1172.3841552734375
+        },
+        {
+            "pieceId": "21",
+            "rotationRadians": 0.569817066192627,
+            "translateVectorX": 723.1368408203125,
+            "translateVectorY": -1528.854248046875
+        },
+        {
+            "pieceId": "22",
+            "rotationRadians": 0.8036117553710938,
+            "translateVectorX": -3131.923583984375,
+            "translateVectorY": 3587.1083984375
+        },
+        {
+            "pieceId": "23",
+            "rotationRadians": 0.8148803114891052,
+            "translateVectorX": -748.0506591796875,
+            "translateVectorY": 1305.1776123046875
+        },
+        {
+            "pieceId": "24",
+            "rotationRadians": 0.7959323525428772,
+            "translateVectorX": -1035.8695068359375,
+            "translateVectorY": 3386.047119140625
+        },
+        {
+            "pieceId": "25",
+            "rotationRadians": 0.8004035353660583,
+            "translateVectorX": -2125.9365234375,
+            "translateVectorY": 3473.895751953125
+        },
+        {
+            "pieceId": "26",
+            "rotationRadians": 0.8359315395355225,
+            "translateVectorX": -790.8286743164063,
+            "translateVectorY": 2617.431396484375
+        },
+        {
+            "pieceId": "27",
+            "rotationRadians": 0.7306472659111023,
+            "translateVectorX": -692.1863403320313,
+            "translateVectorY": 1813.9552001953125
+        },
+        {
+            "pieceId": "28",
+            "rotationRadians": 0.49463656544685364,
+            "translateVectorX": 80.33179473876953,
+            "translateVectorY": 1618.890625
+        },
+        {
+            "pieceId": "29",
+            "rotationRadians": 0.4238070845603943,
+            "translateVectorX": 192.88633728027344,
+            "translateVectorY": 1519.458740234375
+        },
+        {
+            "pieceId": "3",
+            "rotationRadians": 0.8671045899391174,
+            "translateVectorX": -1852.626708984375,
+            "translateVectorY": 2137.431884765625
+        },
+        {
+            "pieceId": "30",
+            "rotationRadians": 0.5443376302719116,
+            "translateVectorX": 828.1001586914063,
+            "translateVectorY": 1244.8463134765625
+        },
+        {
+            "pieceId": "31",
+            "rotationRadians": 0.7993705868721008,
+            "translateVectorX": -1548.385498046875,
+            "translateVectorY": 3923.66015625
+        },
+        {
+            "pieceId": "32",
+            "rotationRadians": 0.579119086265564,
+            "translateVectorX": 2466.171142578125,
+            "translateVectorY": 135.71548461914063
+        },
+        {
+            "pieceId": "33",
+            "rotationRadians": 0.0,
+            "translateVectorX": 0.0,
+            "translateVectorY": 0.0
+        },
+        {
+            "pieceId": "34",
+            "rotationRadians": 0.06202017515897751,
+            "translateVectorX": 849.34228515625,
+            "translateVectorY": 2054.62255859375
+        },
+        {
+            "pieceId": "35",
+            "rotationRadians": -4.1995110511779785,
+            "translateVectorX": 2222.4462890625,
+            "translateVectorY": 161.0832061767578
+        },
+        {
+            "pieceId": "36",
+            "rotationRadians": 0.2677340805530548,
+            "translateVectorX": 867.1321411132813,
+            "translateVectorY": 2580.184814453125
+        },
+        {
+            "pieceId": "37",
+            "rotationRadians": 0.12591201066970825,
+            "translateVectorX": 1326.484619140625,
+            "translateVectorY": 1228.86083984375
+        },
+        {
+            "pieceId": "4",
+            "rotationRadians": 0.8526905179023743,
+            "translateVectorX": -3113.70263671875,
+            "translateVectorY": 2363.364990234375
+        },
+        {
+            "pieceId": "5",
+            "rotationRadians": 0.8227529525756836,
+            "translateVectorX": -2328.756103515625,
+            "translateVectorY": 2758.76611328125
+        },
+        {
+            "pieceId": "6",
+            "rotationRadians": 0.8141472339630127,
+            "translateVectorX": -3338.641845703125,
+            "translateVectorY": 2859.279541015625
+        },
+        {
+            "pieceId": "7",
+            "rotationRadians": 0.8118889331817627,
+            "translateVectorX": -4504.44970703125,
+            "translateVectorY": 2934.516845703125
+        },
+        {
+            "pieceId": "8",
+            "rotationRadians": 0.8100077509880066,
+            "translateVectorX": -4623.96044921875,
+            "translateVectorY": 3208.118408203125
+        },
+        {
+            "pieceId": "9",
+            "rotationRadians": 0.5670587420463562,
+            "translateVectorX": -2006.04052734375,
+            "translateVectorY": -1628.39501953125
+        }
+    ]
+        }
+
+        db = "30-50"
+        puzzle_num = "numPieces_38_rand_56665269_gloria"
+        puzzle_noise_level = 1
+        recipe = loadRegularPuzzle(db,puzzle_num,puzzle_noise_level,is_load_extrapolation_data=False)
+        bag_of_pieces = recipe.cook()
+
+        [piece.load_image() for piece in bag_of_pieces]
+
+        ax = plt.subplot()
+
+        img,positions = restore_assembly_img.restore_final_assembly_image(response,bag_of_pieces,
+                                                                                  background_size=(4800,4800))
+        ax.imshow(img)
+
+        # xs = [pos[0] for pos in positions]
+        # ys = [pos[1] for pos in positions]
+        # ax.scatter(xs,ys,marker="x",color="red")
+
+        plt.show()
+
 if __name__ == "__main__":
     unittest.main()
