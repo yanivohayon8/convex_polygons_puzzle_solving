@@ -2,6 +2,7 @@ import numpy as np
 from functools import reduce
 from shapely import affinity,MultiPolygon,Polygon
 from src import shared_variables
+from src.physics.restore_assembly_img import center_of_mass
 
 def least_square_rigid_motion_svd(points:np.array,ground_truth:np.array,points_weights:np.array):
     '''
@@ -168,10 +169,25 @@ class Qpos():
         # if len(excluded_pieces) != 0:
         #     bag_of_pieces = shared_variables.puzzle.bag_of_pieces
         #     self.ground_truth_polygons = [polygon for piece,polygon in zip(bag_of_pieces,self.ground_truth_polygons) if piece.id not in excluded_pieces]
-            
+
+
+        # because the bag of pieces is sorted by the ids 
+        self.solution_polygons = [p for _,p in sorted(zip(self.solution_ids,self.solution_polygons))]
+        self.solution_ids = sorted(self.solution_ids)
+
+        self.anchored_piece_index = None
+        self.anchored_piece_id = None
+        
+        for i,piece_json in enumerate(self.simulation_response["piecesFinalTransformation"]):
+            if piece_json["translateVectorX"] == 0 and piece_json["translateVectorY"] == 0 and piece_json["rotationRadians"] ==0:
+                self.anchored_piece_index = i
+                self.anchored_piece_id = piece_json["pieceId"]
+                break
+
         
 
-    def evaluate(self,pivot_piece_index=0):
+
+    def evaluate_based_pivot(self,pivot_piece_index=3):
         '''
             solution_polygons - list of polygons
         '''
@@ -188,8 +204,41 @@ class Qpos():
         weights = np.ones(solution_coords.shape[0])
         R,t = least_square_rigid_motion_svd(solution_coords,ground_truth_truth_coords,weights)
 
+        
+
+
+        # # self.translated_solution_polygons = [affinity.rotate(polygon,-trans["rotationRadians"],use_radians=True,origin=center_of_mass(polygon)) for trans, polygon in zip(self.simulation_response["piecesFinalTransformation"] ,self.solution_polygons)] 
+        # self.translated_solution_polygons = []
+        # anchored_piece_mass_x = None
+        # anchored_piece_mass_y = None
+
+        # # TODO: ....
+        # # anchored_piece_mass_x,anchored_piece_mass_y = center_of_mass(self.solution_polygons[self.anchored_piece_index])
+        # # anchored_piece_mass_x*=1/3
+        # # anchored_piece_mass_y*=1/3
+
+        # for trans, polygon in zip(self.simulation_response["piecesFinalTransformation"] ,self.solution_polygons):
+        #     # trans_poly = affinity.rotate(polygon,-trans["rotationRadians"],use_radians=True,origin="centroid")
+        #     trans_poly = affinity.rotate(polygon,-trans["rotationRadians"],use_radians=True,origin=center_of_mass(polygon))
+        #     # tx = trans["translateVectorX"]
+        #     # tx*=1/3
+        #     # ty = trans["translateVectorY"]
+        #     # ty*=1/3
+
+        #     # # if trans["pieceId"] != self.anchored_piece_id:
+        #     # #     tx -= anchored_piece_mass_x
+        #     # #     ty -= anchored_piece_mass_y
+
+        #     # trans_poly = affinity.translate(trans_poly,tx,ty)
+        #     self.translated_solution_polygons.append(trans_poly)
+
+         
+
         angle = np.arccos(R[0,0])
-        self.translated_solution_polygons = [affinity.rotate(polygon,-angle,use_radians=True) for polygon in self.solution_polygons]
+        pivot_center = center_of_mass(self.solution_polygons[pivot_piece_index])
+        self.translated_solution_polygons = [affinity.rotate(polygon,-angle,use_radians=True,origin=pivot_center) for polygon in self.solution_polygons]
+        # self.translated_solution_polygons = [polygon for polygon in self.solution_polygons]
+
         tx = ground_truth_pivot_polygon.centroid.x-self.translated_solution_polygons[pivot_piece_index].centroid.x
         ty = ground_truth_pivot_polygon.centroid.y-self.translated_solution_polygons[pivot_piece_index].centroid.y
         self.translated_solution_polygons = [affinity.translate(polygon,tx,ty) for polygon in self.translated_solution_polygons]
@@ -207,3 +256,25 @@ class Qpos():
         
         return score_sum # score_num/len()
 
+
+
+    def evaluate(self):
+        # sometimes changing the pivot bring the desired resutls 
+        best_score = -9999999999
+        best_translated_solution_polygons = None
+
+        for i in range(len(self.solution_ids)):
+
+            try:
+                score = self.evaluate_based_pivot(pivot_piece_index=i)
+            except Exception as e:
+                score = 0
+                self.translated_solution_polygons = None
+
+            if best_score < score:
+                best_score = score
+                best_translated_solution_polygons = self.translated_solution_polygons
+
+        self.translated_solution_polygons = best_translated_solution_polygons
+
+        return best_score

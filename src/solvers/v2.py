@@ -62,7 +62,8 @@ def run(db,puzzle_num,puzzle_noise_level,pairwise_recipe_name,is_debug_solver=Fa
 
     print("\tSettle up")
     final_matings = zero_loops_recipe.graph_wrapper.get_final_matings()
-    response = assembler.simulate(final_matings,screenshot_name=f"final_nailed")
+    # response = assembler.simulate(final_matings,screenshot_name=f"vika")
+    response = assembler.simulate(final_matings,screenshot_name=f"vika",is_debug_visibility=True)
     # physical_score = assembler.score(response)
     final_solution_polygons,excluded_pieces = assembler.get_final_coordinates_as_polygons(response)
     

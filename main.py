@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--db", default="1")
 parser.add_argument("--puzzle_num", default="")
 parser.add_argument("--puzzle_noise_level", default="0")
-parser.add_argument("--pairwise_recipe_name", default="SD1Pairwise")
+parser.add_argument("--pairwise_recipe_name", default="SD1Pairwise")#SyntheticPairwise
 parser.add_argument('--debug', action='store_true')
 parser.add_argument('--no-debug', dest='debug', action='store_false')
 parser.set_defaults(debug=False)
@@ -53,16 +53,16 @@ if __name__ == "__main__":
 
 
         # if True:
-        # # if args.debug:
-        #     print("restore final assembly image")
-        #     _, axs = plt.subplots()
-        #     # plot_final_polygons(evaluator.translated_solution_polygons,axs)
-        #     # plot_final_polygons(ground_truth_polygons,axs)
-        #     [piece.load_image() for piece in puzzle.bag_of_pieces]
-        #     final_img,_ = restore_assembly_img.restore_final_assembly_image(solution.simulation_response,puzzle.bag_of_pieces,
-        #                                                                     background_size=(7000,7000))
-        #     axs.imshow(final_img)
-        #     plt.show()
+        if args.debug:
+            print("restore final assembly image")
+            _, axs = plt.subplots()
+            plot_final_polygons(evaluator.translated_solution_polygons,axs)
+            plot_final_polygons(ground_truth_polygons,axs)
+            # [piece.load_image() for piece in puzzle.bag_of_pieces]
+            # final_img,_ = restore_assembly_img.restore_final_assembly_image(solution.simulation_response,puzzle.bag_of_pieces,
+            #                                                                 background_size=(7000,7000))
+            # axs.imshow(final_img)
+            plt.show()
 
         return precision, recall,overlapping_score
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     
     print(f"Succeed to run on ({counted_puzzles}/{len(puzzles_paths)})puzzles")
     expected_num_puzzles = 20
-    print(f"Calculate the mean of the first {expected_num_puzzles} puzzles as guaranteed")
+    # print(f"Calculate the mean of the first {expected_num_puzzles} puzzles as guaranteed")
 
     if counted_puzzles<= expected_num_puzzles:
         print(f"Precision Mean: {sum(precisions)/(counted_puzzles+1e-5)}")
